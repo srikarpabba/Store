@@ -1,0 +1,23 @@
+﻿using Domain.Products;
+using Domain.Users;
+using Microsoft.EntityFrameworkCore;
+
+namespace Application.Abstractions.Data;
+
+public interface IApplicationDbContext
+{
+    DbSet<RefreshToken> RefreshTokens { get; }
+    DbSet<Address> Addresses { get; }
+    DbSet<Product> Products { get; }
+    DbSet<Category> Categories { get; }
+    DbSet<Brand> Brands { get; }
+    DbSet<Color> Colors { get; }
+    DbSet<Size> Sizes { get; }
+    DbSet<Gender> Genders { get; }
+    DbSet<ProductPhoto> ProductPhotos { get; }
+    DbSet<ProductColor> ProductColors { get; }
+    DbSet<ProductGender> ProductGenders { get; }
+    DbSet<ProductVariant> ProductVariants { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+}

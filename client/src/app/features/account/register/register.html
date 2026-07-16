@@ -1,0 +1,90 @@
+<h1 class="auth-form__title">Create Account</h1>
+<p class="auth-form__subtitle">Join us and start your shopping journey</p>
+
+<div #googleButton class="auth-form__google"></div>
+
+<div class="auth-form__divider"><span>Or register with email</span></div>
+
+<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="auth-form__row">
+        <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" autocomplete="given-name" />
+            @if (form.controls.firstName.hasError('required')) {
+            <mat-error>First name is required</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" autocomplete="family-name" />
+            @if (form.controls.lastName.hasError('required')) {
+            <mat-error>Last name is required</mat-error>
+            }
+        </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <mat-icon matPrefix>mail_outline</mat-icon>
+        <input matInput type="email" formControlName="email" autocomplete="email" />
+        @if (form.controls.email.hasError('required')) {
+        <mat-error>Email is required</mat-error>
+        } @else if (form.controls.email.hasError('email')) {
+        <mat-error>Enter a valid email address</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+        [hintLabel]="'Min 8 chars with uppercase, lowercase, number & special character'">
+        <mat-label>Password</mat-label>
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
+            autocomplete="new-password" />
+        <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (form.controls.password.hasError('required')) {
+        <mat-error>Password is required</mat-error>
+        } @else if (form.controls.password.hasError('minlength')) {
+        <mat-error>Password must be at least 8 characters</mat-error>
+        } @else if (form.controls.password.hasError('passwordStrength')) {
+        <mat-error>Include uppercase, lowercase, number &amp; special character</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Confirm Password</mat-label>
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="confirmPassword"
+            autocomplete="new-password" />
+        @if (form.controls.confirmPassword.hasError('required')) {
+        <mat-error>Please confirm your password</mat-error>
+        }
+    </mat-form-field>
+
+    @if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+    <p class="auth-form__error" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>Passwords do not match</span>
+    </p>
+    }
+
+    <mat-checkbox class="auth-form__terms" formControlName="acceptTerms">
+        I agree to the <a href="#" (click)="$event.preventDefault()">Terms &amp; Conditions</a>
+        and <a href="#" (click)="$event.preventDefault()">Privacy Policy</a>
+    </mat-checkbox>
+
+    <button mat-flat-button class="auth-form__submit" type="submit"
+        [disabled]="form.invalid || loading.isLoading()">
+        @if (loading.isLoading()) {
+        <span class="auth-form__submit-loading">
+            <mat-spinner diameter="18" />
+            Creating account…
+        </span>
+        } @else {
+        Create account
+        }
+    </button>
+</form>

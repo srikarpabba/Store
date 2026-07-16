@@ -1,0 +1,56 @@
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.not-found__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    border: 6px solid #b6bcc6;
+    border-radius: 50%;
+    color: #b6bcc6;
+    margin-bottom: 1.5rem;
+}
+
+.not-found__icon mat-icon {
+    font-size: 44px;
+    width: 44px;
+    height: 44px;
+}
+
+.not-found__code {
+    margin: 0;
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #1c2431;
+}
+
+.not-found__title {
+    margin: 0.75rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1c2431;
+}
+
+.not-found__subtitle {
+    margin: 0.75rem 0 2rem;
+    color: rgb(0 0 0 / 0.55);
+    font-size: 0.95rem;
+}
+
+.not-found__home {
+    height: 2.75rem;
+    padding: 0 1.5rem;
+    font-weight: 600;
+    --mdc-filled-button-container-shape: 6px;
+    border-radius: 6px;
+}

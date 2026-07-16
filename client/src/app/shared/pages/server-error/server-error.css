@@ -1,0 +1,56 @@
+.server-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.server-error__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    border: 6px solid #b6bcc6;
+    border-radius: 50%;
+    color: #b6bcc6;
+    margin-bottom: 1.5rem;
+}
+
+.server-error__icon mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+.server-error__title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1c2431;
+}
+
+.server-error__subtitle {
+    max-width: 26rem;
+    margin: 0.75rem 0 2rem;
+    color: rgb(0 0 0 / 0.55);
+    font-size: 0.95rem;
+}
+
+.server-error__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.server-error__actions .mdc-button,
+.server-error__retry {
+    height: 2.75rem;
+    padding: 0 1.5rem;
+    font-weight: 600;
+    --mdc-filled-button-container-shape: 6px;
+    --mdc-outlined-button-container-shape: 6px;
+    border-radius: 6px;
+}

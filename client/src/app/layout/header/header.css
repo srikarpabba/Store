@@ -1,0 +1,429 @@
+/*
+ * The header is position: fixed, so :host stays in the flow as a spacer
+ * matching the header's height per breakpoint:
+ *   < 640px:  64px main row + 52px search row
+ *   < 768px:  32px utility bar + 64px main row + 52px search row
+ *   >= 768px: 32px utility bar + 64px main row (search moves inline)
+ */
+:host {
+    display: block;
+    height: calc(64px + 52px);
+}
+
+@media (min-width: 640px) {
+    :host {
+        height: calc(32px + 64px + 52px);
+    }
+}
+
+@media (min-width: 768px) {
+    :host {
+        height: calc(32px + 64px);
+    }
+}
+
+/* ---------- Header shell ---------- */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #f0f0f0;
+    transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.site-header.is-scrolled {
+    border-bottom-color: transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Utility bar ---------- */
+.utility-bar {
+    display: none;
+    background: #000;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+}
+
+.utility-bar__inner {
+    margin: 0 auto;
+    max-width: 1280px;
+    height: 32px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.utility-bar__links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.utility-bar__links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.utility-bar__links a:hover {
+    text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+    .utility-bar {
+        display: block;
+    }
+}
+
+/* ---------- Main row ---------- */
+.main-row {
+    margin: 0 auto;
+    max-width: 1280px;
+    min-height: 64px;
+    padding: 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 16px;
+}
+
+@media (min-width: 1024px) {
+    .main-row {
+        padding: 0 32px;
+    }
+}
+
+/* ---------- Search placement ---------- */
+/* Mobile: full-width row under the main row */
+.header-search {
+    order: 10;
+    flex: 1 1 100%;
+    height: 40px;
+    margin-bottom: 12px;
+}
+
+/* Desktop: inline between nav and actions */
+@media (min-width: 768px) {
+    .header-search {
+        order: 0;
+        flex: 1 1 auto;
+        max-width: 380px;
+        margin-bottom: 0;
+    }
+}
+
+.menu-trigger {
+    display: inline-flex;
+}
+
+@media (min-width: 1024px) {
+    .menu-trigger {
+        display: none;
+    }
+}
+
+/* ---------- Logo ---------- */
+.logo {
+    flex-shrink: 0;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #000;
+    text-decoration: none;
+}
+
+.logo__dot {
+    color: #e11d24;
+}
+
+/* ---------- Desktop nav ---------- */
+.nav {
+    display: none;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+}
+
+@media (min-width: 1024px) {
+    .nav {
+        display: flex;
+    }
+}
+
+.nav__link {
+    position: relative;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #333;
+    text-decoration: none;
+    transition: color 150ms ease;
+}
+
+.nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2px;
+    background: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 150ms ease;
+}
+
+.nav__link:hover::after,
+.nav__link.is-active::after {
+    transform: scaleX(1);
+}
+
+.nav__link.is-active {
+    color: #000;
+}
+
+.nav__link--highlight {
+    color: #e11d24;
+}
+
+.nav__link--highlight::after {
+    background: #e11d24;
+}
+
+/* ---------- Action icons ---------- */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+@media (min-width: 640px) {
+    .actions {
+        gap: 8px;
+    }
+}
+
+.actions__desktop-only {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .actions__desktop-only {
+        display: inline-flex;
+    }
+}
+
+/* ---------- Mobile nav drawer ---------- */
+.mobile-nav {
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+}
+
+@media (min-width: 1024px) {
+    .mobile-nav {
+        display: none;
+    }
+}
+
+.mobile-nav__list {
+    list-style: none;
+    margin: 0;
+    padding: 0 16px;
+}
+
+.mobile-nav__item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-nav__item:last-child {
+    border-bottom: none;
+}
+
+.mobile-nav__link {
+    display: block;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #333;
+    text-decoration: none;
+}
+
+.mobile-nav__link--highlight {
+    color: #e11d24;
+}
+
+.mobile-nav__link--account {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.mobile-nav__icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+/* ---------- Account dropdown (plain CSS, no animations module) ---------- */
+.account-menu {
+    position: relative;
+}
+
+.account-menu__trigger {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 2px 8px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: #222;
+    cursor: pointer;
+}
+
+.account-menu__trigger:hover {
+    background: #f5f5f5;
+}
+
+.account-menu__caret {
+    font-size: 20px;
+    width: 16px;
+    height: 20px;
+    margin-left: -2px;
+    color: #666;
+    transition: transform 150ms ease;
+}
+
+.account-menu__caret--open {
+    transform: rotate(180deg);
+}
+
+.account-menu__panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: -56px;
+    min-width: 280px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 4px;
+    z-index: 60;
+}
+
+/* More room on larger screens: shift the panel toward the right of the icon,
+   stopping just short of the viewport edge (wishlist + cart + row padding) */
+@media (min-width: 640px) {
+    .account-menu__panel {
+        right: -108px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .account-menu__panel {
+        right: -124px;
+    }
+}
+
+.account-menu__welcome {
+    padding: 16px 16px 18px;
+}
+
+.account-menu__welcome-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+}
+
+.account-menu__welcome-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #777;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-menu__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 14px;
+    height: 44px;
+    border: none;
+    border-radius: 6px;
+    background: var(--brand);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.account-menu__cta:hover {
+    background: var(--brand-dark);
+}
+
+.account-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #222;
+    text-align: left;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.account-menu__item:hover {
+    background: #f5f5f5;
+}
+
+a.account-menu__item {
+    text-decoration: none;
+}
+
+.account-menu__item mat-icon {
+    color: #666;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.account-menu__divider {
+    height: 1px;
+    margin: 4px 8px;
+    background: #eee;
+}
+
+/* ---------- Angular Material overrides ---------- */
+::ng-deep .mat-mdc-icon-button {
+    --mdc-icon-button-state-layer-size: 40px;
+}
+
+::ng-deep .mat-badge-content {
+    font-size: 10px;
+    font-weight: 600;
+    right: -4px;
+    top: -2px;
+}

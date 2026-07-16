@@ -1,0 +1,36 @@
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-card__body">
+            @switch (state()) {
+            @case ('confirming') {
+            <div class="auth-form__sent">
+                <mat-spinner diameter="48"></mat-spinner>
+                <h1 class="auth-form__title">Confirming your email…</h1>
+                <p class="auth-form__subtitle">Hang tight, this only takes a moment.</p>
+            </div>
+            }
+            @case ('confirmed') {
+            <div class="auth-form__sent">
+                <mat-icon class="auth-form__sent-icon">verified</mat-icon>
+                <h1 class="auth-form__title">Email confirmed</h1>
+                <p class="auth-form__subtitle">
+                    Your email address has been verified. You're all set to shop.
+                </p>
+                <a mat-flat-button class="auth-form__submit" routerLink="/account/login">Continue to login</a>
+            </div>
+            }
+            @case ('invalid') {
+            <div class="auth-form__sent">
+                <mat-icon class="auth-form__sent-icon auth-form__sent-icon--error">link_off</mat-icon>
+                <h1 class="auth-form__title">Confirmation failed</h1>
+                <p class="auth-form__subtitle">
+                    This confirmation link is invalid or has expired. Try logging in —
+                    if your email still needs confirming, we can send a fresh link.
+                </p>
+                <a class="auth-form__forgot" routerLink="/account/login">Back to login</a>
+            </div>
+            }
+            }
+        </div>
+    </div>
+</div>

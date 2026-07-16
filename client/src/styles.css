@@ -1,0 +1,106 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+/* ---------- Theme: single source of truth for brand colors ---------- */
+:root {
+    --color-primary: #e11d24;
+    --color-primary-dark: #b8151b;
+    --color-primary-soft: #fdeced;
+
+    --color-text: #1c2431;
+    --color-text-muted: #6b7280;
+    --color-border: #e5e7eb;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f4f5f7;
+
+    --color-success: #1e7e34;
+
+    /* Back-compat aliases used across components */
+    --brand: var(--color-primary);
+    --brand-dark: var(--color-primary-dark);
+    --brand-soft: var(--color-primary-soft);
+
+    /* Recolor Angular Material's primary to the brand */
+    --mat-sys-primary: var(--color-primary);
+    --mat-sys-on-primary: #ffffff;
+}
+
+/* ---------- Typography: semantic, consistent scale ---------- */
+body {
+    font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--color-text);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    font-size: 1.75rem;
+}
+
+h2 {
+    font-size: 1.375rem;
+}
+
+h3 {
+    font-size: 1.125rem;
+}
+
+h4,
+h5,
+h6 {
+    font-size: 1rem;
+}
+
+p {
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+}
+
+small {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* ---------- Snackbar variants (overlay panels render outside components).
+   This Material version reads --mat-snack-bar-* tokens; the variant class
+   is combined with the container class to out-rank the theme's own rule. */
+.mat-mdc-snack-bar-container.snackbar--success,
+.snackbar--success .mat-mdc-snack-bar-container {
+    --mat-snack-bar-container-color: var(--color-success);
+    --mat-snack-bar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+}
+
+.mat-mdc-snack-bar-container.snackbar--error,
+.snackbar--error .mat-mdc-snack-bar-container {
+    --mat-snack-bar-container-color: var(--color-primary-dark);
+    --mat-snack-bar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+}
+
+/* Also color the surface directly as a safety net */
+.snackbar--success .mdc-snackbar__surface {
+    background-color: var(--color-success) !important;
+    color: #ffffff;
+}
+
+.snackbar--error .mdc-snackbar__surface {
+    background-color: var(--color-primary-dark) !important;
+    color: #ffffff;
+}

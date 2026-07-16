@@ -1,0 +1,46 @@
+<div class="search">
+    <mat-icon class="search__icon">search</mat-icon>
+
+    <input class="search__input" type="text" [formControl]="query" placeholder="Search for products"
+        autocomplete="off" spellcheck="false" (focus)="onFocus()" (keydown.enter)="viewAllResults()"
+        (keydown.escape)="close()" />
+
+    @if (query.value) {
+    <button class="search__clear" type="button" aria-label="Clear search" (click)="clear()">
+        <mat-icon>close</mat-icon>
+    </button>
+    }
+
+    @if (isOpen()) {
+    <div class="search__panel">
+        @if (isLoading()) {
+        <div class="search__status">Searching…</div>
+        } @else if (results().length === 0) {
+        <div class="search__status">No products found for “{{ query.value.trim() }}”</div>
+        } @else {
+        <ul class="search__results">
+            @for (product of results(); track product.id) {
+            <li>
+                <button class="search__result" type="button" (click)="goToProduct(product)">
+                    @if (product.image) {
+                    <img class="search__result-image" [src]="product.image" alt="" loading="lazy" />
+                    } @else {
+                    <span class="search__result-image search__result-image--empty">
+                        <mat-icon>image_not_supported</mat-icon>
+                    </span>
+                    }
+                    <span class="search__result-info">
+                        <span class="search__result-name">{{ product.name }}</span>
+                        <span class="search__result-price">{{ product.startingPrice | currency }}</span>
+                    </span>
+                </button>
+            </li>
+            }
+        </ul>
+        <button class="search__view-all" type="button" (click)="viewAllResults()">
+            View all results for “{{ query.value.trim() }}”
+        </button>
+        }
+    </div>
+    }
+</div>

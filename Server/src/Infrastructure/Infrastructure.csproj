@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+		<PackageReference Include="AspNetCore.HealthChecks.Redis" />
+		<PackageReference Include="AWSSDK.S3" />
+		<PackageReference Include="EFCore.NamingConventions" />
+		<PackageReference Include="Google.Apis.Auth" />
+		<PackageReference Include="Hangfire.AspNetCore" />
+		<PackageReference Include="Hangfire.Core" />
+		<PackageReference Include="Hangfire.PostgreSql" />
+		<PackageReference Include="MailKit" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />		
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+		<PackageReference Include="ZiggyCreatures.FusionCache.Backplane.StackExchangeRedis" />
+		<PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Email\EmailTemplates\*.html" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,84 @@
+services:
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    container_name: api
+    build:
+      context: .
+      dockerfile: src/API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=store;Username=store;Password=Store@#123$;Include Error Detail=true
+      ConnectionStrings__Redis: redis:6379 
+      Minio__Endpoint: http://minio:9000
+      Minio__AccessKey: minioadmin
+      Minio__SecretKey: minioadmin123
+      Minio__BucketName: files
+      Minio__UseSsl: false      
+    ports:
+      - 5000:8080
+      - 5001:8081
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - seq
+    networks:
+      - store-network
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=store
+      - POSTGRES_USER=store
+      - POSTGRES_PASSWORD=Store@#123$
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - store-network
+  
+  redis:
+    image: redis:8-alpine
+    container_name: redis    
+    ports:
+      - "6379:6379"      
+    volumes:
+      - redis-data:/data      
+    networks:
+      - store-network      
+  
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123      
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - store-network
+
+  seq:
+    image: datalust/seq:2024.3
+    container_name: seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 8081:80
+    networks:
+      - store-network
+ 
+networks:
+  store-network:    
+    driver: bridge
+    
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:

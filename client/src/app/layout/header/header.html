@@ -1,0 +1,152 @@
+<header class="site-header" [class.is-scrolled]="isScrolled()">
+    <!-- Slim utility bar -->
+    <div class="utility-bar">
+        <div class="utility-bar__inner">
+            <span>Free shipping on orders over $99</span>
+            <div class="utility-bar__links">
+                <a href="#">Store Locator</a>
+                <a href="#">Help</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main row -->
+    <div class="main-row">
+        <!-- Mobile menu trigger -->
+        <button mat-icon-button class="menu-trigger" aria-label="Open menu" (click)="toggleMobileMenu()">
+            <mat-icon>{{ isMobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+        </button>
+
+        <!-- Logo -->
+        <a routerLink="/" class="logo">
+            STORE<span class="logo__dot">.</span>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="nav">
+            @for (item of navItems; track item.path) {
+            <a [routerLink]="item.path" routerLinkActive="is-active" class="nav__link"
+                [class.nav__link--highlight]="item.highlight">
+                {{ item.label }}
+            </a>
+            }
+        </nav>
+
+        <!-- Search -->
+        <app-search class="header-search" />
+
+        <!-- Action icons -->
+        <div class="actions">
+            <div class="account-menu">
+                <button class="account-menu__trigger actions__desktop-only" type="button" aria-label="Account"
+                    [attr.aria-expanded]="isAccountMenuOpen()" (click)="toggleAccountMenu(); $event.stopPropagation()">
+                    <mat-icon>person_outline</mat-icon>
+                    <mat-icon class="account-menu__caret"
+                        [class.account-menu__caret--open]="isAccountMenuOpen()">arrow_drop_down</mat-icon>
+                </button>
+
+                @if (isAccountMenuOpen()) {
+                <div class="account-menu__panel">
+                    <div class="account-menu__welcome">
+                        @if (auth.isAuthenticated()) {
+                        <p class="account-menu__welcome-title">Welcome back!</p>
+                        <p class="account-menu__welcome-subtitle">{{ auth.currentUser()?.email }}</p>
+                        <button class="account-menu__cta" type="button" (click)="signOut()">
+                            Logout
+                        </button>
+                        } @else {
+                        <p class="account-menu__welcome-title">Welcome!</p>
+                        <p class="account-menu__welcome-subtitle">Login to access your account</p>
+                        <a class="account-menu__cta" routerLink="/account/login" (click)="closeAccountMenu()">
+                            Login / Register
+                        </a>
+                        }
+                    </div>
+
+                    <div class="account-menu__divider"></div>
+
+                    @if (auth.isAdmin()) {
+                    <a class="account-menu__item" routerLink="/admin" (click)="closeAccountMenu()">
+                        <mat-icon>admin_panel_settings</mat-icon>
+                        <span>Admin Dashboard</span>
+                    </a>
+                    }
+                    @if (auth.isCustomer()) {
+                    <a class="account-menu__item" routerLink="/account/dashboard" (click)="closeAccountMenu()">
+                        <mat-icon>space_dashboard</mat-icon>
+                        <span>Dashboard</span>
+                    </a>
+                    }
+
+                    <button class="account-menu__item" type="button" (click)="closeAccountMenu()">
+                        <mat-icon>receipt_long</mat-icon>
+                        <span>Track Orders</span>
+                    </button>
+                    <button class="account-menu__item" type="button" (click)="closeAccountMenu()">
+                        <mat-icon>favorite_border</mat-icon>
+                        <span>Wishlist</span>
+                    </button>
+                    <button class="account-menu__item" type="button" (click)="closeAccountMenu()">
+                        <mat-icon>support_agent</mat-icon>
+                        <span>Contact Us</span>
+                    </button>
+                </div>
+                }
+            </div>
+
+            <button mat-icon-button class="actions__desktop-only" aria-label="Wishlist"
+                [matBadge]="wishlistCount() || null" matBadgeColor="warn" matBadgeSize="small">
+                <mat-icon>favorite_border</mat-icon>
+            </button>
+
+            <button mat-icon-button aria-label="Cart" [matBadge]="cartCount() || null" matBadgeColor="accent"
+                matBadgeSize="small">
+                <mat-icon>shopping_bag</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile nav drawer -->
+    @if (isMobileMenuOpen()) {
+    <nav class="mobile-nav">
+        <ul class="mobile-nav__list">
+            @for (item of navItems; track item.path) {
+            <li class="mobile-nav__item">
+                <a [routerLink]="item.path" (click)="closeMobileMenu()" class="mobile-nav__link"
+                    [class.mobile-nav__link--highlight]="item.highlight">
+                    {{ item.label }}
+                </a>
+            </li>
+            }
+            <li class="mobile-nav__item">
+                @if (auth.isAuthenticated()) {
+                @if (auth.isAdmin()) {
+                <a routerLink="/admin" (click)="closeMobileMenu()"
+                    class="mobile-nav__link mobile-nav__link--account">
+                    <mat-icon class="mobile-nav__icon">admin_panel_settings</mat-icon>
+                    Admin Dashboard
+                </a>
+                }
+                @if (auth.isCustomer()) {
+                <a routerLink="/account/dashboard" (click)="closeMobileMenu()"
+                    class="mobile-nav__link mobile-nav__link--account">
+                    <mat-icon class="mobile-nav__icon">space_dashboard</mat-icon>
+                    My Account
+                </a>
+                }
+                <a (click)="signOut(); closeMobileMenu()" class="mobile-nav__link mobile-nav__link--account">
+                    <mat-icon class="mobile-nav__icon">logout</mat-icon>
+                    Logout
+                </a>
+                } @else {
+                <a routerLink="/account/login" (click)="closeMobileMenu()"
+                    class="mobile-nav__link mobile-nav__link--account">
+                    <mat-icon class="mobile-nav__icon">person_outline</mat-icon>
+                    Sign in
+                </a>
+                }
+            </li>
+        </ul>
+    </nav>
+    }
+</header>

@@ -1,0 +1,22 @@
+<div class="server-error">
+    <div class="server-error__icon">
+        <mat-icon>cloud_off</mat-icon>
+    </div>
+
+    <h1 class="server-error__title">Connection Problem</h1>
+    <p class="server-error__subtitle">
+        We can't reach the server right now. You may be offline,
+        or the server may be down — please try again in a moment.
+    </p>
+
+    <div class="server-error__actions">
+        <button mat-flat-button class="server-error__retry" type="button" (click)="tryAgain()">
+            <mat-icon>refresh</mat-icon>
+            Try Again
+        </button>
+        <a mat-stroked-button routerLink="/">
+            <mat-icon>home</mat-icon>
+            Go Home
+        </a>
+    </div>
+</div>

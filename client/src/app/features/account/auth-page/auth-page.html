@@ -1,0 +1,16 @@
+<div class="auth-page">
+    <div class="auth-card">
+        <nav class="auth-tabs">
+            <a class="auth-tabs__tab" routerLink="/account/login" routerLinkActive="auth-tabs__tab--active">
+                Login
+            </a>
+            <a class="auth-tabs__tab" routerLink="/account/register" routerLinkActive="auth-tabs__tab--active">
+                Register
+            </a>
+        </nav>
+
+        <div class="auth-card__body">
+            <router-outlet />
+        </div>
+    </div>
+</div>

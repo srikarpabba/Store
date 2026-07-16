@@ -1,0 +1,17 @@
+<div class="admin">
+    <header class="admin__header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage your store. These sections are placeholders — features are on the way.</p>
+    </header>
+
+    <div class="admin__grid">
+        @for (section of sections; track section.title) {
+        <div class="admin__card">
+            <mat-icon class="admin__card-icon">{{ section.icon }}</mat-icon>
+            <h2 class="admin__card-title">{{ section.title }}</h2>
+            <p class="admin__card-description">{{ section.description }}</p>
+            <span class="admin__card-badge">Coming soon</span>
+        </div>
+        }
+    </div>
+</div>

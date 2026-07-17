@@ -5,7 +5,10 @@ internal static class SwaggerApplicationExtensions
     internal static IApplicationBuilder UseSwaggerDocumentation(this WebApplication app)
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+
+        // Keeps the bearer token you paste into "Authorize" across page
+        // reloads, instead of forgetting it every time
+        app.UseSwaggerUI(o => o.EnablePersistAuthorization());
 
         return app;
     }

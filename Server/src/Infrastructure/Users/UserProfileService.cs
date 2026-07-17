@@ -35,7 +35,8 @@ public class UserProfileService(
             user.LastName,
             user.Email ?? string.Empty,
             user.PhoneNumber,
-            user.EmailConfirmed);
+            user.EmailConfirmed,
+            await userManager.HasPasswordAsync(user));
     }
 
     public async Task<Result> UpdateProfileAsync(UpdateMyProfileCommand command, CancellationToken cancellationToken)

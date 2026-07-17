@@ -1,0 +1,494 @@
+.pd {
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+    background: var(--color-surface);
+    /* neutral sans; headings stay regular weight */
+    font-family: 'Helvetica Neue', Helvetica, Arial, var(--font-sans);
+}
+
+.pd__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (min-width: 900px) {
+    .pd__layout {
+        grid-template-columns: minmax(0, 1fr) 26rem;
+    }
+}
+
+/* ---------- Gallery ---------- */
+.pd__photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+}
+
+.pd__photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    background: var(--color-surface-alt);
+}
+
+.pd__no-photos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    aspect-ratio: 3 / 2;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.5rem;
+    color: var(--color-text-subtle);
+}
+
+.pd__no-photos mat-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+/* ---------- Sticky buy box ---------- */
+.pd__panel {
+    /* stays pinned while the gallery + description scroll past;
+       32px utility bar + 64px header + breathing room */
+    position: sticky;
+    top: 7.5rem;
+}
+
+@media (max-width: 899px) {
+    .pd__panel {
+        position: static;
+        order: -1;
+    }
+}
+
+.pd__name {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.3;
+    color: var(--color-text-strong);
+}
+
+.pd__label {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+/* ---------- Colors ---------- */
+.pd__swatches {
+    display: flex;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+}
+
+.pd__swatch {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-strong);
+    cursor: pointer;
+    transition: box-shadow 150ms ease;
+}
+
+.pd__swatch--selected {
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-ink);
+}
+
+/* ---------- Sizes ---------- */
+.pd__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* square chips: thin grey border, black fill with a white
+   inner gap when selected */
+.pd__size {
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding: 0 0.625rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 2px;
+    background: var(--color-surface);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 150ms ease;
+}
+
+.pd__size:hover:not(:disabled) {
+    border-color: var(--color-ink);
+}
+
+.pd__size--selected {
+    background: var(--color-ink);
+    border: 2px solid var(--color-ink);
+    box-shadow: inset 0 0 0 2px var(--color-surface);
+    color: var(--color-on-primary);
+    font-weight: 600;
+}
+
+/* out of stock for the selected color */
+.pd__size:disabled {
+    color: var(--color-text-subtle);
+    background: var(--color-surface-alt);
+    border-color: var(--color-border);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* right-aligned blue link under the size row */
+.pd__sizing-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.875rem;
+}
+
+.pd__sizing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-link);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.pd__sizing:hover {
+    text-decoration: underline;
+}
+
+.pd__sizing mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* ---------- Price + rating ---------- */
+.pd__price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.pd__price {
+    /* the price is the only heavy element on the page */
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--brand);
+}
+
+.pd__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 600;
+}
+
+.pd__rating mat-icon {
+    color: var(--color-rating);
+}
+
+.pd__tax-note {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+/* ---------- Buy row ---------- */
+.pd__buy {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.pd__quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: var(--color-surface-alt);
+}
+
+.pd__quantity span {
+    min-width: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.pd__add {
+    flex: 1;
+    height: 3rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    --mdc-filled-button-container-shape: 999px;
+    border-radius: 999px;
+    --mat-button-filled-container-color: var(--color-ink);
+}
+
+.pd__stock {
+    margin: 0.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.pd__wishlist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 2.75rem;
+    margin-top: 0.875rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease;
+}
+
+.pd__wishlist:hover {
+    background: var(--color-surface-alt);
+    border-color: var(--color-primary);
+}
+
+.pd__wishlist mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* ---------- Delivery details ---------- */
+.pd__delivery {
+    margin-top: 1.5rem;
+}
+
+.pd__delivery-title {
+    margin: 0 0 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+}
+
+.pd__pincode {
+    display: flex;
+    align-items: center;
+    height: 3rem;
+    padding: 0 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background: var(--color-surface);
+}
+
+.pd__pincode:focus-within {
+    border-color: var(--color-border-strong);
+}
+
+.pd__pincode input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    color: var(--color-text);
+}
+
+.pd__pincode input::placeholder {
+    color: var(--color-text-subtle);
+}
+
+.pd__pincode button {
+    border: none;
+    background: none;
+    padding: 0 0 0 0.75rem;
+    color: var(--brand);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.pd__pincode button:hover {
+    text-decoration: underline;
+}
+
+.pd__delivery-result {
+    margin: 0.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+/* ---------- Info accordions ---------- */
+.pd__accordions {
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.pd__accordion {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.pd__accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.125rem 0;
+    font-size: 1rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.pd__accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.pd__accordion summary::after {
+    content: '+';
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--color-text-strong);
+}
+
+.pd__accordion[open] summary {
+    font-weight: 700;
+}
+
+.pd__accordion[open] summary::after {
+    content: '−';
+}
+
+.pd__accordion-body {
+    padding: 0 0 1.25rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.pd__accordion-body h3 {
+    margin: 1rem 0 0.375rem;
+    font-size: 1.125rem;
+    font-weight: 400;
+}
+
+.pd__accordion-body h3:first-child {
+    margin-top: 0;
+}
+
+.pd__accordion-body p {
+    margin: 0 0 0.625rem;
+}
+
+.pd__accordion-body a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.pd__accordion-body a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Below-gallery sections ---------- */
+.pd__section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.pd__section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-strong);
+}
+
+.pd__description {
+    margin: 0;
+    white-space: pre-line;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.pd__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0 0;
+}
+
+.pd__meta dt {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pd__meta dd {
+    margin: 0.125rem 0 0;
+    font-weight: 500;
+}
+
+.pd__reviews-empty {
+    color: var(--color-text-muted);
+}
+
+/* ---------- Size guide (drawer content) ---------- */
+.size-guide {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.size-guide th,
+.size-guide td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.size-guide th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    background: var(--color-surface-alt);
+}
+
+.size-guide__note {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, viewChild } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,11 +7,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { GoogleAuthService } from '../services/google-auth.service';
+import { emailValidator } from '../validators/email.validator';
 import { passwordStrengthValidator } from '../validators/password.validators';
-import { LoadingService } from '../../../shared/services/loading.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { LoadingService } from '../../../core/services/loading.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { PasswordField } from '../../../shared/ui/password-field/password-field';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +25,8 @@ import { NotificationService } from '../../../shared/services/notification.servi
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PasswordField
   ],
   templateUrl: './login.html',
   styleUrl: '../auth.css',
@@ -43,12 +46,10 @@ export class Login implements AfterViewInit {
     viewChild.required<ElementRef<HTMLElement>>('googleButton');
 
   readonly form = this.formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, emailValidator]],
     password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator]],
     rememberMe: [false]
   });
-
-  readonly hidePassword = signal(true);
 
   ngAfterViewInit(): void {
     this.googleAuthService
@@ -75,10 +76,6 @@ export class Login implements AfterViewInit {
       // failures are toasted by the error interceptor
       error: () => { }
     });
-  }
-
-  togglePasswordVisibility(): void {
-    this.hidePassword.update(hidden => !hidden);
   }
 
   private loginWithGoogle(idToken: string): void {

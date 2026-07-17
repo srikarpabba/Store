@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 interface AdminSection {
   icon: string;
   title: string;
   description: string;
+  /** Route of the section's page; absent while still a placeholder */
+  link?: string;
 }
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [MatIconModule],
+  imports: [MatIconModule, RouterLink],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -20,7 +23,8 @@ export class AdminDashboard {
     {
       icon: 'inventory_2',
       title: 'Products',
-      description: 'Create, edit and organise the catalog'
+      description: 'Create, edit and organise the catalog',
+      link: '/admin/products'
     },
     {
       icon: 'receipt_long',

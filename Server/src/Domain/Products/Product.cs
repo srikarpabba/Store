@@ -38,6 +38,34 @@ public sealed class Product : AuditableEntity
 
         return product;
     }
+
+    public void Update(
+        string name,
+        string description,
+        Guid categoryId,
+        Guid brandId)
+    {
+        Name = name;
+        Description = description;
+        CategoryId = categoryId;
+        BrandId = brandId;
+    }
+
+    public void RemoveGender(ProductGender gender)
+    {
+        ProductGenders.Remove(gender);
+    }
+
+    public void RemoveVariant(ProductVariant variant)
+    {
+        Variants.Remove(variant);
+    }
+
+    public void RemoveColor(ProductColor color)
+    {
+        ProductColors.Remove(color);
+    }
+
     public ProductColor AddColor(Guid colorId)
     {
         ProductColor color = new()

@@ -1,0 +1,16 @@
+@if (open()) {
+<div class="drawer__backdrop" (click)="close()" aria-hidden="true"></div>
+
+<aside class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="title() || 'Panel'">
+    <header class="drawer__header">
+        <h2 class="drawer__title">{{ title() }}</h2>
+        <button mat-icon-button type="button" (click)="close()" aria-label="Close panel">
+            <mat-icon>close</mat-icon>
+        </button>
+    </header>
+
+    <div class="drawer__body">
+        <ng-content />
+    </div>
+</aside>
+}

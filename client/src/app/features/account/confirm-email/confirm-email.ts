@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 type ConfirmationState = 'confirming' | 'confirmed' | 'invalid';
 

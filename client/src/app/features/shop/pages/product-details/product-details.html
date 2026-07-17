@@ -1,1 +1,229 @@
-<p>product-details works!</p>
+@if (product(); as p) {
+<div class="pd">
+    <div class="pd__layout">
+        <!-- Left: photo gallery, scrolls with the page -->
+        <div class="pd__gallery">
+            @if (photos().length === 0) {
+            <div class="pd__no-photos">
+                <mat-icon>image_not_supported</mat-icon>
+                <p>No images for this color yet.</p>
+            </div>
+            } @else {
+            <div class="pd__photos">
+                @for (photo of photos(); track photo.id) {
+                <img class="pd__photo" [src]="photo.fileName" [alt]="p.name" loading="lazy" />
+                }
+            </div>
+            }
+
+            <!-- Description flows under the gallery; the buy box stays sticky beside it -->
+            <section class="pd__section">
+                <h2>Description</h2>
+                <p class="pd__description">{{ p.description }}</p>
+
+                <dl class="pd__meta">
+                    <div>
+                        <dt>Brand</dt>
+                        <dd>{{ p.brand.name }}</dd>
+                    </div>
+                    <div>
+                        <dt>Category</dt>
+                        <dd>{{ p.category.name }}</dd>
+                    </div>
+                    <div>
+                        <dt>Gender</dt>
+                        <dd>
+                            @for (gender of p.genders; track gender.id; let last = $last) {
+                            {{ gender.name }}{{ last ? '' : ', ' }}
+                            }
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+
+            <div class="pd__accordions">
+                <details class="pd__accordion">
+                    <summary>Details</summary>
+                    <div class="pd__accordion-body">
+                        <p>Regular fit with a smooth, premium-feel fabric. Designed for everyday wear
+                            with a clean silhouette that pairs easily with anything.</p>
+                    </div>
+                </details>
+
+                <details class="pd__accordion">
+                    <summary>Material / Care</summary>
+                    <div class="pd__accordion-body">
+                        <p>Shell: 100% cotton.</p>
+                        <p>Machine wash cold with like colors. Do not bleach. Tumble dry low.
+                            Iron on low heat if needed. Do not dry clean.</p>
+                    </div>
+                </details>
+
+                <details class="pd__accordion">
+                    <summary>Delivery / Exchange / Return</summary>
+                    <div class="pd__accordion-body">
+                        <h3>Delivery</h3>
+                        <p>Delivery Fee: Ship to Address is ₹250 for orders below ₹2,999, free for
+                            ₹2,999 and above.</p>
+                        <p>Delivery Timeline: Estimated time will appear at checkout after selecting
+                            your preferred delivery method.</p>
+
+                        <h3>Exchange / Return</h3>
+                        <p>Exchanges: Not available for online orders.</p>
+                        <p>Returns: Available by sending items back to the warehouse.</p>
+                        <p>Deadline for Acceptance: Within 30 days including the shipping date.</p>
+                        <p>Return Shipping Cost: To be borne by the customer (except in cases of our
+                            error).</p>
+                    </div>
+                </details>
+
+                <details class="pd__accordion">
+                    <summary>Production</summary>
+                    <div class="pd__accordion-body">
+                        <p>Made responsibly in certified partner facilities. We work with suppliers
+                            who meet our standards for safe and fair working conditions.</p>
+                    </div>
+                </details>
+
+                <details class="pd__accordion">
+                    <summary>Customer Service</summary>
+                    <div class="pd__accordion-body">
+                        <p>Contact Customer Care at</p>
+                        <p>
+                            Store Retail Pvt. Ltd.,<br />
+                            Hyderabad, Telangana, India
+                        </p>
+                        <p>Email address<br />
+                            <a href="mailto:support@store.com">support&#64;store.com</a>
+                        </p>
+                        <p>Toll free number<br />1800-000-0000</p>
+                        <p>Operating hours<br />10:00 am – 05:00 pm</p>
+                    </div>
+                </details>
+            </div>
+
+            <section class="pd__section" id="reviews">
+                <h2>Reviews</h2>
+                <p class="pd__reviews-empty">No reviews yet.</p>
+            </section>
+        </div>
+
+        <!-- Right: sticky buy box -->
+        <aside class="pd__panel">
+            <h1 class="pd__name">{{ p.name }}</h1>
+
+            @if (p.colors.length > 0) {
+            <p class="pd__label">Color: {{ selectedColor()?.colorName }}</p>
+            <div class="pd__swatches">
+                @for (color of p.colors; track color.productColorId) {
+                <button class="pd__swatch" type="button"
+                    [class.pd__swatch--selected]="color.colorId === selectedColorId()"
+                    [style.background]="color.hexCode" (click)="selectColor(color)"
+                    [attr.aria-label]="color.colorName"
+                    [attr.aria-pressed]="color.colorId === selectedColorId()">
+                </button>
+                }
+            </div>
+            }
+
+            @if (sizes().length > 0) {
+            <p class="pd__label">Size</p>
+            <div class="pd__sizes">
+                @for (size of sizes(); track size.sizeId) {
+                <button class="pd__size" type="button" [disabled]="!size.available"
+                    [class.pd__size--selected]="size.sizeId === selectedSizeId()"
+                    (click)="selectSize(size)"
+                    [attr.aria-pressed]="size.sizeId === selectedSizeId()">
+                    {{ size.sizeName }}
+                </button>
+                }
+            </div>
+
+            <div class="pd__sizing-row">
+                <button class="pd__sizing" type="button" (click)="sizeGuideOpen.set(true)">
+                    <mat-icon>straighten</mat-icon>
+                    Sizing
+                </button>
+            </div>
+            }
+
+            <div class="pd__price-row">
+                @if (displayPrice() !== null) {
+                <span class="pd__price">{{ displayPrice() | price }}</span>
+                }
+                <span class="pd__rating">
+                    <mat-icon>star</mat-icon>
+                    {{ p.rating }}
+                </span>
+            </div>
+            <p class="pd__tax-note">inclusive of all taxes</p>
+
+            <div class="pd__buy">
+                <div class="pd__quantity">
+                    <button mat-icon-button type="button" (click)="decreaseQuantity()"
+                        [disabled]="quantity() <= 1" aria-label="Decrease quantity">
+                        <mat-icon>remove</mat-icon>
+                    </button>
+                    <span>{{ quantity() }}</span>
+                    <button mat-icon-button type="button" (click)="increaseQuantity()"
+                        aria-label="Increase quantity">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+                <button mat-flat-button class="pd__add" type="button" [disabled]="!canAddToCart()"
+                    (click)="addToCart()">
+                    ADD TO CART
+                </button>
+            </div>
+
+            <p class="pd__stock">
+                @if (selectedVariant(); as variant) {
+                {{ variant.quantityInStock > 0 ? 'In stock' : 'Out of stock' }}
+                } @else {
+                Select a size
+                }
+            </p>
+
+            <button class="pd__wishlist" type="button" (click)="addToWishlist()">
+                <mat-icon>favorite_border</mat-icon>
+                ADD TO WISHLIST
+            </button>
+
+            <div class="pd__delivery">
+                <p class="pd__delivery-title">Delivery Details</p>
+                <div class="pd__pincode">
+                    <input type="text" inputmode="numeric" maxlength="6" placeholder="Enter Pincode"
+                        [formControl]="pincode" (keydown.enter)="checkDelivery()" />
+                    <button type="button" (click)="checkDelivery()">CHECK</button>
+                </div>
+                @if (deliveryMessage(); as message) {
+                <p class="pd__delivery-result">{{ message }}</p>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<app-drawer [(open)]="sizeGuideOpen" title="Size guide">
+    <table class="size-guide">
+        <thead>
+            <tr>
+                <th>Size</th>
+                <th>Chest (cm)</th>
+                <th>Waist (cm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>S</td><td>80–88</td><td>68–76</td></tr>
+            <tr><td>M</td><td>88–96</td><td>76–84</td></tr>
+            <tr><td>L</td><td>96–104</td><td>84–92</td></tr>
+            <tr><td>XL</td><td>104–112</td><td>92–100</td></tr>
+            <tr><td>XXL</td><td>112–120</td><td>100–108</td></tr>
+        </tbody>
+    </table>
+    <p class="size-guide__note">
+        Measurements are body sizes, not garment sizes. If you're between sizes, we recommend
+        sizing up for a relaxed fit.
+    </p>
+</app-drawer>
+}

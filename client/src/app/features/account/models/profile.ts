@@ -4,4 +4,5 @@ export interface Profile {
     email: string;
     phoneNumber: string | null;
     emailConfirmed: boolean;
+    hasPassword: boolean;
 }

@@ -33,4 +33,19 @@ public sealed class ProductVariant : AuditableEntity
             SKU = sku
         };
     }
+
+    public void Update(
+        ProductColor productColor,
+        Guid sizeId,
+        decimal price,
+        int quantityInStock,
+        string sku)
+    {
+        ProductColor = productColor;
+        ProductColorId = productColor.Id;
+        SizeId = sizeId;
+        Price = price;
+        QuantityInStock = quantityInStock;
+        SKU = sku;
+    }
 }

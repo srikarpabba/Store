@@ -8,6 +8,6 @@ internal sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPas
     {
         RuleFor(c => c.Email).NotEmpty().EmailAddress();
         RuleFor(c => c.Token).NotEmpty();
-        RuleFor(c => c.NewPassword).NotEmpty();
+        RuleFor(c => c.NewPassword).NotEmpty().MinimumLength(8);
     }
 }

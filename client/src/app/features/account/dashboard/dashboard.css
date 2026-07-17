@@ -77,7 +77,7 @@
     border: none;
     border-radius: 0.375rem;
     background: var(--brand);
-    color: #fff;
+    color: var(--color-on-primary);
     font-weight: 600;
     font-size: 0.8rem;
     cursor: pointer;
@@ -97,7 +97,7 @@
     border: none;
     border-radius: 999px;
     background: var(--brand);
-    color: #fff;
+    color: var(--color-on-primary);
     font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
@@ -194,7 +194,7 @@
     padding: 0.125rem 0.5rem;
     border-radius: 999px;
     background: var(--brand);
-    color: #fff;
+    color: var(--color-on-primary);
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -216,7 +216,8 @@
 }
 
 .dashboard__address-action {
-    border: none;
+    /* transparent border reserves space so the hover border doesn't shift layout */
+    border: 1px solid transparent;
     background: transparent;
     padding: 0.25rem 0.375rem;
     font-size: 0.8rem;
@@ -228,11 +229,13 @@
 
 .dashboard__address-action:hover {
     background: var(--color-surface-alt);
+    border-color: var(--color-border-strong);
     color: var(--color-text);
 }
 
 .dashboard__address-action--danger:hover {
     color: var(--brand);
+    border-color: var(--brand);
     background: var(--brand-soft);
 }
 

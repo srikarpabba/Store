@@ -1,0 +1,22 @@
+<nav class="pagination" aria-label="Pagination">
+    <button mat-icon-button type="button" [disabled]="pageIndex() <= 1" (click)="previous()"
+        aria-label="Previous page">
+        <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    @for (page of pages(); track $index) {
+    @if (page === '…') {
+    <span class="pagination__ellipsis" aria-hidden="true">…</span>
+    } @else {
+    <button class="pagination__page" [class.pagination__page--current]="page === pageIndex()" type="button"
+        (click)="select(page)" [attr.aria-current]="page === pageIndex() ? 'page' : null">
+        {{ page }}
+    </button>
+    }
+    }
+
+    <button mat-icon-button type="button" [disabled]="pageIndex() >= totalPages()" (click)="next()"
+        aria-label="Next page">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
+</nav>

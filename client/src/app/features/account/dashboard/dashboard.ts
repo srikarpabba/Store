@@ -7,12 +7,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Observable } from 'rxjs';
+import { filter, Observable, switchMap } from 'rxjs';
 import { Address } from '../models/address';
 import { Profile } from '../models/profile';
 import { UserService } from '../services/user.service';
-import { LoadingService } from '../../../shared/services/loading.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { emailValidator } from '../validators/email.validator';
+import { HasPendingChanges } from '../../../core/guards/pending-changes.guard';
+import { LoadingService } from '../../../core/services/loading.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,11 +32,12 @@ import { NotificationService } from '../../../shared/services/notification.servi
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard {
+export class Dashboard implements HasPendingChanges {
 
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly userService = inject(UserService);
   private readonly notificationService = inject(NotificationService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly loading = inject(LoadingService);
 
@@ -46,7 +50,7 @@ export class Dashboard {
   readonly profileForm = this.formBuilder.group({
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, emailValidator]],
     phoneNumber: ['']
   });
 
@@ -62,6 +66,11 @@ export class Dashboard {
   constructor() {
     this.loadProfile();
     this.loadAddresses();
+  }
+
+  hasPendingChanges(): boolean {
+    return this.profileForm.dirty
+      || (this.editingAddressId() !== null && this.addressForm.dirty);
   }
 
   // ---------- Profile ----------
@@ -148,7 +157,15 @@ export class Dashboard {
   }
 
   deleteAddress(address: Address): void {
-    this.userService.deleteAddress(address.id).subscribe({
+    this.confirmDialog.confirm({
+      title: 'Remove this address?',
+      message: `${address.line1}, ${address.city} will be removed permanently.`,
+      confirmLabel: 'Remove',
+      destructive: true
+    }).pipe(
+      filter(confirmed => confirmed),
+      switchMap(() => this.userService.deleteAddress(address.id))
+    ).subscribe({
       next: () => {
         this.notificationService.success('Address removed.');
         this.loadAddresses();
@@ -178,6 +195,8 @@ export class Dashboard {
         email: profile.email,
         phoneNumber: profile.phoneNumber ?? ''
       });
+      // freshly loaded values are the saved state — nothing pending
+      this.profileForm.markAsPristine();
     });
   }
 

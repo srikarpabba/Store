@@ -47,7 +47,8 @@ public static class EndpointExtensions
            .MapEndpoint<ConfirmEmail>();
 
         endpoints.MapAuthorizedGroup()
-           .MapEndpoint<ChangePassword>();
+           .MapEndpoint<ChangePassword>()
+           .MapEndpoint<SetPassword>();
     }
 
     private static void MapProductEndpoints(this IEndpointRouteBuilder app)
@@ -57,11 +58,16 @@ public static class EndpointExtensions
 
         endpoints.MapPublicGroup()
            .MapEndpoint<GetProducts>()
-           .MapEndpoint<GetProduct>();
+           .MapEndpoint<GetProduct>()
+           .MapEndpoint<GetProductFilters>();
 
         endpoints.MapAuthorizedGroup()
            .MapEndpoint<CreateProduct>()
-           .MapEndpoint<UploadProductImages>();
+           .MapEndpoint<UpdateProduct>()
+           .MapEndpoint<DeleteProduct>()
+           .MapEndpoint<UploadProductImages>()
+           .MapEndpoint<DeleteProductImage>()
+           .MapEndpoint<SetMainProductImage>();
     }
 
     private static void MapCartEndpoints(this IEndpointRouteBuilder app)

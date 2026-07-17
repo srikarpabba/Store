@@ -10,6 +10,7 @@ services:
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=store;Username=store;Password=Store@#123$;Include Error Detail=true
       ConnectionStrings__Redis: redis:6379 
       Minio__Endpoint: http://minio:9000
+      Minio__PublicEndpoint: http://localhost:9000
       Minio__AccessKey: minioadmin
       Minio__SecretKey: minioadmin123
       Minio__BucketName: files

@@ -203,29 +203,41 @@ public static class DependencyInjection
     {
         services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.SectionName));
 
-        services.AddSingleton<IAmazonS3>(_ =>
-        {
-            MinioOptions options = configuration
-                .GetSection(MinioOptions.SectionName)
-                .Get<MinioOptions>()!;
+        MinioOptions options = configuration
+            .GetSection(MinioOptions.SectionName)
+            .Get<MinioOptions>()!;
 
-            return new AmazonS3Client(
-                options.AccessKey,
-                options.SecretKey,
-                new AmazonS3Config
-                {
-                    ServiceURL = options.Endpoint,
-                    ForcePathStyle = true,
-                    UseHttp = options.Endpoint.StartsWith(
-                        "http://",
-                        StringComparison.OrdinalIgnoreCase)
-                });
-        });
+        services.AddSingleton<IAmazonS3>(_ => CreateClient(options, options.Endpoint));
+
+        // Presigned URLs embed the host they were signed for, so they must
+        // be generated against the endpoint the browser will actually hit
+        services.AddKeyedSingleton<IAmazonS3>(
+            MinioFileStorage.PresignClientKey,
+            (_, _) => CreateClient(
+                options,
+                string.IsNullOrWhiteSpace(options.PublicEndpoint)
+                    ? options.Endpoint
+                    : options.PublicEndpoint));
 
         services.AddScoped<IFileStorage, MinioFileStorage>();
 
         services.AddHostedService<MinioStartupValidator>();
 
         return services;
+    }
+
+    private static AmazonS3Client CreateClient(MinioOptions options, string endpoint)
+    {
+        return new AmazonS3Client(
+            options.AccessKey,
+            options.SecretKey,
+            new AmazonS3Config
+            {
+                ServiceURL = endpoint,
+                ForcePathStyle = true,
+                UseHttp = endpoint.StartsWith(
+                    "http://",
+                    StringComparison.OrdinalIgnoreCase)
+            });
     }
 }

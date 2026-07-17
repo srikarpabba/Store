@@ -6,17 +6,16 @@
 
     @for (product of products(); track product.id) {
 
-        <div class="rounded-lg border p-4 shadow-sm">
+        <a class="block rounded-lg border p-4 shadow-sm no-underline hover:border-gray-400"
+            [routerLink]="['/', section(), product.id]">
 
             <p><strong>Name:</strong> {{ product.name }}</p>
 
-            <p><strong>Price:</strong> {{ product.startingPrice | currency }}</p>
+            <p><strong>Price:</strong> {{ product.startingPrice | price }}</p>
 
             <p><strong>Rating:</strong> {{ product.rating }}</p>
 
-            <p><strong>Image:</strong> {{ product.image }}</p>
-
-        </div>
+        </a>
 
     }
 

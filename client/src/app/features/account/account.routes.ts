@@ -7,24 +7,30 @@ import { ForgotPassword } from './forgot-password/forgot-password';
 import { Login } from './login/login';
 import { Register } from './register/register';
 import { ResetPassword } from './reset-password/reset-password';
-import { authGuard } from './guards/auth.guard';
-import { roleGuard } from './guards/role.guard';
+import { SetPassword } from './set-password/set-password';
+import { authGuard } from '../../core/auth/guards/auth.guard';
+import { guestGuard } from '../../core/auth/guards/guest.guard';
+import { roleGuard } from '../../core/auth/guards/role.guard';
+import { pendingChangesGuard } from '../../core/guards/pending-changes.guard';
 
 export const ACCOUNT_ROUTES: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
     canActivate: [roleGuard('Customer')],
+    canDeactivate: [pendingChangesGuard],
     title: 'My Account | Store'
   },
   {
     path: 'forgot-password',
     component: ForgotPassword,
+    canActivate: [guestGuard],
     title: 'Forgot Password | Store'
   },
   {
     path: 'reset-password',
     component: ResetPassword,
+    canActivate: [guestGuard],
     title: 'Reset Password | Store'
   },
   {
@@ -39,8 +45,15 @@ export const ACCOUNT_ROUTES: Routes = [
     title: 'Change Password | Store'
   },
   {
+    path: 'set-password',
+    component: SetPassword,
+    canActivate: [authGuard],
+    title: 'Set Password | Store'
+  },
+  {
     path: '',
     component: AuthPage,
+    canActivate: [guestGuard],
     children: [
       {
         path: 'login',

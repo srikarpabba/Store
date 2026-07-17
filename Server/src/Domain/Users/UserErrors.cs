@@ -24,6 +24,10 @@ public static class UserErrors
         "Users.InvalidCurrentPassword",
         "The current password is incorrect.");
 
+    public static readonly Error PasswordAlreadySet = Error.Conflict(
+        "Users.PasswordAlreadySet",
+        "A password is already set for this account. Use change password instead.");
+
     public static readonly Error EmailNotUnique = Error.Conflict(
         "Users.EmailNotUnique",
         "The provided email is not unique");

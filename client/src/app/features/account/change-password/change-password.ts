@@ -1,26 +1,25 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { UserService } from '../services/user.service';
 import { passwordMatchValidator, passwordStrengthValidator } from '../validators/password.validators';
-import { LoadingService } from '../../../shared/services/loading.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { LoadingService } from '../../../core/services/loading.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { PasswordField } from '../../../shared/ui/password-field/password-field';
 
 @Component({
   selector: 'app-change-password',
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PasswordField
   ],
   templateUrl: './change-password.html',
   styleUrl: '../auth.css',
@@ -29,6 +28,7 @@ export class ChangePassword {
 
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
   private readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
 
@@ -40,7 +40,15 @@ export class ChangePassword {
     confirmPassword: ['', Validators.required]
   }, { validators: passwordMatchValidator });
 
-  readonly hidePassword = signal(true);
+  constructor() {
+    // Google sign-in accounts without a local password can't provide a
+    // current password — they set one via the set password flow instead
+    this.userService.getProfile().subscribe(profile => {
+      if (!profile.hasPassword) {
+        this.router.navigateByUrl('/account/set-password', { replaceUrl: true });
+      }
+    });
+  }
 
   submit(): void {
     if (this.form.invalid) {
@@ -61,9 +69,5 @@ export class ChangePassword {
       // failures are toasted by the error interceptor
       error: () => { }
     });
-  }
-
-  togglePasswordVisibility(): void {
-    this.hidePassword.update(hidden => !hidden);
   }
 }

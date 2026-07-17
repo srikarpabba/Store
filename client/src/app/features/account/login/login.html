@@ -13,23 +13,8 @@
         }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
-        <mat-icon matPrefix>lock_outline</mat-icon>
-        <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
-            autocomplete="current-password" />
-        <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()"
-            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
-            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-        @if (form.controls.password.hasError('required')) {
-        <mat-error>Password is required</mat-error>
-        } @else if (form.controls.password.hasError('minlength')) {
-        <mat-error>Password must be at least 8 characters</mat-error>
-        } @else if (form.controls.password.hasError('passwordStrength')) {
-        <mat-error>Include uppercase, lowercase, number &amp; special character</mat-error>
-        }
-    </mat-form-field>
+    <app-password-field [control]="form.controls.password" label="Password"
+        autocomplete="current-password" />
 
     <div class="auth-form__options">
         <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>

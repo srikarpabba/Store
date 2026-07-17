@@ -5,4 +5,5 @@ public sealed record ProfileResponse(
     string LastName,
     string Email,
     string? PhoneNumber,
-    bool EmailConfirmed);
+    bool EmailConfirmed,
+    bool HasPassword);

@@ -2,19 +2,47 @@
 
 @import 'tailwindcss';
 
-/* ---------- Theme: single source of truth for brand colors ---------- */
+/* ---------- Theme: single source of truth for fonts and colors ---------- */
 :root {
+    /* Fonts */
+    --font-sans: Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* Brand */
     --color-primary: #e11d24;
     --color-primary-dark: #b8151b;
     --color-primary-soft: #fdeced;
+    --color-on-primary: #ffffff;
 
+    /* Text */
+    --color-ink: #000000;
+    --color-text-strong: #111827;
     --color-text: #1c2431;
     --color-text-muted: #6b7280;
-    --color-border: #e5e7eb;
+    --color-text-subtle: #9ca3af;
+
+    /* Surfaces + borders */
     --color-surface: #ffffff;
     --color-surface-alt: #f4f5f7;
+    --color-footer: #e6e7e8;
+    --color-border: #e5e7eb;
+    --color-border-strong: #d1d5db;
 
+    /* Status */
     --color-success: #1e7e34;
+    --color-rating: #f5a623;
+
+    /* Accents */
+    --color-link: #1a73e8;
+    --color-accent: #0e9f9f;
+
+    /* Shadows */
+    --shadow-card: 0 8px 24px rgb(0 0 0 / 0.06);
+    --shadow-panel: 0 8px 24px rgb(0 0 0 / 0.12);
+    --shadow-popup: 0 12px 32px rgb(0 0 0 / 0.14);
+    --shadow-header: 0 0 6px rgb(0 0 0 / 0.4);
+
+    /* Overlays */
+    --color-backdrop: rgb(0 0 0 / 0.45);
 
     /* Back-compat aliases used across components */
     --brand: var(--color-primary);
@@ -23,12 +51,12 @@
 
     /* Recolor Angular Material's primary to the brand */
     --mat-sys-primary: var(--color-primary);
-    --mat-sys-on-primary: #ffffff;
+    --mat-sys-on-primary: var(--color-on-primary);
 }
 
 /* ---------- Typography: semantic, consistent scale ---------- */
 body {
-    font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-sans);
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -77,30 +105,45 @@ small {
     color: var(--color-text-muted);
 }
 
+/* ---------- Buttons ---------- */
+
+/* A submitting button (disabled + spinner showing) keeps a dimmed brand
+   tone instead of Material's grey disabled look. Plain disabled (e.g.
+   invalid form, no spinner) stays grey. */
+button[mat-flat-button]:disabled:has(mat-spinner) {
+    --mat-button-filled-disabled-container-color: color-mix(in srgb, var(--color-primary) 55%, white);
+    --mat-button-filled-disabled-label-text-color: var(--color-on-primary);
+}
+
+/* Outlined buttons pick up the brand border on hover */
+button[mat-stroked-button]:hover:not(:disabled) {
+    --mat-button-outlined-outline-color: var(--color-primary);
+}
+
 /* ---------- Snackbar variants (overlay panels render outside components).
    This Material version reads --mat-snack-bar-* tokens; the variant class
    is combined with the container class to out-rank the theme's own rule. */
 .mat-mdc-snack-bar-container.snackbar--success,
 .snackbar--success .mat-mdc-snack-bar-container {
     --mat-snack-bar-container-color: var(--color-success);
-    --mat-snack-bar-supporting-text-color: #ffffff;
-    --mat-snack-bar-button-color: #ffffff;
+    --mat-snack-bar-supporting-text-color: var(--color-on-primary);
+    --mat-snack-bar-button-color: var(--color-on-primary);
 }
 
 .mat-mdc-snack-bar-container.snackbar--error,
 .snackbar--error .mat-mdc-snack-bar-container {
     --mat-snack-bar-container-color: var(--color-primary-dark);
-    --mat-snack-bar-supporting-text-color: #ffffff;
-    --mat-snack-bar-button-color: #ffffff;
+    --mat-snack-bar-supporting-text-color: var(--color-on-primary);
+    --mat-snack-bar-button-color: var(--color-on-primary);
 }
 
 /* Also color the surface directly as a safety net */
 .snackbar--success .mdc-snackbar__surface {
     background-color: var(--color-success) !important;
-    color: #ffffff;
+    color: var(--color-on-primary);
 }
 
 .snackbar--error .mdc-snackbar__surface {
     background-color: var(--color-primary-dark) !important;
-    color: #ffffff;
+    color: var(--color-on-primary);
 }

@@ -14,9 +14,9 @@
     justify-content: center;
     width: 88px;
     height: 88px;
-    border: 6px solid #b6bcc6;
+    border: 6px solid var(--color-text-subtle);
     border-radius: 50%;
-    color: #b6bcc6;
+    color: var(--color-text-subtle);
     margin-bottom: 1.5rem;
 }
 
@@ -31,19 +31,19 @@
     font-size: 4.5rem;
     font-weight: 800;
     line-height: 1;
-    color: #1c2431;
+    color: var(--color-text);
 }
 
 .not-found__title {
     margin: 0.75rem 0 0;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1c2431;
+    color: var(--color-text);
 }
 
 .not-found__subtitle {
     margin: 0.75rem 0 2rem;
-    color: rgb(0 0 0 / 0.55);
+    color: var(--color-text-muted);
     font-size: 0.95rem;
 }
 

@@ -1,8 +1,13 @@
 <header class="site-header" [class.is-scrolled]="isScrolled()">
+    <!-- API activity indicator, pinned to the header's bottom edge -->
+    @if (loading.isBusy()) {
+    <mat-progress-bar class="header-progress" mode="indeterminate" aria-label="Loading" />
+    }
+
     <!-- Slim utility bar -->
     <div class="utility-bar">
         <div class="utility-bar__inner">
-            <span>Free shipping on orders over $99</span>
+            <span>Free shipping on orders over {{ freeShippingThreshold | price }}</span>
             <div class="utility-bar__links">
                 <a href="#">Store Locator</a>
                 <a href="#">Help</a>

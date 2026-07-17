@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { roleGuard } from './features/account/guards/role.guard';
+import { roleGuard } from './core/auth/guards/role.guard';
 import { shopSectionGuard } from './features/shop/guards/shop-section.guard';
 import { NotFound } from './shared/pages/not-found/not-found';
 import { ServerError } from './shared/pages/server-error/server-error';

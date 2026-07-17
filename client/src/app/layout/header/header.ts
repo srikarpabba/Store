@@ -5,10 +5,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NAV_ITEMS } from '../../shared/constants/navigation';
-import { AuthService } from '../../features/account/services/auth.service';
-import { Search } from './search/search';
+import { AuthService } from '../../core/auth/auth.service';
+import { LoadingService } from '../../core/services/loading.service';
+import { PricePipe } from '../../shared/pipes/price.pipe';
+import { Search } from '../../features/shop/search/search';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +24,8 @@ import { Search } from './search/search';
     MatBadgeModule,
     MatMenuModule,
     MatDividerModule,
+    MatProgressBarModule,
+    PricePipe,
     Search,
   ],
   templateUrl: './header.html',
@@ -32,8 +37,14 @@ export class Header {
   /** Auth state driving the account menu */
   readonly auth = inject(AuthService);
 
+  /** API activity driving the progress bar under the header */
+  readonly loading = inject(LoadingService);
+
   /** Primary nav, edit to match catalog */
   readonly navItems = NAV_ITEMS;
+
+  /** Order value above which shipping is free, shown in the utility bar */
+  readonly freeShippingThreshold = 999;
 
   /** Mobile nav drawer open state */
   readonly isMobileMenuOpen = signal(false);

@@ -6,8 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../services/auth.service';
-import { LoadingService } from '../../../shared/services/loading.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { emailValidator } from '../validators/email.validator';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -31,7 +32,7 @@ export class ForgotPassword {
   readonly loading = inject(LoadingService);
 
   readonly form = this.formBuilder.group({
-    email: ['', [Validators.required, Validators.email]]
+    email: ['', [Validators.required, emailValidator]]
   });
 
   readonly emailSent = signal(false);

@@ -12,12 +12,47 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+      /* Bootstrap splash — Angular replaces <app-root>'s content on startup.
+         Inlined so it renders before any bundle loads; keep the logo styling
+         in sync with .logo in header.css */
+      .splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+      }
+
+      .splash__logo {
+        font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        color: #000000;
+        animation: splash-pulse 1.4s ease-in-out infinite;
+      }
+
+      .splash__logo span {
+        color: #e11d24;
+      }
+
+      @keyframes splash-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.45; }
+      }
+    </style>
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <div class="splash" role="status" aria-label="Loading Store">
+        <div class="splash__logo">STORE<span>.</span></div>
+      </div>
+    </app-root>
   </body>
 </html>

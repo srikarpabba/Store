@@ -1,14 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { ShopSection } from '../../models/enums/shop-section';
 import { Product } from '../../models/product';
-import { CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
+import { PricePipe } from '../../../../shared/pipes/price.pipe';
 
 @Component({
   selector: 'app-shop-page',
-  imports: [TitleCasePipe, CurrencyPipe],
+  imports: [TitleCasePipe, PricePipe, RouterLink],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.css',
 })

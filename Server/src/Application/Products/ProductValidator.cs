@@ -88,10 +88,12 @@ internal sealed class ProductValidator(IApplicationDbContext context)
 
     public async Task<Result> ValidateSkusAsync(
         IReadOnlyCollection<string> skus,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Guid? excludeProductId = null)
     {
         bool exists = await context.ProductVariants
             .AsNoTracking()
+            .Where(x => excludeProductId == null || x.ProductColor.ProductId != excludeProductId)
             .AnyAsync(x => skus.Contains(x.SKU), cancellationToken);
 
         return exists

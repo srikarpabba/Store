@@ -9,6 +9,7 @@ using Application.Auth.Login;
 using Application.Auth.Refresh;
 using Application.Auth.Register;
 using Application.Auth.ResetPassword;
+using Application.Auth.SetPassword;
 using Domain.Users;
 using Google.Apis.Auth;
 using Infrastructure.Authorization;
@@ -230,6 +231,33 @@ public class IdentityService(
                             x => x.RevokedOnUtc,
                             dateTimeProvider.UtcNow),
                         cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> SetPasswordAsync(SetPasswordCommand command, CancellationToken cancellationToken)
+    {
+        AppUser? user = await userManager.FindByIdAsync(userContext.UserId.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(UserErrors.Unauthorized());
+        }
+
+        // Only for accounts created via an external login (e.g. Google)
+        // that never had a local password — existing passwords must go
+        // through change password, which verifies the current one
+        if (await userManager.HasPasswordAsync(user))
+        {
+            return Result.Failure(UserErrors.PasswordAlreadySet);
+        }
+
+        IdentityResult result = await userManager.AddPasswordAsync(user, command.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(IdentityErrorMapper.Map(result.Errors));
+        }
 
         return Result.Success();
     }

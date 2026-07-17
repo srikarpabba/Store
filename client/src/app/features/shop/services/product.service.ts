@@ -3,6 +3,7 @@ import { ProductQuery } from '../models/product-query';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Product } from '../models/product';
+import { ProductDetails } from '../models/product-details';
 import { PagedResponse } from '../models/paged-response';
 import { ProductApi } from '../api/product-api';
 import { ProductFilters } from '../models/product-filters';
@@ -27,7 +28,7 @@ export class ProductService {
     }
 
     getProduct(id: string) {
-        return this.http.get<Product>(
+        return this.http.get<ProductDetails>(
             `${this.apiUrl}${ProductApi.details(id)}`
         );
     }

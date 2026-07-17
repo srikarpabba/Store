@@ -40,6 +40,18 @@
     border-radius: 0.5rem;
 }
 
+.admin__card--active {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.admin__card--active:hover {
+    border-color: color-mix(in srgb, var(--brand) 40%, white);
+    box-shadow: var(--shadow-card);
+}
+
 .admin__card-icon {
     color: var(--brand);
     font-size: 1.75rem;

@@ -1,0 +1,83 @@
+<div class="admin-products">
+    <header class="admin-products__header">
+        <div>
+            <h1>Products</h1>
+            <p>{{ totalCount() }} product{{ totalCount() === 1 ? '' : 's' }} in the catalog</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add product
+        </a>
+    </header>
+
+    <div class="admin-products__search">
+        <mat-icon>search</mat-icon>
+        <input type="text" [formControl]="search" placeholder="Search products…" />
+    </div>
+
+    @if (!isLoading() && products().length === 0) {
+    <div class="admin-products__empty">
+        <mat-icon>inventory_2</mat-icon>
+        @if (search.value.trim()) {
+        <p>No products match "<strong>{{ search.value.trim() }}</strong>".</p>
+        } @else {
+        <p>No products yet. Add your first one to get started.</p>
+        }
+    </div>
+    } @else {
+    <div class="admin-products__table-wrap">
+        <table class="admin-products__table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Starting price</th>
+                    <th>Rating</th>
+                    <th class="admin-products__actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (product of products(); track product.id) {
+                <tr>
+                    <td>
+                        <div class="admin-products__product">
+                            @if (product.image) {
+                            <img class="admin-products__thumb" [src]="product.image" [alt]="product.name" />
+                            } @else {
+                            <span class="admin-products__thumb admin-products__thumb--empty">
+                                <mat-icon>image</mat-icon>
+                            </span>
+                            }
+                            <span class="admin-products__name">{{ product.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ product.startingPrice | price }}</td>
+                    <td>
+                        <span class="admin-products__rating">
+                            <mat-icon>star</mat-icon>
+                            {{ product.rating }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="admin-products__actions">
+                            <a mat-icon-button [routerLink]="[product.id, 'edit']" aria-label="Edit product">
+                                <mat-icon>edit</mat-icon>
+                            </a>
+                            <button mat-icon-button class="admin-products__delete" type="button"
+                                (click)="deleteProduct(product)" aria-label="Delete product">
+                                <mat-icon>delete_outline</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (totalPages() > 1) {
+    <div class="admin-products__pager">
+        <app-pagination [pageIndex]="pageIndex()" [totalPages]="totalPages()" (pageChange)="goToPage($event)" />
+    </div>
+    }
+    }
+</div>

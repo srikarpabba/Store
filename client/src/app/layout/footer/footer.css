@@ -1,0 +1,202 @@
+.footer {
+    margin-top: 4rem;
+    background: var(--color-footer);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.footer__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* ---------- Newsletter ---------- */
+.footer__newsletter {
+    background: var(--color-footer);
+    /* border-strong for contrast — the footer background is close in
+       tone to --color-border, which would make the separator invisible */
+    border-bottom: 1px solid var(--color-border-strong);
+}
+
+.footer__newsletter-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    text-align: center;
+}
+
+.footer__newsletter-title {
+    margin: 0 0 0.375rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+}
+
+.footer__newsletter-subtitle {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.footer__newsletter-form {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 30rem;
+}
+
+.footer__newsletter-input {
+    flex: 1;
+    min-width: 0;
+    height: 2.875rem;
+    padding: 0 1rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.375rem;
+    background: var(--color-surface);
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.footer__newsletter-input::placeholder {
+    color: var(--color-text-subtle);
+}
+
+.footer__newsletter-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.footer__newsletter-btn {
+    flex-shrink: 0;
+    height: 2.875rem;
+    padding: 0 1.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    background: var(--brand);
+    color: var(--color-on-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.footer__newsletter-btn:hover {
+    background: var(--brand-dark);
+}
+
+@media (min-width: 768px) {
+    .footer__newsletter-inner {
+        flex-direction: row;
+        text-align: left;
+    }
+}
+
+/* ---------- Link columns ---------- */
+.footer__links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+    .footer__links {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1024px) {
+    .footer__links {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+}
+
+.footer__heading {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+}
+
+.footer__about {
+    margin: 0;
+    max-width: 22rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.footer__link {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 150ms ease;
+}
+
+.footer__link:hover {
+    color: var(--color-text-strong);
+}
+
+/* ---------- Bottom bar ---------- */
+.footer__bottom {
+    border-top: 1px solid var(--color-border-strong);
+}
+
+.footer__bottom-inner {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.footer__copyright {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.footer__social {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.footer__social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+    background: var(--color-ink);
+    color: var(--color-surface);
+    transition: opacity 150ms ease;
+}
+
+.footer__social-link:hover {
+    opacity: 0.75;
+}
+
+@media (min-width: 640px) {
+    .footer__bottom-inner {
+        flex-direction: row;
+    }
+}

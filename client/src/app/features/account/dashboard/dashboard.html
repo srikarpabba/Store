@@ -222,6 +222,16 @@
             </h2>
 
             <div class="dashboard__links">
+                @if (profile()?.hasPassword === false) {
+                <a class="dashboard__link" routerLink="/account/set-password">
+                    <mat-icon>lock_reset</mat-icon>
+                    <span>
+                        <strong>Set password</strong>
+                        <small>Add a password to also log in without Google</small>
+                    </span>
+                    <mat-icon class="dashboard__link-chevron">chevron_right</mat-icon>
+                </a>
+                } @else {
                 <a class="dashboard__link" routerLink="/account/change-password">
                     <mat-icon>lock_reset</mat-icon>
                     <span>
@@ -230,6 +240,7 @@
                     </span>
                     <mat-icon class="dashboard__link-chevron">chevron_right</mat-icon>
                 </a>
+                }
 
                 <div class="dashboard__link dashboard__link--disabled">
                     <mat-icon>receipt_long</mat-icon>

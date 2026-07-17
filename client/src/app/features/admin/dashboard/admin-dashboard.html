@@ -6,12 +6,20 @@
 
     <div class="admin__grid">
         @for (section of sections; track section.title) {
+        @if (section.link) {
+        <a class="admin__card admin__card--active" [routerLink]="section.link">
+            <mat-icon class="admin__card-icon">{{ section.icon }}</mat-icon>
+            <h2 class="admin__card-title">{{ section.title }}</h2>
+            <p class="admin__card-description">{{ section.description }}</p>
+        </a>
+        } @else {
         <div class="admin__card">
             <mat-icon class="admin__card-icon">{{ section.icon }}</mat-icon>
             <h2 class="admin__card-title">{{ section.title }}</h2>
             <p class="admin__card-description">{{ section.description }}</p>
             <span class="admin__card-badge">Coming soon</span>
         </div>
+        }
         }
     </div>
 </div>

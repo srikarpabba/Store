@@ -23,6 +23,10 @@ internal sealed class RefreshToken : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(RefreshToken))
+        .WithSummary("Exchanges a refresh token for a new access/refresh token pair.")
+        .Produces<AccessTokensResponse>()
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

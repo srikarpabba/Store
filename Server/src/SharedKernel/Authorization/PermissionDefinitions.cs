@@ -10,6 +10,14 @@ public static class PermissionDefinitions
         (Permissions.ProductsRead, "Read products"),
         (Permissions.ProductsCreate, "Create products"),
         (Permissions.ProductsUpdate, "Update products"),
-        (Permissions.ProductsDelete, "Delete products")
+        (Permissions.ProductsDelete, "Delete products"),
+
+        (Permissions.CategoriesCreate, "Create categories"),
+        (Permissions.CategoriesUpdate, "Update categories"),
+        (Permissions.CategoriesDelete, "Delete categories"),
+
+        (Permissions.BrandsCreate, "Create brands"),
+        (Permissions.BrandsUpdate, "Update brands"),
+        (Permissions.BrandsDelete, "Delete brands")
     ];
 }

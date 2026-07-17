@@ -20,6 +20,10 @@ internal sealed class DeleteProduct : IEndpoint
                 cancellationToken))
                 .Match(Results.NoContent, CustomResults.Problem);
         })
-        .HasPermission(Permissions.ProductsDelete);
+        .HasPermission(Permissions.ProductsDelete)
+        .WithName(nameof(DeleteProduct))
+        .WithSummary("Deletes a product and its variants.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

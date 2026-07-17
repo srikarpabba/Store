@@ -18,6 +18,9 @@ internal sealed class GetMyAddresses : IEndpoint
                 await handler.Handle(new GetMyAddressesQuery(), cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithName(nameof(GetMyAddresses))
+        .WithSummary("Lists the signed-in user's saved addresses.")
+        .Produces<IReadOnlyList<AddressResponse>>();
     }
 }

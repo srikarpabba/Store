@@ -23,6 +23,10 @@ internal sealed class ResetPassword : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(ResetPassword))
+        .WithSummary("Resets a password using the token from the forgot-password email.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

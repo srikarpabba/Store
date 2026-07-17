@@ -1,5 +1,7 @@
 ﻿using API.Endpoints;
 using API.Endpoints.Auth;
+using API.Endpoints.Brands;
+using API.Endpoints.Categories;
 using API.Endpoints.Home;
 using API.Endpoints.Products;
 using API.Endpoints.Users;
@@ -16,6 +18,8 @@ public static class EndpointExtensions
         endpoints.MapHomeEndpoints();
         endpoints.MapAuthenticationEndpoints();
         endpoints.MapProductEndpoints();
+        endpoints.MapCategoryEndpoints();
+        endpoints.MapBrandEndpoints();
         endpoints.MapCartEndpoints();
         endpoints.MapUserEndpoints();
         endpoints.MapWishlistEndpoints();
@@ -68,6 +72,40 @@ public static class EndpointExtensions
            .MapEndpoint<UploadProductImages>()
            .MapEndpoint<DeleteProductImage>()
            .MapEndpoint<SetMainProductImage>();
+    }
+
+    private static void MapCategoryEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/categories")
+            .WithTags(Tags.Categories);
+
+        endpoints.MapPublicGroup()
+           .MapEndpoint<GetCategories>()
+           .MapEndpoint<GetCategory>();
+
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<CreateCategory>()
+           .MapEndpoint<UpdateCategory>()
+           .MapEndpoint<DeleteCategory>()
+           .MapEndpoint<UploadCategoryGenderPhoto>()
+           .MapEndpoint<DeleteCategoryGenderPhoto>();
+    }
+
+    private static void MapBrandEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/brands")
+            .WithTags(Tags.Brands);
+
+        endpoints.MapPublicGroup()
+           .MapEndpoint<GetBrands>()
+           .MapEndpoint<GetBrand>();
+
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<CreateBrand>()
+           .MapEndpoint<UpdateBrand>()
+           .MapEndpoint<DeleteBrand>()
+           .MapEndpoint<UploadBrandLogo>()
+           .MapEndpoint<DeleteBrandLogo>();
     }
 
     private static void MapCartEndpoints(this IEndpointRouteBuilder app)

@@ -22,6 +22,11 @@ internal sealed class GoogleLogin : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(GoogleLogin))
+        .WithSummary("Signs in or registers using a Google ID token.")
+        .WithDescription("Creates the account on first sign-in. Returns an access/refresh token pair.")
+        .Produces<GoogleAuthResponse>()
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

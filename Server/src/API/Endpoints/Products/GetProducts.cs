@@ -17,6 +17,9 @@ internal sealed class GetProducts : IEndpoint
         {
             return (await handler.Handle(query, cancellationToken))
                 .Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithName(nameof(GetProducts))
+        .WithSummary("Searches, filters and paginates the product catalog.")
+        .Produces<PagedResponse<ProductResponse>>();
     }
 }

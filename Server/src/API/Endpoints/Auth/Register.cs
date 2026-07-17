@@ -26,6 +26,11 @@ internal sealed class Register : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(Register))
+        .WithSummary("Creates a new customer account.")
+        .WithDescription("Returns the new user's id. The email/password sign-in path only — Google sign-up uses /auth/google.")
+        .Produces<Guid>()
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }

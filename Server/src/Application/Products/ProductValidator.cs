@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Data;
+using Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -52,6 +53,28 @@ internal sealed class ProductValidator(IApplicationDbContext context)
                 Error.NotFound(
                     "Gender.NotFound",
                     "One or more genders were not found."));
+    }
+
+    /// <summary>
+    /// Every category is explicitly tagged with the genders it applies to
+    /// (each tag also carries its own display photo) — there is no implicit
+    /// "unisex" default. A product's genders must all be among the
+    /// category's tagged genders.
+    /// </summary>
+    public async Task<Result> ValidateCategoryGenderCompatibilityAsync(
+        Guid categoryId,
+        IReadOnlyCollection<Guid> genderIds,
+        CancellationToken cancellationToken)
+    {
+        List<Guid> allowedGenderIds = await context.CategoryGenders
+            .AsNoTracking()
+            .Where(x => x.CategoryId == categoryId)
+            .Select(x => x.GenderId)
+            .ToListAsync(cancellationToken);
+
+        return genderIds.All(allowedGenderIds.Contains)
+            ? Result.Success()
+            : Result.Failure(ProductErrors.CategoryGenderMismatch);
     }
 
     public async Task<Result> ValidateColorIdsAsync(

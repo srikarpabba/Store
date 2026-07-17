@@ -18,7 +18,7 @@ namespace Infrastructure.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("store")
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -56,9 +56,10 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_featured");
 
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("logo_url");
+                    b.Property<string>("LogoFileName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("logo_file_name");
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uuid")
@@ -159,6 +160,30 @@ namespace Infrastructure.Database.Migrations
                         .HasDatabaseName("IX_Category_IsDeleted_CreatedOn");
 
                     b.ToTable("categories", "store");
+                });
+
+            modelBuilder.Entity("Domain.Products.CategoryGender", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid>("GenderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("gender_id");
+
+                    b.Property<string>("PhotoFileName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("photo_file_name");
+
+                    b.HasKey("CategoryId", "GenderId")
+                        .HasName("pk_category_genders");
+
+                    b.HasIndex("GenderId")
+                        .HasDatabaseName("ix_category_genders_gender_id");
+
+                    b.ToTable("category_genders", "store");
                 });
 
             modelBuilder.Entity("Domain.Products.Color", b =>
@@ -1063,6 +1088,27 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("user_tokens", "store");
                 });
 
+            modelBuilder.Entity("Domain.Products.CategoryGender", b =>
+                {
+                    b.HasOne("Domain.Products.Category", "Category")
+                        .WithMany("CategoryGenders")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_genders_categories_category_id");
+
+                    b.HasOne("Domain.Products.Gender", "Gender")
+                        .WithMany("CategoryGenders")
+                        .HasForeignKey("GenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_genders_genders_gender_id");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Gender");
+                });
+
             modelBuilder.Entity("Domain.Products.Product", b =>
                 {
                     b.HasOne("Domain.Products.Brand", "Brand")
@@ -1257,6 +1303,8 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Products.Category", b =>
                 {
+                    b.Navigation("CategoryGenders");
+
                     b.Navigation("Products");
                 });
 
@@ -1267,6 +1315,8 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Products.Gender", b =>
                 {
+                    b.Navigation("CategoryGenders");
+
                     b.Navigation("ProductGenders");
                 });
 

@@ -41,6 +41,11 @@ internal sealed class CreateProduct : IEndpoint
                 CustomResults.Problem);
         })
         .HasPermission(Permissions.ProductsCreate)
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(CreateProduct))
+        .WithSummary("Creates a product with its initial variants.")
+        .WithDescription("At least one variant is required. Images are uploaded separately after creation via /products/{id}/images.")
+        .Produces<Guid>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

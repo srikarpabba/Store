@@ -19,7 +19,9 @@ internal sealed class GetProduct : IEndpoint
             return (await handler.Handle(query, cancellationToken))
                     .Match(Results.Ok, CustomResults.Problem);
         })
-        .WithName(nameof(GetProduct));
-
+        .WithName(nameof(GetProduct))
+        .WithSummary("Gets a single product with its variants, colors and photos.")
+        .Produces<ProductDetailsResponse>()
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

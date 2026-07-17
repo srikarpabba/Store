@@ -15,6 +15,10 @@ internal sealed class GetProductFilters : IEndpoint
         {
             return (await handler.Handle(new GetProductFiltersQuery(), cancellationToken))
                 .Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithName(nameof(GetProductFilters))
+        .WithSummary("Gets the lookup data for the shop's filter sidebar and admin product form.")
+        .WithDescription("Brands, categories (with their gender tags), colors, sizes, genders and the current price range.")
+        .Produces<ProductFiltersResponse>();
     }
 }

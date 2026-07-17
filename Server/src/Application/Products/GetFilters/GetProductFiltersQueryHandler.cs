@@ -19,10 +19,13 @@ internal sealed class GetProductFiltersQueryHandler(
             .Select(x => new LookupResponse(x.Id, x.Name))
             .ToListAsync(cancellationToken);
 
-        List<LookupResponse> categories = await context.Categories
+        List<CategoryLookupResponse> categories = await context.Categories
             .AsNoTracking()
             .OrderBy(x => x.Name)
-            .Select(x => new LookupResponse(x.Id, x.Name))
+            .Select(x => new CategoryLookupResponse(
+                x.Id,
+                x.Name,
+                x.CategoryGenders.Select(cg => cg.GenderId).ToList()))
             .ToListAsync(cancellationToken);
 
         List<LookupResponse> colors = await context.Colors

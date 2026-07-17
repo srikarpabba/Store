@@ -1,0 +1,15 @@
+/* Sticky footer: html/body force height to exactly the viewport (see
+   material-theme.scss), which leaves a blank gap below the footer on pages
+   shorter than one screen. Making app-root a flex column and giving the
+   routed content flex:1 pushes the footer to the true bottom instead. */
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.app-main {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+}

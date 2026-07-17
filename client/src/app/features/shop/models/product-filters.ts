@@ -1,10 +1,11 @@
+import { CategoryLookup } from './category-lookup';
 import { Lookup } from './lookup';
 
 export interface ProductFilters {
 
     brands: Lookup[];
 
-    categories: Lookup[];
+    categories: CategoryLookup[];
 
     colors: Lookup[];
 

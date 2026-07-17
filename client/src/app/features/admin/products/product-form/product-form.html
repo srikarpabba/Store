@@ -37,12 +37,15 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Category</mat-label>
                     <mat-select formControlName="categoryId">
-                        @for (category of filters()?.categories ?? []; track category.id) {
+                        @for (category of availableCategories(); track category.id) {
                         <mat-option [value]="category.id">{{ category.name }}</mat-option>
                         }
                     </mat-select>
                     @if (form.controls.categoryId.hasError('required')) {
                     <mat-error>Category is required</mat-error>
+                    }
+                    @if (availableCategories().length === 0) {
+                    <mat-hint>No categories are tagged for the selected genders yet</mat-hint>
                     }
                 </mat-form-field>
 
@@ -62,12 +65,15 @@
             <mat-form-field appearance="outline">
                 <mat-label>Genders</mat-label>
                 <mat-select formControlName="genderIds" multiple>
-                    @for (gender of filters()?.genders ?? []; track gender.id) {
+                    @for (gender of availableGenders(); track gender.id) {
                     <mat-option [value]="gender.id">{{ gender.name }}</mat-option>
                     }
                 </mat-select>
                 @if (form.controls.genderIds.hasError('required')) {
                 <mat-error>Select at least one gender</mat-error>
+                }
+                @if (selectedCategoryName(); as categoryName) {
+                <mat-hint>Showing genders tagged on "{{ categoryName }}"</mat-hint>
                 }
             </mat-form-field>
         </section>

@@ -23,6 +23,10 @@ internal sealed class ForgotPassword : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(ForgotPassword))
+        .WithSummary("Sends a password reset link to the given email.")
+        .WithDescription("Always succeeds regardless of whether the email exists, to avoid leaking account existence.")
+        .Produces(StatusCodes.Status204NoContent);
     }
 }

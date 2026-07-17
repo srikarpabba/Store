@@ -1,0 +1,98 @@
+<div class="category-form">
+    <header class="category-form__header">
+        <a mat-icon-button routerLink="/admin/categories" aria-label="Back to categories">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit category' : 'New category' }}</h1>
+            <p>{{ isEdit ? 'Update the category and its gender tags.' : 'Add a category and the genders it applies to.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="category-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 100 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+                @if (form.controls.description.hasError('maxlength')) {
+                <mat-error>Description must be 1000 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Genders</mat-label>
+                <mat-select formControlName="genderIds" multiple>
+                    @for (gender of allGenders(); track gender.id) {
+                    <mat-option [value]="gender.id">{{ gender.name }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.controls.genderIds.hasError('required')) {
+                <mat-error>Select at least one gender this category applies to</mat-error>
+                }
+            </mat-form-field>
+        </section>
+
+        @if (isEdit && category(); as savedCategory) {
+        <section class="category-form__card">
+            <h2>Photos</h2>
+            <p class="category-form__photos-hint">
+                One photo per gender. Newly added genders appear here after saving.
+            </p>
+
+            @for (gender of savedCategory.genders; track gender.genderId) {
+            <div class="category-form__gender-row">
+                @if (gender.photo) {
+                <img class="category-form__photo" [src]="gender.photo" [alt]="gender.genderName" />
+                } @else {
+                <span class="category-form__photo category-form__photo--empty">
+                    <mat-icon>image</mat-icon>
+                </span>
+                }
+
+                <span class="category-form__gender-name">{{ gender.genderName }}</span>
+
+                <button mat-stroked-button type="button" (click)="fileInput.click()">
+                    <mat-icon>add_photo_alternate</mat-icon>
+                    {{ gender.photo ? 'Replace' : 'Upload' }}
+                </button>
+                <input #fileInput type="file" hidden accept="image/jpeg,image/png,image/webp"
+                    (change)="onFileSelected(gender, fileInput)" />
+
+                @if (gender.photo) {
+                <button mat-icon-button class="category-form__photo-delete" type="button"
+                    (click)="deletePhoto(gender)" matTooltip="Delete photo" aria-label="Delete photo">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+                }
+            </div>
+            }
+        </section>
+        }
+
+        <div class="category-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="category-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create category' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/categories">Cancel</a>
+        </div>
+    </form>
+</div>

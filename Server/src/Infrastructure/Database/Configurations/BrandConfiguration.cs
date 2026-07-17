@@ -14,6 +14,9 @@ public class BrandConfiguration : AuditableBaseEntityConfiguration<Brand>
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(b => b.LogoFileName)
+            .HasMaxLength(500);
+
         builder.HasIndex(b => b.Name).IsUnique();
 
         // One Brand -> Many Products

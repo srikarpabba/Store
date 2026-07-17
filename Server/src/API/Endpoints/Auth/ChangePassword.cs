@@ -23,6 +23,11 @@ internal sealed class ChangePassword : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(ChangePassword))
+        .WithSummary("Changes the signed-in user's password.")
+        .WithDescription("Requires the current password. For accounts with no password yet (Google sign-up), use /auth/set-password instead.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

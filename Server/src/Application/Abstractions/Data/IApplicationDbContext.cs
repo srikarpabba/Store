@@ -18,6 +18,7 @@ public interface IApplicationDbContext
     DbSet<ProductColor> ProductColors { get; }
     DbSet<ProductGender> ProductGenders { get; }
     DbSet<ProductVariant> ProductVariants { get; }
+    DbSet<CategoryGender> CategoryGenders { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -17,6 +17,11 @@ internal sealed class ResendEmailConfirmation : IEndpoint
             Result result = await handler.Handle(new ResendEmailConfirmationCommand(), cancellationToken);
 
             return result.Match(Results.NoContent, CustomResults.Problem);
-        });
+        })
+        .WithName(nameof(ResendEmailConfirmation))
+        .WithSummary("Resends the email confirmation link.")
+        .WithDescription("Rate-limited to once per minute per account.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

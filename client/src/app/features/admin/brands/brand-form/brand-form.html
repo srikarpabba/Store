@@ -1,0 +1,81 @@
+<div class="brand-form">
+    <header class="brand-form__header">
+        <a mat-icon-button routerLink="/admin/brands" aria-label="Back to brands">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit brand' : 'New brand' }}</h1>
+            <p>{{ isEdit ? 'Update the brand details and logo.' : 'Add a brand.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="brand-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 100 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+                @if (form.controls.description.hasError('maxlength')) {
+                <mat-error>Description must be 1000 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-checkbox formControlName="isFeatured">Featured brand</mat-checkbox>
+        </section>
+
+        @if (isEdit && brand(); as savedBrand) {
+        <section class="brand-form__card">
+            <h2>Logo</h2>
+
+            <div class="brand-form__logo-row">
+                @if (savedBrand.logo) {
+                <img class="brand-form__logo" [src]="savedBrand.logo" [alt]="savedBrand.name" />
+                } @else {
+                <span class="brand-form__logo brand-form__logo--empty">
+                    <mat-icon>storefront</mat-icon>
+                </span>
+                }
+
+                <button mat-stroked-button type="button" (click)="logoInput.click()">
+                    <mat-icon>add_photo_alternate</mat-icon>
+                    {{ savedBrand.logo ? 'Replace' : 'Upload' }}
+                </button>
+                <input #logoInput type="file" hidden accept="image/jpeg,image/png,image/webp"
+                    (change)="onLogoSelected(logoInput)" />
+
+                @if (savedBrand.logo) {
+                <button mat-icon-button class="brand-form__logo-delete" type="button" (click)="deleteLogo()"
+                    aria-label="Delete logo">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+                }
+            </div>
+        </section>
+        }
+
+        <div class="brand-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="brand-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create brand' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/brands">Cancel</a>
+        </div>
+    </form>
+</div>

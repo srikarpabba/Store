@@ -42,6 +42,12 @@ internal sealed class UpdateProduct : IEndpoint
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
         .HasPermission(Permissions.ProductsUpdate)
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(UpdateProduct))
+        .WithSummary("Updates a product's details and syncs its variants.")
+        .WithDescription("Variants with an id are updated in place; variants without one are added; omitted variants are removed.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

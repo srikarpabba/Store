@@ -21,6 +21,10 @@ internal sealed class SetMainProductImage : IEndpoint
                 cancellationToken))
                 .Match(Results.NoContent, CustomResults.Problem);
         })
-        .HasPermission(Permissions.ProductsUpdate);
+        .HasPermission(Permissions.ProductsUpdate)
+        .WithName(nameof(SetMainProductImage))
+        .WithSummary("Sets a photo as the main photo for its color.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

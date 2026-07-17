@@ -210,5 +210,55 @@ public static class StoreDbSeeder
         }
 
         await context.SaveChangesAsync();
+
+        await SeedCategoryGendersAsync(context);
+    }
+
+    /// <summary>
+    /// Every category must be explicitly tagged with the genders it applies
+    /// to — there is no implicit "unisex" default, since each tag also
+    /// carries its own display photo (set later via the admin UI). A
+    /// category with no tags can't be used by any product yet.
+    /// </summary>
+    private static async Task SeedCategoryGendersAsync(ApplicationDbContext context)
+    {
+        if (await context.CategoryGenders.AnyAsync())
+        {
+            return;
+        }
+
+        (string CategoryName, string[] GenderNames)[] associations =
+        [
+            ("Boots", ["Male", "Female", "Unisex"]),
+            ("Hat", ["Male", "Female", "Unisex"]),
+            ("Kurta", ["Male", "Female"]),
+            ("Dress", ["Female"]),
+            ("Shoes", ["Male", "Female", "Unisex"]),
+            ("Jeans", ["Male", "Female", "Unisex"]),
+            ("Shirt", ["Male", "Female", "Unisex"]),
+            ("T-Shirt", ["Male", "Female", "Unisex"])
+        ];
+
+        foreach ((string categoryName, string[] genderNames) in associations)
+        {
+            Category? category = await context.Categories.FirstOrDefaultAsync(c => c.Name == categoryName);
+
+            if (category is null)
+            {
+                continue;
+            }
+
+            foreach (string genderName in genderNames)
+            {
+                Gender? gender = await context.Genders.FirstOrDefaultAsync(g => g.Name == genderName);
+
+                if (gender is not null)
+                {
+                    context.CategoryGenders.Add(new CategoryGender { CategoryId = category.Id, GenderId = gender.Id });
+                }
+            }
+        }
+
+        await context.SaveChangesAsync();
     }
 }

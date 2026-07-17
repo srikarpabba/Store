@@ -19,6 +19,7 @@ internal sealed class GetHome : IEndpoint
         })
         .WithName("GetHome")
         .WithSummary("Gets the home page for a storefront")
-        .WithRequestValidation<GetHomeQuery>();
+        .WithRequestValidation<GetHomeQuery>()
+        .Produces<HomeResponse>();
     }
 }

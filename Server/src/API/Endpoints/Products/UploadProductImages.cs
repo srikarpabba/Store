@@ -37,6 +37,12 @@ internal sealed class UploadProductImages : IEndpoint
         })
         .DisableAntiforgery()
         .HasPermission(Permissions.ProductsCreate)
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(UploadProductImages))
+        .WithSummary("Uploads one or more photos for a product color.")
+        .WithDescription("The first photo uploaded for a color becomes its main photo. Accepts JPEG, PNG or WebP up to 5 MB each.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

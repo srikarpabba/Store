@@ -36,6 +36,7 @@ public sealed class ApplicationDbContext(
     public DbSet<ProductColor> ProductColors { get; set; }
     public DbSet<ProductGender> ProductGenders { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
+    public DbSet<CategoryGender> CategoryGenders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

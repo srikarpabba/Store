@@ -37,6 +37,10 @@ internal sealed class UpdateAddress : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(UpdateAddress))
+        .WithSummary("Updates one of the signed-in user's addresses.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

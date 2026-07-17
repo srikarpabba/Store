@@ -21,6 +21,11 @@ internal sealed class DeleteProductImage : IEndpoint
                 cancellationToken))
                 .Match(Results.NoContent, CustomResults.Problem);
         })
-        .HasPermission(Permissions.ProductsUpdate);
+        .HasPermission(Permissions.ProductsUpdate)
+        .WithName(nameof(DeleteProductImage))
+        .WithSummary("Deletes a product photo.")
+        .WithDescription("If the deleted photo was the color's main photo, the oldest remaining photo for that color becomes main.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

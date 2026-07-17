@@ -164,6 +164,16 @@ internal sealed class UpdateProductCommandHandler(
             return result;
         }
 
+        result = await validator.ValidateCategoryGenderCompatibilityAsync(
+            command.CategoryId,
+            command.GenderIds,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result;
+        }
+
         result = await validator.ValidateColorIdsAsync(
             command.Variants.Select(x => x.ColorId).Distinct().ToList(),
             cancellationToken);

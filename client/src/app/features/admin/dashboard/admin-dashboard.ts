@@ -27,6 +27,18 @@ export class AdminDashboard {
       link: '/admin/products'
     },
     {
+      icon: 'category',
+      title: 'Categories',
+      description: 'Manage categories and their gender tags',
+      link: '/admin/categories'
+    },
+    {
+      icon: 'storefront',
+      title: 'Brands',
+      description: 'Manage brands and logos',
+      link: '/admin/brands'
+    },
+    {
       icon: 'receipt_long',
       title: 'Orders',
       description: 'Track, fulfil and refund customer orders'

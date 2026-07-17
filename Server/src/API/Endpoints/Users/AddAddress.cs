@@ -34,6 +34,11 @@ internal sealed class AddAddress : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(AddAddress))
+        .WithSummary("Adds a delivery address for the signed-in user.")
+        .WithDescription("The first address added for an account becomes its default.")
+        .Produces<Guid>()
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

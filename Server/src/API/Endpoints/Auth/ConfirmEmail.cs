@@ -23,6 +23,10 @@ internal sealed class ConfirmEmail : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(ConfirmEmail))
+        .WithSummary("Confirms a user's email address using the emailed token.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

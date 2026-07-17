@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -79,6 +80,54 @@ export class ProductForm implements HasPendingChanges {
     return this.form.controls.variants;
   }
 
+  private readonly selectedGenderIds = toSignal(this.form.controls.genderIds.valueChanges, {
+    initialValue: <string[]>[]
+  });
+
+  private readonly selectedCategoryId = toSignal(this.form.controls.categoryId.valueChanges, {
+    initialValue: ''
+  });
+
+  /** Categories compatible with every currently selected gender —
+      a category must be explicitly tagged with all of them */
+  readonly availableCategories = computed(() => {
+    const genderIds = this.selectedGenderIds();
+    const categories = this.filters()?.categories ?? [];
+
+    return genderIds.length === 0
+      ? categories
+      : categories.filter(category => genderIds.every(id => category.genderIds.includes(id)));
+  });
+
+  /** Genders the selected category is tagged with — narrows the other way.
+      Never needs to prune an existing gender selection: availableCategories
+      already only lists categories that are supersets of it, so whichever
+      category gets picked is guaranteed compatible with what's selected. */
+  readonly availableGenders = computed(() => {
+    const categoryId = this.selectedCategoryId();
+    const genders = this.filters()?.genders ?? [];
+
+    if (!categoryId) {
+      return genders;
+    }
+
+    const category = this.filters()?.categories.find(c => c.id === categoryId);
+
+    return category ? genders.filter(g => category.genderIds.includes(g.id)) : genders;
+  });
+
+  /** Name of the selected category, only when it actually narrows the
+      gender list — drives the hint under the Genders field */
+  readonly selectedCategoryName = computed(() => {
+    const categoryId = this.selectedCategoryId();
+
+    if (!categoryId) {
+      return null;
+    }
+
+    return this.filters()?.categories.find(c => c.id === categoryId)?.name ?? null;
+  });
+
   constructor() {
     this.productService.getFilters().subscribe(filters => this.filters.set(filters));
 
@@ -87,6 +136,17 @@ export class ProductForm implements HasPendingChanges {
     } else {
       this.addVariant();
     }
+
+    // the previously selected category may no longer be valid once the
+    // gender selection changes — clear it rather than submit a bad combo
+    effect(() => {
+      const available = this.availableCategories();
+      const current = this.form.controls.categoryId.value;
+
+      if (current && !available.some(category => category.id === current)) {
+        this.form.controls.categoryId.setValue('');
+      }
+    });
   }
 
   hasPendingChanges(): boolean {

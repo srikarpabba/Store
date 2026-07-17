@@ -27,6 +27,11 @@ internal sealed class UpdateMyProfile : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(UpdateMyProfile))
+        .WithSummary("Updates the signed-in user's profile.")
+        .WithDescription("Changing the email address resets email confirmation and sends a new confirmation link.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }

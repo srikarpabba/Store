@@ -23,6 +23,11 @@ internal sealed class SetPassword : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(SetPassword))
+        .WithSummary("Sets a local password for a Google-only account.")
+        .WithDescription("For accounts that already have a password, use /auth/change-password instead.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }

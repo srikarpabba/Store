@@ -23,6 +23,11 @@ internal sealed class Login : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .WithName(nameof(Login))
+        .WithSummary("Signs in with email and password.")
+        .WithDescription("Returns an access/refresh token pair on success.")
+        .Produces<AccessTokensResponse>()
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

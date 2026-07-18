@@ -2,14 +2,17 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
+import { StorefrontService } from '../../services/storefront.service';
 import { ShopSection } from '../../models/enums/shop-section';
 import { Product } from '../../models/product';
+import { StorefrontCategoryItem, StorefrontSectionType } from '../../models/storefront-section';
 import { TitleCasePipe } from '@angular/common';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { BannerSlide, BannerSlider } from '../../../../shared/ui/banner-slider/banner-slider';
 
 @Component({
   selector: 'app-shop-page',
-  imports: [TitleCasePipe, PricePipe, RouterLink],
+  imports: [TitleCasePipe, PricePipe, RouterLink, BannerSlider],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.css',
 })
@@ -18,9 +21,15 @@ export class ShopPage {
 
   private shopService = inject(ShopService);
 
+  private storefrontService = inject(StorefrontService);
+
   readonly section = signal('');
 
   readonly products = signal<Product[]>([]);
+
+  readonly bannerSlides = signal<BannerSlide[]>([]);
+
+  readonly categories = signal<StorefrontCategoryItem[]>([]);
 
   ngOnInit(): void {
 
@@ -34,22 +43,39 @@ export class ShopPage {
 
       const search = queryParams.get('search') ?? undefined;
 
+      const category = queryParams.get('category') ?? undefined;
+
       this.section.set(section);
 
-      this.loadProducts(section, search);
+      this.loadProducts(section, search, category);
+
+      this.loadStorefrontSections(section);
 
     });
   }
 
-  private async loadProducts(section: ShopSection, search?: string) {
+  private loadProducts(section: ShopSection, search?: string, category?: string): void {
 
-    const response = await this.shopService
-      .loadSection(section, search);
+    this.shopService
+      .loadSection(section, search, category)
+      .subscribe(result => this.products.set(result.items));
+  }
 
-    response.subscribe(result => {
+  private loadStorefrontSections(section: ShopSection): void {
 
-      this.products.set(result.items);
+    if (section !== ShopSection.Men && section !== ShopSection.Women) {
+      this.bannerSlides.set([]);
+      this.categories.set([]);
+      return;
+    }
 
+    this.storefrontService.getSections(section).subscribe(response => {
+
+      const bannerSection = response.sections.find(s => s.type === StorefrontSectionType.Banner);
+      const categorySection = response.sections.find(s => s.type === StorefrontSectionType.Category);
+
+      this.bannerSlides.set((bannerSection?.items as BannerSlide[] | undefined) ?? []);
+      this.categories.set((categorySection?.items as StorefrontCategoryItem[] | undefined) ?? []);
     });
   }
 }

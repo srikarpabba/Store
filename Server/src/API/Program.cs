@@ -1,8 +1,10 @@
 using API;
 using API.Extensions;
 using API.GraphQL;
+using API.Handlers;
 using Application;
 using Hangfire;
+using Hangfire.Dashboard;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -36,8 +38,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();
 
-    // Inspect queued/failed email jobs at /hangfire
-    app.UseHangfireDashboard("/hangfire");
+    // Inspect queued/failed email jobs at /hangfire.
+    // Default dashboard auth only allows loopback requests, which breaks
+    // under Docker's port-forwarding — safe to allow all here since this
+    // whole block is already Development-only.
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new AllowAllDashboardAuthorizationFilter()]
+    });
 
     await app.ApplyMigrationsAsync();
 }

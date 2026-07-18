@@ -3,7 +3,7 @@ using Amazon.S3;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Email;
-using Application.Abstractions.Home;
+using Application.Abstractions.Storefront;
 using Application.Abstractions.Storage;
 using Application.Abstractions.Users;
 using Hangfire;
@@ -13,7 +13,7 @@ using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Email;
-using Infrastructure.Home;
+using Infrastructure.Storefront;
 using Infrastructure.Storage;
 using Infrastructure.Time;
 using Infrastructure.Users;
@@ -54,7 +54,7 @@ public static class DependencyInjection
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
-        services.AddTransient<IHomeSectionService, HomeSectionService>();
+        services.AddTransient<IStorefrontSectionService, StorefrontSectionService>();
 
 
         return services;

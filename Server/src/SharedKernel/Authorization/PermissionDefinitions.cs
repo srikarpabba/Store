@@ -18,6 +18,11 @@ public static class PermissionDefinitions
 
         (Permissions.BrandsCreate, "Create brands"),
         (Permissions.BrandsUpdate, "Update brands"),
-        (Permissions.BrandsDelete, "Delete brands")
+        (Permissions.BrandsDelete, "Delete brands"),
+
+        (Permissions.BannersRead, "Read banners"),
+        (Permissions.BannersCreate, "Create banners"),
+        (Permissions.BannersUpdate, "Update banners"),
+        (Permissions.BannersDelete, "Delete banners")
     ];
 }

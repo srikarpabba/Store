@@ -1,0 +1,86 @@
+<div class="banner-form">
+    <header class="banner-form__header">
+        <a mat-icon-button routerLink="/admin/store-look/banners" aria-label="Back to banners">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit banner' : 'New banner' }}</h1>
+            <p>{{ isEdit ? 'Update the banner details and image.' : 'Add a banner for a storefront page.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="banner-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Storefront</mat-label>
+                <mat-select formControlName="storefront">
+                    @for (storefront of storefronts; track storefront) {
+                    <mat-option [value]="storefront">{{ storefront | titlecase }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Title</mat-label>
+                <input matInput formControlName="title" />
+                @if (form.controls.title.hasError('maxlength')) {
+                <mat-error>Title must be 200 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Link</mat-label>
+                <input matInput formControlName="link" placeholder="https://…" />
+                @if (form.controls.link.hasError('maxlength')) {
+                <mat-error>Link must be 2048 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Sort order</mat-label>
+                <input matInput type="number" formControlName="sortOrder" />
+            </mat-form-field>
+
+            <mat-checkbox formControlName="isActive">Active</mat-checkbox>
+        </section>
+
+        @if (isEdit && banner(); as savedBanner) {
+        <section class="banner-form__card">
+            <h2>Image</h2>
+
+            <div class="banner-form__image-row">
+                @if (savedBanner.photo) {
+                <img class="banner-form__image" [src]="savedBanner.photo" [alt]="savedBanner.title ?? ''" />
+                } @else {
+                <span class="banner-form__image banner-form__image--empty">
+                    <mat-icon>image</mat-icon>
+                </span>
+                }
+
+                <button mat-stroked-button type="button" (click)="imageInput.click()">
+                    <mat-icon>add_photo_alternate</mat-icon>
+                    {{ savedBanner.photo ? 'Replace' : 'Upload' }}
+                </button>
+                <input #imageInput type="file" hidden accept="image/jpeg,image/png,image/webp,image/avif"
+                    (change)="onImageSelected(imageInput)" />
+            </div>
+        </section>
+        }
+
+        <div class="banner-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="banner-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create banner' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/store-look/banners">Cancel</a>
+        </div>
+    </form>
+</div>

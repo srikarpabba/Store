@@ -1,0 +1,151 @@
+.admin-banners {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.admin-banners__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-banners__header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-banners__header h1 {
+    margin: 0;
+}
+
+.admin-banners__header p {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.admin-banners__tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-banners__tab {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.admin-banners__tab--active {
+    border-color: var(--color-primary);
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-weight: 600;
+}
+
+.admin-banners__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 4rem 1rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.admin-banners__empty mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-text-subtle);
+}
+
+.admin-banners__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 1rem;
+}
+
+.admin-banners__card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+}
+
+.admin-banners__thumb {
+    flex-shrink: 0;
+    width: 4.5rem;
+    height: 3rem;
+    border-radius: 0.375rem;
+    object-fit: cover;
+    background: var(--color-surface-alt);
+}
+
+.admin-banners__thumb--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-subtle);
+}
+
+.admin-banners__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-banners__name {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.admin-banners__inactive {
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-surface-alt);
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-banners__meta {
+    margin: 0.2rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.admin-banners__storefront-chip {
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.admin-banners__actions {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.admin-banners__delete {
+    color: var(--color-primary);
+}

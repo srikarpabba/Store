@@ -1,6 +1,9 @@
 <div class="admin-categories">
     <header class="admin-categories__header">
-        <div>
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-categories__header-text">
             <h1>Categories</h1>
             <p>{{ categories().length }} categor{{ categories().length === 1 ? 'y' : 'ies' }}</p>
         </div>

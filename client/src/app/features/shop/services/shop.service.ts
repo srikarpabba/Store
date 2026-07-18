@@ -8,9 +8,13 @@ import { ProductQuery } from '../models/product-query';
 export class ShopService {
     private readonly productService = inject(ProductService);
 
-    loadSection(section: ShopSection, search?: string) {
+    loadSection(section: ShopSection, search?: string, category?: string) {
 
         const query: ProductQuery = { search };
+
+        if (category) {
+            query.categories = [category];
+        }
 
         switch (section) {
 

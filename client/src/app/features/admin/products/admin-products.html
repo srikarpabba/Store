@@ -1,6 +1,9 @@
 <div class="admin-products">
     <header class="admin-products__header">
-        <div>
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-products__header-text">
             <h1>Products</h1>
             <p>{{ totalCount() }} product{{ totalCount() === 1 ? '' : 's' }} in the catalog</p>
         </div>

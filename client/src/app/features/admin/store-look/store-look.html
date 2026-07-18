@@ -1,0 +1,21 @@
+<div class="admin">
+    <header class="admin__header">
+        <a class="admin__back" routerLink="/admin" aria-label="Back to admin dashboard">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>Store Look</h1>
+            <p>Manage the visual sections shown on storefront pages.</p>
+        </div>
+    </header>
+
+    <div class="admin__grid">
+        @for (section of sections; track section.title) {
+        <a class="admin__card admin__card--active" [routerLink]="section.link">
+            <mat-icon class="admin__card-icon">{{ section.icon }}</mat-icon>
+            <h2 class="admin__card-title">{{ section.title }}</h2>
+            <p class="admin__card-description">{{ section.description }}</p>
+        </a>
+        }
+    </div>
+</div>

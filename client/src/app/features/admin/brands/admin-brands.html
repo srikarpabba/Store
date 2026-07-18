@@ -1,6 +1,9 @@
 <div class="admin-brands">
     <header class="admin-brands__header">
-        <div>
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-brands__header-text">
             <h1>Brands</h1>
             <p>{{ brands().length }} brand{{ brands().length === 1 ? '' : 's' }}</p>
         </div>

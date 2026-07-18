@@ -22,21 +22,15 @@ export class AdminDashboard {
   readonly sections: AdminSection[] = [
     {
       icon: 'inventory_2',
-      title: 'Products',
-      description: 'Create, edit and organise the catalog',
-      link: '/admin/products'
+      title: 'Product Management',
+      description: 'Products, categories and brands',
+      link: '/admin/product-management'
     },
     {
-      icon: 'category',
-      title: 'Categories',
-      description: 'Manage categories and their gender tags',
-      link: '/admin/categories'
-    },
-    {
-      icon: 'storefront',
-      title: 'Brands',
-      description: 'Manage brands and logos',
-      link: '/admin/brands'
+      icon: 'auto_awesome_mosaic',
+      title: 'Store Look',
+      description: 'Banners and other storefront visual sections',
+      link: '/admin/store-look'
     },
     {
       icon: 'receipt_long',

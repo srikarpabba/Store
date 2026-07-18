@@ -210,7 +210,7 @@ export class ProductForm implements HasPendingChanges {
         next: id => {
           this.notificationService.success('Product created. You can now upload images.');
           this.form.markAsPristine();
-          this.router.navigate(['/admin/products', id, 'edit']);
+          this.router.navigate(['/admin/product-management/products', id, 'edit']);
         },
         error: () => { }
       });

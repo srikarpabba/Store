@@ -1,0 +1,68 @@
+<div class="admin-banners">
+    <header class="admin-banners__header">
+        <a mat-icon-button routerLink="/admin/store-look" aria-label="Back to store look">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-banners__header-text">
+            <h1>Banners</h1>
+            <p>{{ banners().length }} banner{{ banners().length === 1 ? '' : 's' }}</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add banner
+        </a>
+    </header>
+
+    <div class="admin-banners__tabs">
+        @for (tab of tabs; track tab.label) {
+        <button class="admin-banners__tab" [class.admin-banners__tab--active]="tab.label === activeTab().label"
+            type="button" (click)="selectTab(tab)">
+            {{ tab.label }}
+        </button>
+        }
+    </div>
+
+    @if (!isLoading() && banners().length === 0) {
+    <div class="admin-banners__empty">
+        <mat-icon>view_carousel</mat-icon>
+        <p>No banners yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-banners__grid">
+        @for (banner of banners(); track banner.id) {
+        <div class="admin-banners__card">
+            @if (banner.photo) {
+            <img class="admin-banners__thumb" [src]="banner.photo" [alt]="banner.title ?? ''" />
+            } @else {
+            <span class="admin-banners__thumb admin-banners__thumb--empty">
+                <mat-icon>image</mat-icon>
+            </span>
+            }
+
+            <div class="admin-banners__body">
+                <p class="admin-banners__name">
+                    {{ banner.title || 'Untitled banner' }}
+                    @if (!banner.isActive) {
+                    <span class="admin-banners__inactive">Inactive</span>
+                    }
+                </p>
+                <p class="admin-banners__meta">
+                    <span class="admin-banners__storefront-chip">{{ banner.storefront }}</span>
+                    Order {{ banner.sortOrder }}
+                </p>
+            </div>
+
+            <div class="admin-banners__actions">
+                <a mat-icon-button [routerLink]="[banner.id, 'edit']" aria-label="Edit banner">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-banners__delete" type="button"
+                    (click)="deleteBanner(banner)" aria-label="Delete banner">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

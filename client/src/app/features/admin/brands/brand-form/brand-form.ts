@@ -94,7 +94,7 @@ export class BrandForm implements HasPendingChanges {
         next: id => {
           this.notificationService.success('Brand created. You can now upload a logo.');
           this.form.markAsPristine();
-          this.router.navigate(['/admin/brands', id, 'edit']);
+          this.router.navigate(['/admin/product-management/brands', id, 'edit']);
         },
         error: () => { }
       });

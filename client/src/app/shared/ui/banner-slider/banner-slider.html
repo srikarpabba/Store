@@ -1,0 +1,34 @@
+@if (banners().length > 0) {
+<div class="banner-slider">
+    <div class="banner-slider__track" [style.transform]="'translateX(-' + (activeIndex() * 100) + '%)'">
+        @for (banner of banners(); track banner.id) {
+        <a class="banner-slider__slide" [href]="banner.link || null">
+            @if (banner.photo) {
+            <img class="banner-slider__image" [src]="banner.photo" [alt]="banner.title ?? ''" />
+            }
+            @if (banner.title) {
+            <span class="banner-slider__caption">{{ banner.title }}</span>
+            }
+        </a>
+        }
+    </div>
+
+    @if (banners().length > 1) {
+    <button class="banner-slider__nav banner-slider__nav--prev" type="button" (click)="previous()"
+        aria-label="Previous banner">
+        <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button class="banner-slider__nav banner-slider__nav--next" type="button" (click)="next()"
+        aria-label="Next banner">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <div class="banner-slider__dots">
+        @for (banner of banners(); track banner.id; let i = $index) {
+        <button class="banner-slider__dot" [class.banner-slider__dot--active]="i === activeIndex()" type="button"
+            (click)="select(i)" [attr.aria-label]="'Go to slide ' + (i + 1)"></button>
+        }
+    </div>
+    }
+</div>
+}

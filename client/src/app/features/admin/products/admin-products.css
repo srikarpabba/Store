@@ -7,9 +7,13 @@
 .admin-products__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 1.25rem;
+}
+
+.admin-products__header-text {
+    flex: 1;
+    min-width: 0;
 }
 
 .admin-products__header h1 {

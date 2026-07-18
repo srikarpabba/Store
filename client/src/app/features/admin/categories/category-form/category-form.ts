@@ -103,7 +103,7 @@ export class CategoryForm implements HasPendingChanges {
         next: id => {
           this.notificationService.success('Category created. You can now upload photos.');
           this.form.markAsPristine();
-          this.router.navigate(['/admin/categories', id, 'edit']);
+          this.router.navigate(['/admin/product-management/categories', id, 'edit']);
         },
         error: () => { }
       });

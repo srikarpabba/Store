@@ -1,9 +1,10 @@
 ﻿using API.Endpoints;
 using API.Endpoints.Auth;
+using API.Endpoints.Banners;
 using API.Endpoints.Brands;
 using API.Endpoints.Categories;
-using API.Endpoints.Home;
 using API.Endpoints.Products;
+using API.Endpoints.Storefronts;
 using API.Endpoints.Users;
 using API.RateLimiting;
 
@@ -15,24 +16,25 @@ public static class EndpointExtensions
     {
         RouteGroupBuilder endpoints = app.MapGroup("/api");
 
-        endpoints.MapHomeEndpoints();
+        endpoints.MapStorefrontEndpoints();
         endpoints.MapAuthenticationEndpoints();
         endpoints.MapProductEndpoints();
         endpoints.MapCategoryEndpoints();
         endpoints.MapBrandEndpoints();
+        endpoints.MapBannerEndpoints();
         endpoints.MapCartEndpoints();
         endpoints.MapUserEndpoints();
         endpoints.MapWishlistEndpoints();
     }
 
-    private static void MapHomeEndpoints(this IEndpointRouteBuilder app)
+    private static void MapStorefrontEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder endpoints = app.MapGroup("/home")
-            .WithTags(Tags.Home)
+        RouteGroupBuilder endpoints = app.MapGroup("/storefronts")
+            .WithTags(Tags.Storefronts)
             .RequireRateLimiting(RateLimitingPolicies.Authentication);
 
         endpoints.MapPublicGroup()
-           .MapEndpoint<GetHome>();
+           .MapEndpoint<GetStorefrontSections>();
     }
 
     private static void MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
@@ -106,6 +108,22 @@ public static class EndpointExtensions
            .MapEndpoint<DeleteBrand>()
            .MapEndpoint<UploadBrandLogo>()
            .MapEndpoint<DeleteBrandLogo>();
+    }
+
+    private static void MapBannerEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/banners")
+            .WithTags(Tags.Banners);
+
+        // Admin-only end to end — the storefront-facing banner list comes
+        // from /storefronts/{storefront} instead, so there's no public group here
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<GetBanners>()
+           .MapEndpoint<GetBanner>()
+           .MapEndpoint<CreateBanner>()
+           .MapEndpoint<UpdateBanner>()
+           .MapEndpoint<DeleteBanner>()
+           .MapEndpoint<UploadBannerImage>();
     }
 
     private static void MapCartEndpoints(this IEndpointRouteBuilder app)

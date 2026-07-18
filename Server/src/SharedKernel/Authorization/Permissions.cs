@@ -17,4 +17,9 @@ public static class Permissions
     public const string BrandsCreate = "brands:create";
     public const string BrandsUpdate = "brands:update";
     public const string BrandsDelete = "brands:delete";
+
+    public const string BannersRead = "banners:read";
+    public const string BannersCreate = "banners:create";
+    public const string BannersUpdate = "banners:update";
+    public const string BannersDelete = "banners:delete";
 }

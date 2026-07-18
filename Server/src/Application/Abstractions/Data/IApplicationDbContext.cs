@@ -1,4 +1,5 @@
-﻿using Domain.Products;
+﻿using Domain.Banners;
+using Domain.Products;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Application.Abstractions.Data;
 public interface IApplicationDbContext
 {
     DbSet<RefreshToken> RefreshTokens { get; }
+    DbSet<Banner> Banners { get; }
     DbSet<Address> Addresses { get; }
     DbSet<Product> Products { get; }
     DbSet<Category> Categories { get; }

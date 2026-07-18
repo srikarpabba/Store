@@ -2,8 +2,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 /**
  * Extracts a user-friendly message from an API error.
- * The API returns RFC 7807 problem details, with validation
- * failures carried in an `errors` dictionary.
+ * The API returns RFC 7807 problem details. Validation failures carry
+ * their messages in an `errors` property, but its shape differs by source:
+ * - FluentValidation's automatic request validation: a dictionary of
+ *   `{ propertyName: string[] }`.
+ * - This app's own aggregated `ValidationError` (used for things like
+ *   file-upload validation): an array of `{ code, description, type }`.
  */
 export function extractHttpErrorMessage(error: HttpErrorResponse): string {
 
@@ -21,7 +25,17 @@ export function extractHttpErrorMessage(error: HttpErrorResponse): string {
 
     const problem = error.error;
 
-    if (problem?.errors) {
+    if (Array.isArray(problem?.errors)) {
+        const firstError = problem.errors[0];
+
+        if (typeof firstError === 'string') {
+            return firstError;
+        }
+
+        if (typeof firstError?.description === 'string') {
+            return firstError.description;
+        }
+    } else if (problem?.errors) {
         const firstError = Object.values(problem.errors).flat()[0];
 
         if (typeof firstError === 'string') {

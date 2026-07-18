@@ -1,16 +1,19 @@
 namespace Application.Common.Validation;
 
 /// <summary>
-/// Confirms an uploaded file's actual bytes match its declared image content
-/// type, instead of trusting the client-supplied Content-Type/extension.
+/// Confirms an uploaded file's actual bytes are a real image of an allowed
+/// type, instead of trusting the client-supplied Content-Type/extension. It
+/// deliberately accepts a file whose bytes match *any* allowed format even if
+/// its extension/content-type claims a different one (e.g. a WebP saved as
+/// ".jpg" — common with modern CDN downloads) — the goal is to reject
+/// non-images (a renamed executable), not to police mislabeled-but-valid ones.
 /// </summary>
 public static class ImageSignatureValidator
 {
     private static readonly byte[] PngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
-    public static async Task<bool> MatchesDeclaredTypeAsync(
+    public static async Task<bool> IsRecognizedImageAsync(
         Stream content,
-        string contentType,
         CancellationToken cancellationToken)
     {
         if (!content.CanSeek)
@@ -38,24 +41,30 @@ public static class ImageSignatureValidator
 
         content.Position = 0;
 
-        return contentType switch
+        // JPEG
+        if (totalRead >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
         {
-            "image/jpeg" => totalRead >= 3
-                && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+            return true;
+        }
 
-            "image/png" => totalRead >= 8
-                && header.AsSpan(0, 8).SequenceEqual(PngSignature),
+        // PNG
+        if (totalRead >= 8 && header.AsSpan(0, 8).SequenceEqual(PngSignature))
+        {
+            return true;
+        }
 
-            "image/webp" => totalRead >= 12
-                && header.AsSpan(0, 4).SequenceEqual("RIFF"u8)
-                && header.AsSpan(8, 4).SequenceEqual("WEBP"u8),
+        // WebP: "RIFF" .... "WEBP"
+        if (totalRead >= 12 && header.AsSpan(0, 4).SequenceEqual("RIFF"u8) && header.AsSpan(8, 4).SequenceEqual("WEBP"u8))
+        {
+            return true;
+        }
 
-            // ISOBMFF 'ftyp' box; covers the vast majority of real-world encoders,
-            // which set major_brand to avif/avis directly.
-            "image/avif" => totalRead >= 12
-                && header.AsSpan(4, 4).SequenceEqual("ftyp"u8),
+        // AVIF: ISOBMFF 'ftyp' box
+        if (totalRead >= 12 && header.AsSpan(4, 4).SequenceEqual("ftyp"u8))
+        {
+            return true;
+        }
 
-            _ => false
-        };
+        return false;
     }
 }

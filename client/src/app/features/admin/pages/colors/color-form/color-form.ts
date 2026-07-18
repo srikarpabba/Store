@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -13,6 +13,8 @@ import { Color } from '../../../../shop/models/color';
 import { HasPendingChanges } from '../../../../../core/guards/pending-changes.guard';
 import { LoadingService } from '../../../../../core/services/loading.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { ColorPicker } from '../../../../../shared/ui/color-picker/color-picker';
+import { nearestColorName } from '../../../../../shared/ui/color-picker/named-colors';
 
 @Component({
   selector: 'app-color-form',
@@ -23,7 +25,8 @@ import { NotificationService } from '../../../../../core/services/notification.s
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ColorPicker
   ],
   templateUrl: './color-form.html',
   styleUrl: './color-form.css',
@@ -45,7 +48,14 @@ export class ColorForm implements HasPendingChanges {
 
   readonly isEdit = this.colorId !== null;
 
-  private readonly picker = viewChild<ElementRef<HTMLInputElement>>('picker');
+  /** While true, the name field tracks the picked color's nearest name. Turns
+   *  off the moment the admin types their own name (and stays off in edit
+   *  mode, so a loaded name is never clobbered). */
+  private autoName = true;
+
+  /** Guards the name write below so our own auto-fill isn't mistaken for a
+   *  manual edit. */
+  private settingName = false;
 
   readonly form = this.formBuilder.group({
     name: ['', [Validators.required, Validators.maxLength(50)]],
@@ -57,23 +67,23 @@ export class ColorForm implements HasPendingChanges {
       this.adminColorService.getById(this.colorId).subscribe(color => this.populate(color));
     }
 
-    // Mirror the hex into the native picker when it's typed or loaded. We only
-    // write when it actually differs from what the picker already shows — so a
-    // picker-originated change (drag) is a no-op here and never resets the
-    // native cursor mid-drag. Native color inputs use lowercase #rrggbb.
+    // Suggest a name from the picked color (picker drag, preset, or typed hex),
+    // until the admin takes over the name themselves.
     this.form.controls.hexCode.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(value => {
-        const el = this.picker()?.nativeElement;
-
-        if (!el || !ColorForm.HEX_PATTERN.test(value)) {
-          return;
+      .subscribe(hex => {
+        if (this.autoName && ColorForm.HEX_PATTERN.test(hex)) {
+          this.settingName = true;
+          this.form.controls.name.setValue(nearestColorName(hex));
+          this.settingName = false;
         }
+      });
 
-        const normalized = value.toLowerCase();
-
-        if (el.value !== normalized) {
-          el.value = normalized;
+    this.form.controls.name.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (!this.settingName) {
+          this.autoName = false;
         }
       });
   }
@@ -82,10 +92,8 @@ export class ColorForm implements HasPendingChanges {
     return this.form.dirty;
   }
 
-  onPickerInput(event: Event): void {
-    const value = (event.target as HTMLInputElement).value.toUpperCase();
-
-    this.form.controls.hexCode.setValue(value);
+  onPickerChange(hex: string): void {
+    this.form.controls.hexCode.setValue(hex.toUpperCase());
     this.form.controls.hexCode.markAsDirty();
   }
 
@@ -124,6 +132,9 @@ export class ColorForm implements HasPendingChanges {
   }
 
   private populate(color: Color): void {
+    // editing an existing color — keep its saved name, don't auto-overwrite
+    this.autoName = false;
+
     this.form.patchValue({
       name: color.name,
       hexCode: color.hexCode

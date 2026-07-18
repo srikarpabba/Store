@@ -23,10 +23,10 @@
                 }
             </mat-form-field>
 
+            <app-color-picker [value]="form.controls.hexCode.value" (valueChange)="onPickerChange($event)" />
+
             <div class="color-form__hex-row">
-                <input #picker type="color" class="color-form__picker"
-                    (input)="onPickerInput($event)" (change)="onPickerInput($event)"
-                    aria-label="Pick color" />
+                <span class="color-form__preview" [style.background]="form.controls.hexCode.value"></span>
 
                 <mat-form-field appearance="outline" class="color-form__hex-field">
                     <mat-label>Hex code</mat-label>

@@ -60,7 +60,7 @@ internal sealed class UploadProductImagesCommandValidator
 
                 file.RuleFor(x => x)
                     .MustAsync((upload, cancellationToken) =>
-                        ImageSignatureValidator.MatchesDeclaredTypeAsync(upload.Content, upload.ContentType, cancellationToken))
+                        ImageSignatureValidator.IsRecognizedImageAsync(upload.Content, cancellationToken))
                     .WithMessage("A file's contents don't match a valid image.")
                     .When(upload => AllowedContentTypes.Contains(upload.ContentType));
             });

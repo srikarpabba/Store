@@ -13,9 +13,30 @@ internal sealed class StorefrontSectionService(
     IFileStorage fileStorage)
     : IStorefrontSectionService
 {
+    private const int NewArrivalsCount = 4;
+
     private sealed record BannerRow(Guid Id, string? Title, string? LinkUrl, string? ImageFileName, int SortOrder);
 
     private sealed record CategoryRow(Guid Id, string Name, string? PhotoFileName);
+
+    private sealed record NewArrivalRow(
+        Guid Id,
+        string Name,
+        decimal StartingPrice,
+        decimal Rating,
+        string? ImageFileName,
+        Guid CategoryId,
+        string CategoryName,
+        List<NewArrivalColorRow> Colors);
+
+    private sealed record NewArrivalColorRow(
+        Guid ProductColorId,
+        Guid ColorId,
+        string ColorName,
+        string HexCode,
+        List<NewArrivalPhotoRow> Photos);
+
+    private sealed record NewArrivalPhotoRow(Guid Id, string FileName, bool IsMain);
 
     public async Task<IReadOnlyList<StorefrontSectionResponse>> GetSectionsAsync(string storefront, CancellationToken cancellationToken)
     {
@@ -48,6 +69,12 @@ internal sealed class StorefrontSectionService(
         if (categories.Count > 0)
         {
             sections.Add(new StorefrontSectionResponse("categories", "Shop by Category", StorefrontSectionType.Category, sections.Count, categories));
+        }
+
+        IReadOnlyList<StorefrontProductItem> newArrivals = await GetNewArrivalsAsync(genderName, cancellationToken);
+        if (newArrivals.Count > 0)
+        {
+            sections.Add(new StorefrontSectionResponse("new-arrivals", "New Arrivals", StorefrontSectionType.Product, sections.Count, newArrivals));
         }
 
         return sections;
@@ -84,6 +111,59 @@ internal sealed class StorefrontSectionService(
                 r.LinkUrl,
                 r.ImageFileName is null ? null : fileStorage.GetUrl(r.ImageFileName).AbsoluteUri,
                 r.SortOrder))
+            .ToList();
+    }
+
+    private async Task<IReadOnlyList<StorefrontProductItem>> GetNewArrivalsAsync(string genderName, CancellationToken cancellationToken)
+    {
+        List<NewArrivalRow> rows = await context.Products
+            .AsNoTracking()
+            .Where(p => p.Variants.Any() && p.ProductGenders.Any(pg => pg.Gender.Name == genderName))
+            .OrderByDescending(p => p.CreatedOnUtc)
+            .Take(NewArrivalsCount)
+            .Select(p => new NewArrivalRow(
+                p.Id,
+                p.Name,
+                p.Variants.Min(v => v.Price),
+                p.Rating,
+                p.ProductColors
+                    .SelectMany(pc => pc.Photos)
+                    .OrderByDescending(ph => ph.IsMain)
+                    .ThenBy(ph => ph.CreatedOnUtc)
+                    .Select(ph => ph.FileName)
+                    .FirstOrDefault(),
+                p.CategoryId,
+                p.Category.Name,
+                p.ProductColors
+                    .Select(pc => new NewArrivalColorRow(
+                        pc.Id,
+                        pc.ColorId,
+                        pc.Color.Name,
+                        pc.Color.HexCode,
+                        pc.Photos
+                            .Select(ph => new NewArrivalPhotoRow(ph.Id, ph.FileName, ph.IsMain))
+                            .ToList()))
+                    .ToList()))
+            .ToListAsync(cancellationToken);
+
+        return rows
+            .Select(r => new StorefrontProductItem(
+                r.Id,
+                r.Name,
+                r.StartingPrice,
+                r.Rating,
+                r.ImageFileName is null ? null : fileStorage.GetUrl(r.ImageFileName).AbsoluteUri,
+                new StorefrontProductCategory(r.CategoryId, r.CategoryName),
+                r.Colors
+                    .Select(c => new StorefrontProductColor(
+                        c.ProductColorId,
+                        c.ColorId,
+                        c.ColorName,
+                        c.HexCode,
+                        c.Photos
+                            .Select(ph => new StorefrontProductPhoto(ph.Id, fileStorage.GetUrl(ph.FileName).AbsoluteUri, ph.IsMain))
+                            .ToList()))
+                    .ToList()))
             .ToList();
     }
 

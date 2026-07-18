@@ -1,0 +1,22 @@
+<div class="cp">
+    <div #sv class="cp__sv" [style.background-color]="hueColor()"
+        (pointerdown)="onSvPointerDown($event)" (pointermove)="onSvPointerMove($event)">
+        <div class="cp__sv-white"></div>
+        <div class="cp__sv-black"></div>
+        <div class="cp__handle" [style.left.%]="svLeft()" [style.top.%]="svTop()"></div>
+    </div>
+
+    <div #hue class="cp__hue" (pointerdown)="onHuePointerDown($event)" (pointermove)="onHuePointerMove($event)">
+        <div class="cp__hue-handle" [style.left.%]="hueLeft()"></div>
+    </div>
+
+    @if (presets().length > 0) {
+    <div class="cp__presets">
+        @for (preset of presets(); track preset.hex) {
+        <button type="button" class="cp__preset" [style.background]="preset.hex"
+            (click)="selectPreset(preset.hex)" [title]="preset.name" [attr.aria-label]="preset.name"></button>
+        }
+    </div>
+    }
+</div>
+

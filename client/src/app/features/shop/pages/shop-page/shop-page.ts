@@ -34,6 +34,8 @@ export class ShopPage {
 
   readonly categories = signal<StorefrontCategoryItem[]>([]);
 
+  readonly newArrivals = signal<Product[]>([]);
+
   /** 0 = nothing loaded yet for the current section/search/category */
   readonly pageIndex = signal(0);
 
@@ -66,12 +68,20 @@ export class ShopPage {
    *  category/search filter change should only reload the product grid. */
   private loadedStorefrontSection: ShopSection | null = null;
 
+  /** False on Men/Women until the storefront sections (banner + categories +
+   *  new arrivals) have loaded. Until then the page is artificially short and
+   *  the sentinel would sit spuriously in view, eager-loading products before
+   *  the shopper ever scrolls. Gate the observer on this so it only attaches
+   *  once the page has its real height. */
+  private readonly storefrontReady = signal(false);
+
   constructor() {
     effect(onCleanup => {
       const sentinel = this.scrollSentinel();
-      this.resetTrigger(); // establishes the dependency — re-run on every section change
+      this.resetTrigger(); // re-run on every section change
+      const ready = this.storefrontReady(); // …and once the sections have landed
 
-      if (!sentinel) {
+      if (!sentinel || !ready) {
         return;
       }
 
@@ -222,16 +232,26 @@ export class ShopPage {
     if (section !== ShopSection.Men && section !== ShopSection.Women) {
       this.bannerSlides.set([]);
       this.categories.set([]);
+      this.newArrivals.set([]);
+      // No sections to wait for — the sentinel starts in view, load right away.
+      this.storefrontReady.set(true);
       return;
     }
+
+    // Defer product loading until these land (see storefrontReady).
+    this.storefrontReady.set(false);
 
     this.storefrontService.getSections(section).subscribe(response => {
 
       const bannerSection = response.sections.find(s => s.type === StorefrontSectionType.Banner);
       const categorySection = response.sections.find(s => s.type === StorefrontSectionType.Category);
+      const productSection = response.sections.find(s => s.type === StorefrontSectionType.Product);
 
       this.bannerSlides.set((bannerSection?.items as BannerSlide[] | undefined) ?? []);
       this.categories.set((categorySection?.items as StorefrontCategoryItem[] | undefined) ?? []);
+      this.newArrivals.set((productSection?.items as Product[] | undefined) ?? []);
+
+      this.storefrontReady.set(true);
     });
   }
 }

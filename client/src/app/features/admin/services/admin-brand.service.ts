@@ -1,8 +1,9 @@
 import { inject, Service } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { BrandApi } from '../../shop/api/brand-api';
 import { Brand } from '../../shop/models/brand';
+import { PagedResponse } from '../../shop/models/paged-response';
 import { SaveBrandRequest } from '../models/save-brand-request';
 
 @Service()
@@ -12,8 +13,16 @@ export class AdminBrandService {
 
     private readonly apiUrl = environment.apiUrl;
 
-    getAll() {
-        return this.http.get<Brand[]>(`${this.apiUrl}${BrandApi.brands}`);
+    getAll(pageIndex: number, pageSize: number) {
+
+        const params = new HttpParams()
+            .set('pageIndex', pageIndex)
+            .set('pageSize', pageSize);
+
+        return this.http.get<PagedResponse<Brand>>(
+            `${this.apiUrl}${BrandApi.brands}`,
+            { params }
+        );
     }
 
     getById(id: string) {

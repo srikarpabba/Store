@@ -8,9 +8,9 @@ import { ProductQuery } from '../models/product-query';
 export class ShopService {
     private readonly productService = inject(ProductService);
 
-    loadSection(section: ShopSection, search?: string, category?: string) {
+    loadSection(section: ShopSection, search?: string, category?: string, pageIndex = 1) {
 
-        const query: ProductQuery = { search };
+        const query: ProductQuery = { search, pageIndex, pageSize: 24 };
 
         if (category) {
             query.categories = [category];
@@ -35,6 +35,6 @@ export class ShopService {
                 break;
         }
 
-        return this.productService.getProducts(query);
+        return this.productService.getProductsGraphQl(query);
     }
 }

@@ -1,0 +1,230 @@
+<div class="product-form">
+    <header class="product-form__header">
+        <a mat-icon-button routerLink="/admin/product-management/products" aria-label="Back to products">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit product' : 'New product' }}</h1>
+            <p>{{ isEdit ? 'Update the catalog entry and its variants.' : 'Add a product with at least one variant.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="product-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 200 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="4"></textarea>
+                @if (form.controls.description.hasError('required')) {
+                <mat-error>Description is required</mat-error>
+                } @else if (form.controls.description.hasError('maxlength')) {
+                <mat-error>Description must be 2000 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <div class="product-form__row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Category</mat-label>
+                    <mat-select formControlName="categoryId">
+                        @for (category of availableCategories(); track category.id) {
+                        <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (form.controls.categoryId.hasError('required')) {
+                    <mat-error>Category is required</mat-error>
+                    }
+                    @if (availableCategories().length === 0) {
+                    <mat-hint>No categories are tagged for the selected genders yet</mat-hint>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Brand</mat-label>
+                    <mat-select formControlName="brandId">
+                        @for (brand of filters()?.brands ?? []; track brand.id) {
+                        <mat-option [value]="brand.id">{{ brand.name }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (form.controls.brandId.hasError('required')) {
+                    <mat-error>Brand is required</mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Genders</mat-label>
+                <mat-select formControlName="genderIds" multiple>
+                    @for (gender of availableGenders(); track gender.id) {
+                    <mat-option [value]="gender.id">{{ gender.name }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.controls.genderIds.hasError('required')) {
+                <mat-error>Select at least one gender</mat-error>
+                }
+                @if (selectedCategoryName(); as categoryName) {
+                <mat-hint>Showing genders tagged on "{{ categoryName }}"</mat-hint>
+                }
+            </mat-form-field>
+        </section>
+
+        <section class="product-form__card">
+            <div class="product-form__variants-header">
+                <h2>Variants</h2>
+                <button mat-stroked-button type="button" (click)="addVariant()">
+                    <mat-icon>add</mat-icon>
+                    Add variant
+                </button>
+            </div>
+
+            @if (variants.length === 0) {
+            <p class="product-form__no-variants">No variants yet — add at least one.</p>
+            }
+
+            <div formArrayName="variants">
+                @for (variant of variants.controls; track variant; let i = $index) {
+                <div class="product-form__variant" [formGroupName]="i">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Color</mat-label>
+                        <mat-select formControlName="colorId">
+                            @for (color of filters()?.colors ?? []; track color.id) {
+                            <mat-option [value]="color.id">
+                                <span class="product-form__color-option">
+                                    <span class="product-form__color-swatch" [style.background]="color.hexCode"></span>
+                                    {{ color.name }}
+                                </span>
+                            </mat-option>
+                            }
+                        </mat-select>
+                        @if (variant.controls.colorId.hasError('required')) {
+                        <mat-error>Required</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Size</mat-label>
+                        <mat-select formControlName="sizeId">
+                            @for (size of filters()?.sizes ?? []; track size.id) {
+                            <mat-option [value]="size.id">{{ size.name }}</mat-option>
+                            }
+                        </mat-select>
+                        @if (variant.controls.sizeId.hasError('required')) {
+                        <mat-error>Required</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Price (₹)</mat-label>
+                        <input matInput type="number" formControlName="price" min="0.01" step="0.01" />
+                        @if (variant.controls.price.hasError('required') || variant.controls.price.hasError('min')) {
+                        <mat-error>Must be above 0</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Stock</mat-label>
+                        <input matInput type="number" formControlName="quantityInStock" min="0" step="1" />
+                        @if (variant.controls.quantityInStock.hasError('required') || variant.controls.quantityInStock.hasError('min')) {
+                        <mat-error>0 or more</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>SKU</mat-label>
+                        <input matInput formControlName="sku" />
+                        @if (variant.controls.sku.hasError('required')) {
+                        <mat-error>Required</mat-error>
+                        } @else if (variant.controls.sku.hasError('pattern')) {
+                        <mat-error>Letters, numbers, - and _ only</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <button mat-icon-button class="product-form__remove-variant" type="button"
+                        (click)="removeVariant(i)" aria-label="Remove variant">
+                        <mat-icon>delete_outline</mat-icon>
+                    </button>
+                </div>
+                }
+            </div>
+        </section>
+
+        @if (isEdit && details(); as product) {
+        <section class="product-form__card">
+            <h2>Images</h2>
+            <p class="product-form__images-hint">
+                Images are grouped by color. Colors from newly added variants appear here after saving.
+            </p>
+
+            @if (product.colors.length === 0) {
+            <p class="product-form__no-variants">No colors yet — save a variant first, then upload images for its color.</p>
+            }
+
+            @for (color of product.colors; track color.productColorId) {
+            <div class="product-form__color">
+                <div class="product-form__color-header">
+                    <span class="product-form__swatch" [style.background]="color.hexCode"></span>
+                    <h3>{{ color.colorName }}</h3>
+                    <button mat-stroked-button type="button" (click)="fileInput.click()">
+                        <mat-icon>add_photo_alternate</mat-icon>
+                        Upload
+                    </button>
+                    <input #fileInput type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/avif"
+                        (change)="onFilesSelected(color, fileInput)" />
+                </div>
+
+                @if (color.photos.length === 0) {
+                <p class="product-form__no-photos">No images for this color yet.</p>
+                } @else {
+                <div class="product-form__photos">
+                    @for (photo of color.photos; track photo.id) {
+                    <figure class="product-form__photo" [class.product-form__photo--main]="photo.isMain">
+                        <img [src]="photo.fileName" alt="Product photo" loading="lazy" />
+                        @if (photo.isMain) {
+                        <span class="product-form__photo-badge">Main</span>
+                        }
+                        <div class="product-form__photo-actions">
+                            @if (!photo.isMain) {
+                            <button mat-icon-button type="button" (click)="setMainImage(photo)"
+                                matTooltip="Set as main image" aria-label="Set as main image">
+                                <mat-icon>star_outline</mat-icon>
+                            </button>
+                            }
+                            <button mat-icon-button class="product-form__photo-delete" type="button"
+                                (click)="deleteImage(photo)" matTooltip="Delete image" aria-label="Delete image">
+                                <mat-icon>delete_outline</mat-icon>
+                            </button>
+                        </div>
+                    </figure>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </section>
+        }
+
+        <div class="product-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="product-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create product' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/product-management/products">Cancel</a>
+        </div>
+    </form>
+</div>

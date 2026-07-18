@@ -1,0 +1,71 @@
+<div class="admin-categories">
+    <header class="admin-categories__header">
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-categories__header-text">
+            <h1>Categories</h1>
+            <p>{{ totalCount() }} categor{{ totalCount() === 1 ? 'y' : 'ies' }}</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add category
+        </a>
+    </header>
+
+    <div class="admin-categories__tabs">
+        @for (tab of tabs; track tab.label) {
+        <button class="admin-categories__tab" [class.admin-categories__tab--active]="tab.label === activeTab().label"
+            type="button" (click)="selectTab(tab)">
+            {{ tab.label }}
+        </button>
+        }
+    </div>
+
+    @if (!isLoading() && categories().length === 0) {
+    <div class="admin-categories__empty">
+        <mat-icon>category</mat-icon>
+        <p>No categories yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-categories__grid">
+        @for (category of categories(); track category.id) {
+        <div class="admin-categories__card">
+            @if (firstPhoto(category); as photo) {
+            <img class="admin-categories__thumb" [src]="photo" [alt]="category.name" />
+            } @else {
+            <span class="admin-categories__thumb admin-categories__thumb--empty">
+                <mat-icon>image</mat-icon>
+            </span>
+            }
+
+            <div class="admin-categories__body">
+                <p class="admin-categories__name">{{ category.name }}</p>
+
+                <div class="admin-categories__genders">
+                    @for (gender of category.genders; track gender.genderId) {
+                    <span class="admin-categories__gender-chip">{{ gender.genderName }}</span>
+                    }
+                </div>
+            </div>
+
+            <div class="admin-categories__actions">
+                <a mat-icon-button [routerLink]="[category.id, 'edit']" aria-label="Edit category">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-categories__delete" type="button"
+                    (click)="deleteCategory(category)" aria-label="Delete category">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+
+    @if (totalPages() > 1) {
+    <div class="admin-categories__pager">
+        <app-pagination [pageIndex]="pageIndex()" [totalPages]="totalPages()" (pageChange)="goToPage($event)" />
+    </div>
+    }
+    }
+</div>

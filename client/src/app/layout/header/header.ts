@@ -11,7 +11,7 @@ import { NAV_ITEMS } from '../../shared/constants/navigation';
 import { AuthService } from '../../core/auth/auth.service';
 import { LoadingService } from '../../core/services/loading.service';
 import { PricePipe } from '../../shared/pipes/price.pipe';
-import { Search } from '../../features/shop/search/search';
+import { Search } from '../../features/shop/components/search/search';
 
 @Component({
   selector: 'app-header',

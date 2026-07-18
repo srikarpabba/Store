@@ -1,0 +1,57 @@
+<div class="color-form">
+    <header class="color-form__header">
+        <a mat-icon-button routerLink="/admin/product-management/colors" aria-label="Back to colors">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit color' : 'New color' }}</h1>
+            <p>{{ isEdit ? 'Update the color name and hex.' : 'Add a color to the palette.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="color-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 50 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <div class="color-form__hex-row">
+                <input #picker type="color" class="color-form__picker"
+                    (input)="onPickerInput($event)" (change)="onPickerInput($event)"
+                    aria-label="Pick color" />
+
+                <mat-form-field appearance="outline" class="color-form__hex-field">
+                    <mat-label>Hex code</mat-label>
+                    <input matInput formControlName="hexCode" placeholder="#RRGGBB" maxlength="7" />
+                    @if (form.controls.hexCode.hasError('required')) {
+                    <mat-error>Hex code is required</mat-error>
+                    } @else if (form.controls.hexCode.hasError('pattern')) {
+                    <mat-error>Must be in the form #RRGGBB</mat-error>
+                    }
+                </mat-form-field>
+            </div>
+        </section>
+
+        <div class="color-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="color-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create color' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/product-management/colors">Cancel</a>
+        </div>
+    </form>
+</div>

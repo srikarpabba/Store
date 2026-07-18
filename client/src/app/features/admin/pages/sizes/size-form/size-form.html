@@ -1,0 +1,41 @@
+<div class="size-form">
+    <header class="size-form__header">
+        <a mat-icon-button routerLink="/admin/product-management/sizes" aria-label="Back to sizes">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit size' : 'New size' }}</h1>
+            <p>{{ isEdit ? 'Update the size name.' : 'Add a size (e.g. S, M, 32, UK 10).' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="size-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" maxlength="10" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 10 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+        </section>
+
+        <div class="size-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="size-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create size' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/product-management/sizes">Cancel</a>
+        </div>
+    </form>
+</div>

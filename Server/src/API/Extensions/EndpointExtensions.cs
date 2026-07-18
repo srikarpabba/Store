@@ -3,7 +3,9 @@ using API.Endpoints.Auth;
 using API.Endpoints.Banners;
 using API.Endpoints.Brands;
 using API.Endpoints.Categories;
+using API.Endpoints.Colors;
 using API.Endpoints.Products;
+using API.Endpoints.Sizes;
 using API.Endpoints.Storefronts;
 using API.Endpoints.Users;
 using API.RateLimiting;
@@ -21,6 +23,8 @@ public static class EndpointExtensions
         endpoints.MapProductEndpoints();
         endpoints.MapCategoryEndpoints();
         endpoints.MapBrandEndpoints();
+        endpoints.MapColorEndpoints();
+        endpoints.MapSizeEndpoints();
         endpoints.MapBannerEndpoints();
         endpoints.MapCartEndpoints();
         endpoints.MapUserEndpoints();
@@ -108,6 +112,36 @@ public static class EndpointExtensions
            .MapEndpoint<DeleteBrand>()
            .MapEndpoint<UploadBrandLogo>()
            .MapEndpoint<DeleteBrandLogo>();
+    }
+
+    private static void MapColorEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/colors")
+            .WithTags(Tags.Colors);
+
+        endpoints.MapPublicGroup()
+           .MapEndpoint<GetColors>()
+           .MapEndpoint<GetColor>();
+
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<CreateColor>()
+           .MapEndpoint<UpdateColor>()
+           .MapEndpoint<DeleteColor>();
+    }
+
+    private static void MapSizeEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/sizes")
+            .WithTags(Tags.Sizes);
+
+        endpoints.MapPublicGroup()
+           .MapEndpoint<GetSizes>()
+           .MapEndpoint<GetSize>();
+
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<CreateSize>()
+           .MapEndpoint<UpdateSize>()
+           .MapEndpoint<DeleteSize>();
     }
 
     private static void MapBannerEndpoints(this IEndpointRouteBuilder app)

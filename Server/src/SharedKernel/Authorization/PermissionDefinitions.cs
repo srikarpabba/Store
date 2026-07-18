@@ -20,6 +20,14 @@ public static class PermissionDefinitions
         (Permissions.BrandsUpdate, "Update brands"),
         (Permissions.BrandsDelete, "Delete brands"),
 
+        (Permissions.ColorsCreate, "Create colors"),
+        (Permissions.ColorsUpdate, "Update colors"),
+        (Permissions.ColorsDelete, "Delete colors"),
+
+        (Permissions.SizesCreate, "Create sizes"),
+        (Permissions.SizesUpdate, "Update sizes"),
+        (Permissions.SizesDelete, "Delete sizes"),
+
         (Permissions.BannersRead, "Read banners"),
         (Permissions.BannersCreate, "Create banners"),
         (Permissions.BannersUpdate, "Update banners"),

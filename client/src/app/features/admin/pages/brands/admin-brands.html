@@ -1,0 +1,61 @@
+<div class="admin-brands">
+    <header class="admin-brands__header">
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-brands__header-text">
+            <h1>Brands</h1>
+            <p>{{ totalCount() }} brand{{ totalCount() === 1 ? '' : 's' }}</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add brand
+        </a>
+    </header>
+
+    @if (!isLoading() && brands().length === 0) {
+    <div class="admin-brands__empty">
+        <mat-icon>storefront</mat-icon>
+        <p>No brands yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-brands__grid">
+        @for (brand of brands(); track brand.id) {
+        <div class="admin-brands__card">
+            @if (brand.logo) {
+            <img class="admin-brands__thumb" [src]="brand.logo" [alt]="brand.name" />
+            } @else {
+            <span class="admin-brands__thumb admin-brands__thumb--empty">
+                <mat-icon>storefront</mat-icon>
+            </span>
+            }
+
+            <div class="admin-brands__body">
+                <p class="admin-brands__name">
+                    {{ brand.name }}
+                    @if (brand.isFeatured) {
+                    <span class="admin-brands__featured">Featured</span>
+                    }
+                </p>
+            </div>
+
+            <div class="admin-brands__actions">
+                <a mat-icon-button [routerLink]="[brand.id, 'edit']" aria-label="Edit brand">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-brands__delete" type="button"
+                    (click)="deleteBrand(brand)" aria-label="Delete brand">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+
+    @if (totalPages() > 1) {
+    <div class="admin-brands__pager">
+        <app-pagination [pageIndex]="pageIndex()" [totalPages]="totalPages()" (pageChange)="goToPage($event)" />
+    </div>
+    }
+    }
+</div>

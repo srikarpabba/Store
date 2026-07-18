@@ -276,11 +276,37 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
                     b.Property<string>("HexCode")
                         .IsRequired()
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)")
                         .HasColumnName("hex_code");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -291,9 +317,21 @@ namespace Infrastructure.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_colors");
 
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Color_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Color_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Color_IsDeleted");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_colors_name");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Color_IsDeleted_CreatedOn");
 
                     b.ToTable("colors", "store");
                 });
@@ -621,6 +659,32 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -630,9 +694,21 @@ namespace Infrastructure.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_sizes");
 
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Size_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Size_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Size_IsDeleted");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_sizes_name");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Size_IsDeleted_CreatedOn");
 
                     b.ToTable("sizes", "store");
                 });

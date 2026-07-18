@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
@@ -6,13 +6,14 @@ import { StorefrontService } from '../../services/storefront.service';
 import { ShopSection } from '../../models/enums/shop-section';
 import { Product } from '../../models/product';
 import { StorefrontCategoryItem, StorefrontSectionType } from '../../models/storefront-section';
-import { TitleCasePipe } from '@angular/common';
-import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BannerSlide, BannerSlider } from '../../../../shared/ui/banner-slider/banner-slider';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ProductCard } from '../../components/product-card/product-card';
 
 @Component({
   selector: 'app-shop-page',
-  imports: [TitleCasePipe, PricePipe, RouterLink, BannerSlider],
+  imports: [RouterLink, BannerSlider, MatProgressSpinnerModule, ProductCard],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.css',
 })
@@ -23,16 +24,76 @@ export class ShopPage {
 
   private storefrontService = inject(StorefrontService);
 
+  private notificationService = inject(NotificationService);
+
   readonly section = signal('');
 
   readonly products = signal<Product[]>([]);
 
-  /** False for the bare Men/Women landing page (banners + categories only, no flat grid) */
-  readonly showProducts = signal(true);
-
   readonly bannerSlides = signal<BannerSlide[]>([]);
 
   readonly categories = signal<StorefrontCategoryItem[]>([]);
+
+  /** 0 = nothing loaded yet for the current section/search/category */
+  readonly pageIndex = signal(0);
+
+  readonly hasNext = signal(false);
+
+  readonly isLoadingMore = signal(false);
+
+  readonly isSentinelIntersecting = signal(false);
+
+  private readonly scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
+
+  /** Bumped on every section/search/category change, so the observer effect
+   *  below re-subscribes and re-reads the sentinel's *current* on-screen
+   *  state — Men/Women start with it below the fold (banner + categories
+   *  above it), so nothing loads until the shopper actually scrolls there;
+   *  New/Sale have no banner/categories, so the sentinel starts in view and
+   *  page 1 loads immediately, all through the same code path. */
+  private readonly resetTrigger = signal(0);
+
+  /** Bumped alongside resetTrigger so a slow, now-stale request can't overwrite newer results */
+  private generation = 0;
+
+  readonly activeCategory = signal<string | undefined>(undefined);
+
+  private currentSection: ShopSection = ShopSection.New;
+
+  private currentSearch?: string;
+
+  /** Only re-fetch banners/categories when the section itself changes — a
+   *  category/search filter change should only reload the product grid. */
+  private loadedStorefrontSection: ShopSection | null = null;
+
+  constructor() {
+    effect(onCleanup => {
+      const sentinel = this.scrollSentinel();
+      this.resetTrigger(); // establishes the dependency — re-run on every section change
+
+      if (!sentinel) {
+        return;
+      }
+
+      // Creating a fresh observer and calling .observe() always triggers an
+      // initial callback reporting the sentinel's *current* intersection
+      // state (per the IntersectionObserver spec, independent of Angular's
+      // render timing) — that's what decides whether the new section's
+      // first page loads immediately or waits for a scroll.
+      const observer = new IntersectionObserver(entries => {
+        const isIntersecting = entries[0]?.isIntersecting ?? false;
+        this.isSentinelIntersecting.set(isIntersecting);
+
+        if (isIntersecting) {
+          this.loadMore();
+        }
+      });
+
+      observer.observe(sentinel.nativeElement);
+
+      onCleanup(() => observer.disconnect());
+    });
+  }
 
   ngOnInit(): void {
 
@@ -50,35 +111,113 @@ export class ShopPage {
 
       this.section.set(section);
 
-      // Men/Women with no category/search picked yet are landing pages
-      // (banners + category tiles) — the flat product grid only kicks in
-      // once the shopper drills into a category or searches.
-      const isBareLandingPage =
-        (section === ShopSection.Men || section === ShopSection.Women)
-        && !search
-        && !category;
+      this.currentSection = section;
+      this.currentSearch = search;
+      this.activeCategory.set(category);
 
-      this.showProducts.set(!isBareLandingPage);
-
-      if (isBareLandingPage) {
-        this.products.set([]);
-      } else {
-        this.loadProducts(section, search, category);
-      }
+      this.generation++;
+      this.products.set([]);
+      this.pageIndex.set(0);
+      this.hasNext.set(false);
+      this.isLoadingMore.set(false);
 
       this.loadStorefrontSections(section);
+
+      // Don't eagerly load products here — see resetTrigger above.
+      this.resetTrigger.update(n => n + 1);
 
     });
   }
 
-  private loadProducts(section: ShopSection, search?: string, category?: string): void {
+  /**
+   * Pill filtering is in-place UI state, not real navigation — it
+   * deliberately doesn't touch the URL (no bookmarking/back-button support
+   * for it), which also means there's no router navigation to trigger
+   * Angular's default scroll-to-top.
+   */
+  selectCategory(category?: string): void {
+
+    if (this.activeCategory() === category) {
+      return;
+    }
+
+    this.activeCategory.set(category);
+
+    this.generation++;
+    this.products.set([]);
+    this.pageIndex.set(0);
+    this.hasNext.set(false);
+    this.isLoadingMore.set(false);
+
+    this.loadPage(1);
+  }
+
+  loadMore(): void {
+
+    if (this.isLoadingMore()) {
+      return;
+    }
+
+    if (this.pageIndex() > 0 && !this.hasNext()) {
+      return;
+    }
+
+    this.loadPage(this.pageIndex() + 1);
+  }
+
+  private loadPage(pageIndex: number): void {
+
+    const generation = this.generation;
+
+    this.isLoadingMore.set(true);
 
     this.shopService
-      .loadSection(section, search, category)
-      .subscribe(result => this.products.set(result.items));
+      .loadSection(this.currentSection, this.currentSearch, this.activeCategory(), pageIndex)
+      .subscribe({
+        next: result => {
+
+          if (generation !== this.generation) {
+            return;
+          }
+
+          this.products.update(current => [...current, ...result.items]);
+          this.pageIndex.set(result.pageIndex);
+          this.hasNext.set(result.hasNext);
+          this.isLoadingMore.set(false);
+
+          // IntersectionObserver only fires on crossing events — if the
+          // sentinel is still visible after this page landed (e.g. a short
+          // result set that doesn't fill the viewport), keep loading.
+          if (this.isSentinelIntersecting()) {
+            this.loadMore();
+          }
+        },
+        error: (err: unknown) => {
+
+          if (generation !== this.generation) {
+            return;
+          }
+
+          this.isLoadingMore.set(false);
+
+          // A real HttpErrorResponse (network/5xx/etc.) is already toasted
+          // by the shared error interceptor; a GraphQL body-level failure
+          // surfaces here as a plain Error instead, since HotChocolate
+          // returns those with HTTP 200 and the interceptor never sees them.
+          if (err instanceof Error) {
+            this.notificationService.error(err.message);
+          }
+        }
+      });
   }
 
   private loadStorefrontSections(section: ShopSection): void {
+
+    if (section === this.loadedStorefrontSection) {
+      return;
+    }
+
+    this.loadedStorefrontSection = section;
 
     if (section !== ShopSection.Men && section !== ShopSection.Women) {
       this.bannerSlides.set([]);

@@ -6,4 +6,6 @@ internal sealed record ProductDto(
     string Description,
     decimal StartingPrice,
     decimal Rating,
-    string? Image);
+    string? Image,
+    CategoryDto? Category,
+    IReadOnlyList<ProductColorDto>? Colors);

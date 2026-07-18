@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 import { ProductColorDetails, ProductDetails as ProductDetailsModel, ProductVariantDetails } from '../../models/product-details';
 import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -107,17 +107,30 @@ export class ProductDetails {
     (this.selectedVariant()?.quantityInStock ?? 0) > 0);
 
   constructor() {
-    this.route.paramMap.pipe(
-      switchMap(params => this.productService.getProduct(params.get('id') ?? ''))
-    ).subscribe(product => {
+    // combineLatest (not just paramMap) so a color picked on the shop grid
+    // for a product the shopper is already viewing (same :id, only the
+    // ?color= query param differs) is still picked up — paramMap alone only
+    // re-emits on path changes and would silently drop it.
+    combineLatest([
+      this.route.paramMap,
+      this.route.queryParamMap
+    ]).pipe(
+      switchMap(([params, queryParams]) =>
+        this.productService.getProduct(params.get('id') ?? '').pipe(
+          map(product => ({ product, colorParam: queryParams.get('color') }))))
+    ).subscribe(({ product, colorParam }) => {
       this.product.set(product);
       this.title.setTitle(`${product.name} | Store`);
+
+      const preselected = colorParam
+        ? product.colors.find(c => c.colorId === colorParam)
+        : undefined;
 
       // preselect the first color that has stock (falling back to the first)
       const firstAvailable = product.colors.find(color =>
         product.variants.some(v => v.productColorId === color.productColorId && v.quantityInStock > 0));
 
-      const colorId = (firstAvailable ?? product.colors[0])?.colorId ?? null;
+      const colorId = (preselected ?? firstAvailable ?? product.colors[0])?.colorId ?? null;
 
       this.selectedColorId.set(colorId);
       this.selectedSizeId.set(this.firstAvailableSizeId(colorId));

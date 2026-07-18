@@ -15,6 +15,7 @@ public sealed record GetProductsQuery(
     decimal? MaxPrice,
     ProductSort? Sort,
     int? PageIndex,
-    int? PageSize
+    int? PageSize,
+    bool? IncludeColors
     )
     : IQuery<PagedResponse<ProductResponse>>;

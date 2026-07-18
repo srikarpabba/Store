@@ -1,6 +1,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Storage;
+using Application.Common.Pagination;
+using Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -9,8 +11,10 @@ namespace Application.Categories.GetCategories;
 internal sealed class GetCategoriesQueryHandler(
     IApplicationDbContext context,
     IFileStorage fileStorage)
-    : IQueryHandler<GetCategoriesQuery, IReadOnlyList<CategoryResponse>>
+    : IQueryHandler<GetCategoriesQuery, PagedResponse<CategoryResponse>>
 {
+    private const int DefaultPageSize = 25;
+
     private sealed record CategoryGenderRow(Guid GenderId, string GenderName, string? PhotoFileName);
 
     private sealed record CategoryRow(
@@ -19,13 +23,29 @@ internal sealed class GetCategoriesQueryHandler(
         string? Description,
         List<CategoryGenderRow> Genders);
 
-    public async Task<Result<IReadOnlyList<CategoryResponse>>> Handle(
+    public async Task<Result<PagedResponse<CategoryResponse>>> Handle(
         GetCategoriesQuery query,
         CancellationToken cancellationToken)
     {
-        List<CategoryRow> rows = await context.Categories
-            .AsNoTracking()
-            .OrderBy(c => c.Name)
+        int pageIndex = query.PageIndex ?? 1;
+        int pageSize = query.PageSize ?? DefaultPageSize;
+
+        IQueryable<Category> categories = context.Categories.AsNoTracking();
+
+        categories = query.Gender switch
+        {
+            "Men" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Male")),
+            "Women" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Female")),
+            "Unisex" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Unisex")),
+            _ => categories
+        };
+
+        categories = categories.OrderBy(c => c.Name);
+
+        int total = await categories.CountAsync(cancellationToken);
+
+        List<CategoryRow> rows = await categories
+            .ApplyPaging(pageIndex, pageSize)
             .Select(c => new CategoryRow(
                 c.Id,
                 c.Name,
@@ -48,6 +68,6 @@ internal sealed class GetCategoriesQueryHandler(
                     .ToList()))
             .ToList();
 
-        return items;
+        return new PagedResponse<CategoryResponse>(items, pageIndex, pageSize, total);
     }
 }

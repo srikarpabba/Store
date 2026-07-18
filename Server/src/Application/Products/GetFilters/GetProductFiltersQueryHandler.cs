@@ -28,10 +28,10 @@ internal sealed class GetProductFiltersQueryHandler(
                 x.CategoryGenders.Select(cg => cg.GenderId).ToList()))
             .ToListAsync(cancellationToken);
 
-        List<LookupResponse> colors = await context.Colors
+        List<ColorLookupResponse> colors = await context.Colors
             .AsNoTracking()
             .OrderBy(x => x.Name)
-            .Select(x => new LookupResponse(x.Id, x.Name))
+            .Select(x => new ColorLookupResponse(x.Id, x.Name, x.HexCode))
             .ToListAsync(cancellationToken);
 
         List<LookupResponse> sizes = await context.Sizes

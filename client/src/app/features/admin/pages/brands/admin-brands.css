@@ -1,0 +1,113 @@
+.admin-brands {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.admin-brands__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-brands__header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-brands__header h1 {
+    margin: 0;
+}
+
+.admin-brands__header p {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.admin-brands__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 4rem 1rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.admin-brands__empty mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-text-subtle);
+}
+
+.admin-brands__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1rem;
+}
+
+.admin-brands__card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+}
+
+.admin-brands__thumb {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.375rem;
+    object-fit: contain;
+    background: var(--color-surface-alt);
+}
+
+.admin-brands__thumb--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-subtle);
+}
+
+.admin-brands__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-brands__name {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.admin-brands__featured {
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-brands__actions {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.admin-brands__delete {
+    color: var(--color-primary);
+}
+
+.admin-brands__pager {
+    margin-top: 1.25rem;
+}

@@ -1,0 +1,53 @@
+.size-form {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.size-form__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.size-form__header h1 {
+    margin: 0;
+}
+
+.size-form__header p {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.size-form__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+}
+
+.size-form__card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+}
+
+.size-form__card mat-form-field {
+    width: 100%;
+}
+
+.size-form__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.size-form__saving {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}

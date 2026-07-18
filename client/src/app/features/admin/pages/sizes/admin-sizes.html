@@ -1,0 +1,40 @@
+<div class="admin-sizes">
+    <header class="admin-sizes__header">
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-sizes__header-text">
+            <h1>Sizes</h1>
+            <p>{{ sizes().length }} size{{ sizes().length === 1 ? '' : 's' }}</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add size
+        </a>
+    </header>
+
+    @if (!isLoading() && sizes().length === 0) {
+    <div class="admin-sizes__empty">
+        <mat-icon>straighten</mat-icon>
+        <p>No sizes yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-sizes__grid">
+        @for (size of sizes(); track size.id) {
+        <div class="admin-sizes__card">
+            <span class="admin-sizes__badge">{{ size.name }}</span>
+
+            <div class="admin-sizes__actions">
+                <a mat-icon-button [routerLink]="[size.id, 'edit']" aria-label="Edit size">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-sizes__delete" type="button"
+                    (click)="deleteSize(size)" aria-label="Delete size">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

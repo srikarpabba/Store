@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Data;
+using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Common.Pagination;
 using Application.Products.Common;
@@ -28,21 +28,65 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
 
         int total = await products.CountAsync(cancellationToken);
 
-        List<ProductDto> items = await products
-            .ApplyPaging(pageIndex, pageSize)
-            .Select(product => new ProductDto(
-                product.Id,
-                product.Name,
-                product.Description,
-                product.Variants.Min(v => v.Price),
-                product.Rating,
-                product.ProductColors
-                    .SelectMany(pc => pc.Photos)
-                    .OrderByDescending(p => p.IsMain)
-                    .ThenBy(p => p.CreatedOnUtc)
-                    .Select(p => p.FileName)
-                    .FirstOrDefault()))
-            .ToListAsync(cancellationToken);
+        IQueryable<Product> page = products.ApplyPaging(pageIndex, pageSize);
+
+        // Category + per-color photos are only needed by the shop grid's
+        // interactive cards (color swap, hover slider) — the admin product
+        // table and search typeahead share this same handler but never
+        // render that data, so keep it opt-in rather than always paying for
+        // the extra join/photo-URL presigning.
+        //
+        // Note: this two-level nested collection (Colors -> Photos) can
+        // produce a cartesian-product row multiplication in the single SQL
+        // query EF generates here. AsSplitQuery() would avoid that, but it
+        // lives in Microsoft.EntityFrameworkCore.Relational, which this
+        // (Application) project deliberately doesn't reference — keeping
+        // the Application layer persistence-agnostic. Catalog sizes here
+        // are modest (admin-curated), so accepting the single-query
+        // behavior is the right trade-off over leaking a relational-only
+        // dependency into this layer for one query.
+        List<ProductDto> items = query.IncludeColors == true
+            ? await page
+                .Select(product => new ProductDto(
+                    product.Id,
+                    product.Name,
+                    product.Description,
+                    product.Variants.Min(v => v.Price),
+                    product.Rating,
+                    product.ProductColors
+                        .SelectMany(pc => pc.Photos)
+                        .OrderByDescending(p => p.IsMain)
+                        .ThenBy(p => p.CreatedOnUtc)
+                        .Select(p => p.FileName)
+                        .FirstOrDefault(),
+                    new CategoryDto(product.CategoryId, product.Category.Name),
+                    product.ProductColors
+                        .Select(pc => new ProductColorDto(
+                            pc.Id,
+                            pc.ColorId,
+                            pc.Color.Name,
+                            pc.Color.HexCode,
+                            pc.Photos
+                                .Select(photo => new ProductPhotoDto(photo.Id, photo.FileName, photo.IsMain))
+                                .ToList()))
+                        .ToList()))
+                .ToListAsync(cancellationToken)
+            : await page
+                .Select(product => new ProductDto(
+                    product.Id,
+                    product.Name,
+                    product.Description,
+                    product.Variants.Min(v => v.Price),
+                    product.Rating,
+                    product.ProductColors
+                        .SelectMany(pc => pc.Photos)
+                        .OrderByDescending(p => p.IsMain)
+                        .ThenBy(p => p.CreatedOnUtc)
+                        .Select(p => p.FileName)
+                        .FirstOrDefault(),
+                    null,
+                    null))
+                .ToListAsync(cancellationToken);
 
         return new PagedResponse<ProductResponse>(
             items.Select(mapper.ToResponse).ToList(),

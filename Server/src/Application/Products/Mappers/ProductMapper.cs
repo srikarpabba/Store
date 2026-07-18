@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Storage;
 using Application.Products.Common.Dtos;
+using Application.Products.Common.Responses;
 using Application.Products.GetProduct;
 using Application.Products.GetProducts;
 
@@ -16,7 +17,24 @@ internal sealed class ProductMapper(IFileStorage fileStorage)
             dto.Rating,
             dto.Image is null
                 ? null
-                : fileStorage.GetUrl(dto.Image).AbsoluteUri);
+                : fileStorage.GetUrl(dto.Image).AbsoluteUri,
+            dto.Category is null
+                ? null
+                : new ProductCategoryResponse(dto.Category.Id, dto.Category.Name),
+            dto.Colors?
+                .Select(color => new ProductColorResponse(
+                    color.Id,
+                    color.ColorId,
+                    color.Name,
+                    color.HexCode,
+
+                    color.Photos
+                        .Select(photo => new ProductPhotoResponse(
+                            photo.Id,
+                            fileStorage.GetUrl(photo.FileName).AbsoluteUri,
+                            photo.IsMain))
+                        .ToList()))
+                .ToList());
     }
 
     public ProductDetailsResponse ToResponse(ProductDetailsDto dto)
@@ -25,7 +43,7 @@ internal sealed class ProductMapper(IFileStorage fileStorage)
             dto.Id,
             dto.Name,
             dto.Description,
-            new CategoryResponse(
+            new ProductCategoryResponse(
                 dto.Category.Id,
                 dto.Category.Name),
             new BrandResponse(

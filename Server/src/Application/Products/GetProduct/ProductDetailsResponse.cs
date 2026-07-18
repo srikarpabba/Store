@@ -1,10 +1,12 @@
-﻿namespace Application.Products.GetProduct;
+﻿using Application.Products.Common.Responses;
+
+namespace Application.Products.GetProduct;
 
 public sealed record ProductDetailsResponse(
     Guid Id,
     string Name,
     string Description,
-    CategoryResponse Category,
+    ProductCategoryResponse Category,
     BrandResponse Brand,
     decimal Rating,
     IReadOnlyList<ProductColorResponse> Colors,

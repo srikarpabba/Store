@@ -1,0 +1,45 @@
+<div class="admin-colors">
+    <header class="admin-colors__header">
+        <a mat-icon-button routerLink="/admin/product-management" aria-label="Back to product management">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-colors__header-text">
+            <h1>Colors</h1>
+            <p>{{ colors().length }} color{{ colors().length === 1 ? '' : 's' }}</p>
+        </div>
+        <a mat-flat-button routerLink="new">
+            <mat-icon>add</mat-icon>
+            Add color
+        </a>
+    </header>
+
+    @if (!isLoading() && colors().length === 0) {
+    <div class="admin-colors__empty">
+        <mat-icon>palette</mat-icon>
+        <p>No colors yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-colors__grid">
+        @for (color of colors(); track color.id) {
+        <div class="admin-colors__card">
+            <span class="admin-colors__swatch" [style.background]="color.hexCode"></span>
+
+            <div class="admin-colors__body">
+                <p class="admin-colors__name">{{ color.name }}</p>
+                <p class="admin-colors__hex">{{ color.hexCode }}</p>
+            </div>
+
+            <div class="admin-colors__actions">
+                <a mat-icon-button [routerLink]="[color.id, 'edit']" aria-label="Edit color">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-colors__delete" type="button"
+                    (click)="deleteColor(color)" aria-label="Delete color">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

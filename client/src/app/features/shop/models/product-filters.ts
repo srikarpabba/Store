@@ -1,4 +1,5 @@
 import { CategoryLookup } from './category-lookup';
+import { ColorLookup } from './color-lookup';
 import { Lookup } from './lookup';
 
 export interface ProductFilters {
@@ -7,7 +8,7 @@ export interface ProductFilters {
 
     categories: CategoryLookup[];
 
-    colors: Lookup[];
+    colors: ColorLookup[];
 
     sizes: Lookup[];
 

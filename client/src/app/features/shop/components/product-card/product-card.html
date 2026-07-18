@@ -1,0 +1,53 @@
+<div class="card">
+
+    <a class="card__media" tabindex="-1" aria-hidden="true"
+        [routerLink]="['/', section(), product().id]" [queryParams]="queryParams()"
+        (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+        @if (displayedPhoto(); as photo) {
+        <img class="card__img" [src]="photo.fileName" [alt]="product().name" />
+        } @else if (product().image) {
+        <img class="card__img" [src]="product().image" [alt]="product().name" />
+        } @else {
+        <span class="card__placeholder"></span>
+        }
+
+        @if (isHovering() && photos().length > 1) {
+        <div class="card__dots">
+            @for (photo of photos(); track photo.id; let i = $index) {
+            <span class="card__dot" [class.card__dot--active]="i === photoIndex()"></span>
+            }
+        </div>
+        }
+    </a>
+
+    <div class="card__row">
+        <div class="card__swatches">
+            @for (color of colors(); track color.productColorId) {
+            <button type="button" class="swatch"
+                [class.swatch--selected]="color.colorId === selectedColor()?.colorId"
+                [style.background]="color.hexCode"
+                (click)="selectColor(color.colorId)"
+                [attr.aria-label]="color.colorName"
+                [attr.aria-pressed]="color.colorId === selectedColor()?.colorId">
+            </button>
+            }
+        </div>
+
+        <button type="button" class="card__wish" [class.card__wish--active]="wishlisted()"
+            (click)="toggleWishlist()" aria-label="Toggle wishlist">
+            <mat-icon>{{ wishlisted() ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
+    </div>
+
+    <a class="card__info" [routerLink]="['/', section(), product().id]" [queryParams]="queryParams()">
+        <p class="card__name">{{ product().name }}</p>
+        @if (product().category; as category) {
+        <p class="card__category">{{ category.name }}</p>
+        }
+        <p class="card__price">{{ product().startingPrice | price }}</p>
+        @if (product().rating > 0) {
+        <p class="card__rating">★ {{ product().rating }}</p>
+        }
+    </a>
+
+</div>

@@ -33,29 +33,46 @@
     </section>
     }
 
-    @if (showProducts()) {
-    <h1 class="text-3xl font-bold mb-8">
-        {{ section() | titlecase }}
-    </h1>
+    @if (categories().length > 0) {
+    <div class="flex gap-3 overflow-x-auto pb-2 mb-8">
+        <button type="button"
+            class="shrink-0 cursor-pointer rounded-full px-5 py-2 text-sm transition-colors"
+            [class]="!activeCategory() ? 'bg-black text-white font-semibold' : 'border border-gray-300 text-inherit hover:border-gray-800'"
+            (click)="selectCategory()">
+            ALL
+        </button>
+        @for (category of categories(); track category.id) {
+        <button type="button"
+            class="shrink-0 cursor-pointer rounded-full px-5 py-2 text-sm transition-colors"
+            [class]="activeCategory() === category.name ? 'bg-black text-white font-semibold' : 'border border-gray-300 text-inherit hover:border-gray-800'"
+            (click)="selectCategory(category.name)">
+            {{ category.name }}
+        </button>
+        }
+    </div>
+    }
 
-    <div class="space-y-4">
+    @if (pageIndex() > 0 && !isLoadingMore() && products().length === 0) {
+    <div class="flex flex-col items-center gap-2 py-20 text-center text-gray-500">
+        <p class="text-base font-medium">No products found</p>
+        <p class="text-sm">Try a different category or check back later.</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-10">
 
         @for (product of products(); track product.id) {
-
-            <a class="block rounded-lg border p-4 shadow-sm no-underline hover:border-gray-400"
-                [routerLink]="['/', section(), product.id]">
-
-                <p><strong>Name:</strong> {{ product.name }}</p>
-
-                <p><strong>Price:</strong> {{ product.startingPrice | price }}</p>
-
-                <p><strong>Rating:</strong> {{ product.rating }}</p>
-
-            </a>
-
+        <app-product-card [product]="product" [section]="section()" />
         }
 
     </div>
     }
+
+    <div #scrollSentinel class="flex justify-center py-10">
+        @if (isLoadingMore()) {
+        <mat-spinner diameter="28" />
+        } @else if (!hasNext() && products().length > 0) {
+        <p class="text-sm text-gray-500">You've reached the end.</p>
+        }
+    </div>
 
 </div>

@@ -1,14 +1,14 @@
-﻿using Domain.Products;
+using Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Configurations;
 
-public class ColorConfiguration : IEntityTypeConfiguration<Color>
+public class ColorConfiguration : AuditableBaseEntityConfiguration<Color>
 {
-    public void Configure(EntityTypeBuilder<Color> builder)
+    public override void Configure(EntityTypeBuilder<Color> builder)
     {
-        builder.HasKey(x => x.Id);
+        base.Configure(builder);
 
         builder.Property(x => x.Name)
             .HasMaxLength(50)

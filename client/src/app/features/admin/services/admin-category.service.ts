@@ -1,9 +1,12 @@
 import { inject, Service } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { CategoryApi } from '../../shop/api/category-api';
 import { Category } from '../../shop/models/category';
+import { PagedResponse } from '../../shop/models/paged-response';
 import { SaveCategoryRequest } from '../models/save-category-request';
+
+export type CategoryGenderFilter = 'Men' | 'Women' | 'Unisex';
 
 @Service()
 export class AdminCategoryService {
@@ -12,8 +15,20 @@ export class AdminCategoryService {
 
     private readonly apiUrl = environment.apiUrl;
 
-    getAll() {
-        return this.http.get<Category[]>(`${this.apiUrl}${CategoryApi.categories}`);
+    getAll(pageIndex: number, pageSize: number, gender?: CategoryGenderFilter) {
+
+        let params = new HttpParams()
+            .set('pageIndex', pageIndex)
+            .set('pageSize', pageSize);
+
+        if (gender) {
+            params = params.set('gender', gender);
+        }
+
+        return this.http.get<PagedResponse<Category>>(
+            `${this.apiUrl}${CategoryApi.categories}`,
+            { params }
+        );
     }
 
     getById(id: string) {

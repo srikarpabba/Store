@@ -34,6 +34,8 @@ builder.Services.AddRateLimitingInternal(builder.Configuration);
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseSecurityHeaders();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();

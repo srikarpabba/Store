@@ -1,3 +1,4 @@
+using Application.Common.Validation;
 using FluentValidation;
 
 namespace Application.Banners.UploadBannerImage;
@@ -46,5 +47,11 @@ internal sealed class UploadBannerImageCommandValidator : AbstractValidator<Uplo
             .LessThanOrEqualTo(MaxFileSize)
             .WithMessage("The image must be 5 MB or smaller.")
             .When(x => x.File is not null);
+
+        RuleFor(x => x.File)
+            .MustAsync((file, cancellationToken) =>
+                ImageSignatureValidator.MatchesDeclaredTypeAsync(file.Content, file.ContentType, cancellationToken))
+            .WithMessage("The file's contents don't match a valid image.")
+            .When(x => x.File is not null && AllowedContentTypes.Contains(x.File.ContentType));
     }
 }

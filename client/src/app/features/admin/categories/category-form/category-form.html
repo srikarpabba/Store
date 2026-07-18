@@ -67,7 +67,7 @@
                     <mat-icon>add_photo_alternate</mat-icon>
                     {{ gender.photo ? 'Replace' : 'Upload' }}
                 </button>
-                <input #fileInput type="file" hidden accept="image/jpeg,image/png,image/webp"
+                <input #fileInput type="file" hidden accept="image/jpeg,image/png,image/webp,image/avif"
                     (change)="onFileSelected(gender, fileInput)" />
 
                 @if (gender.photo) {

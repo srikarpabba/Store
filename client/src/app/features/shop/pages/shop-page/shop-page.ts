@@ -27,6 +27,9 @@ export class ShopPage {
 
   readonly products = signal<Product[]>([]);
 
+  /** False for the bare Men/Women landing page (banners + categories only, no flat grid) */
+  readonly showProducts = signal(true);
+
   readonly bannerSlides = signal<BannerSlide[]>([]);
 
   readonly categories = signal<StorefrontCategoryItem[]>([]);
@@ -47,7 +50,21 @@ export class ShopPage {
 
       this.section.set(section);
 
-      this.loadProducts(section, search, category);
+      // Men/Women with no category/search picked yet are landing pages
+      // (banners + category tiles) — the flat product grid only kicks in
+      // once the shopper drills into a category or searches.
+      const isBareLandingPage =
+        (section === ShopSection.Men || section === ShopSection.Women)
+        && !search
+        && !category;
+
+      this.showProducts.set(!isBareLandingPage);
+
+      if (isBareLandingPage) {
+        this.products.set([]);
+      } else {
+        this.loadProducts(section, search, category);
+      }
 
       this.loadStorefrontSections(section);
 

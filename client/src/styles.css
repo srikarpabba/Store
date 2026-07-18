@@ -52,6 +52,9 @@
     /* Recolor Angular Material's primary to the brand */
     --mat-sys-primary: var(--color-primary);
     --mat-sys-on-primary: var(--color-on-primary);
+
+    /* Material 3's generated surface tone is an off-white (#FAF9FD); force pure white */
+    --mat-sys-surface: var(--color-surface);
 }
 
 /* ---------- Typography: semantic, consistent scale ---------- */

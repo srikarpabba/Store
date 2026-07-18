@@ -51,7 +51,7 @@
                     <mat-icon>add_photo_alternate</mat-icon>
                     {{ savedBrand.logo ? 'Replace' : 'Upload' }}
                 </button>
-                <input #logoInput type="file" hidden accept="image/jpeg,image/png,image/webp"
+                <input #logoInput type="file" hidden accept="image/jpeg,image/png,image/webp,image/avif"
                     (change)="onLogoSelected(logoInput)" />
 
                 @if (savedBrand.logo) {

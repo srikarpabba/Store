@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Application.Common.Validation;
+using FluentValidation;
 
 namespace Application.Products.UploadProductImages;
 
@@ -11,7 +12,8 @@ internal sealed class UploadProductImagesCommandValidator
     [
         "image/jpeg",
         "image/png",
-        "image/webp"
+        "image/webp",
+        "image/avif"
     ];
 
     private static readonly HashSet<string> AllowedExtensions =
@@ -19,7 +21,8 @@ internal sealed class UploadProductImagesCommandValidator
         ".jpg",
         ".jpeg",
         ".png",
-        ".webp"
+        ".webp",
+        ".avif"
     ];
 
     public UploadProductImagesCommandValidator()
@@ -44,7 +47,7 @@ internal sealed class UploadProductImagesCommandValidator
 
                 file.RuleFor(x => x.ContentType)
                     .Must(AllowedContentTypes.Contains)
-                    .WithMessage("Only JPEG, PNG and WebP images are allowed.");
+                    .WithMessage("Only JPEG, PNG, WebP and AVIF images are allowed.");
 
                 file.RuleFor(x => x.Length)
                     .GreaterThan(0)
@@ -54,6 +57,12 @@ internal sealed class UploadProductImagesCommandValidator
                 file.RuleFor(x => x.FileName)
                     .NotEmpty()
                     .MaximumLength(255);
+
+                file.RuleFor(x => x)
+                    .MustAsync((upload, cancellationToken) =>
+                        ImageSignatureValidator.MatchesDeclaredTypeAsync(upload.Content, upload.ContentType, cancellationToken))
+                    .WithMessage("A file's contents don't match a valid image.")
+                    .When(upload => AllowedContentTypes.Contains(upload.ContentType));
             });
 
         RuleFor(x => x.Files)

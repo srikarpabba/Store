@@ -28,9 +28,20 @@
         <p>No categories yet. Add your first one to get started.</p>
     </div>
     } @else {
-    <div class="admin-categories__grid">
+    @if (canReorder()) {
+    <p class="admin-categories__reorder-hint">
+        <mat-icon>drag_indicator</mat-icon>
+        Drag cards to set the order shoppers see on the {{ activeTab().label }} page.
+    </p>
+    }
+
+    <div class="admin-categories__grid" cdkDropList cdkDropListOrientation="mixed"
+        [cdkDropListDisabled]="!canReorder()" (cdkDropListDropped)="dropCategory($event)">
         @for (category of categories(); track category.id) {
-        <div class="admin-categories__card">
+        <div class="admin-categories__card" cdkDrag>
+            @if (canReorder()) {
+            <mat-icon class="admin-categories__drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+            }
             @if (firstPhoto(category); as photo) {
             <img class="admin-categories__thumb" [src]="photo" [alt]="category.name" />
             } @else {

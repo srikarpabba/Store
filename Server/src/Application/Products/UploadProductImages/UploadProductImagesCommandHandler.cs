@@ -44,6 +44,10 @@ internal sealed class UploadProductImagesCommandHandler(
 
         bool firstImage = !hasMainPhoto;
 
+        int nextSortOrder = productColor.Photos.Count == 0
+            ? 0
+            : productColor.Photos.Max(x => x.SortOrder) + 1;
+
         foreach (FileUpload file in command.Files)
         {
             string extension = Path.GetExtension(file.FileName);
@@ -59,11 +63,13 @@ internal sealed class UploadProductImagesCommandHandler(
             ProductPhoto photo = product.CreatePhoto(
                 productColor,
                 objectKey,
-                firstImage);
+                firstImage,
+                nextSortOrder);
 
             context.ProductPhotos.Add(photo);
 
             firstImage = false;
+            nextSortOrder++;
         }
 
         await context.SaveChangesAsync(cancellationToken);

@@ -5,6 +5,7 @@ export interface ProductQuery {
 
     brands?: string[];
     categories?: string[];
+    subcategories?: string[];
     colors?: string[];
     sizes?: string[];
     genders?: string[];

@@ -6,5 +6,6 @@ public sealed record UpdateCategoryCommand(
     Guid Id,
     string Name,
     string? Description,
-    IReadOnlyCollection<Guid> GenderIds)
+    IReadOnlyCollection<Guid> GenderIds,
+    IReadOnlyCollection<Guid> SizeIds)
     : ICommand;

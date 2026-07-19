@@ -23,7 +23,8 @@ internal sealed class CreateProductCommandHandler(
             command.Name,
             command.Description,
             command.CategoryId,
-            command.BrandId);
+            command.BrandId,
+            command.SubcategoryId);
 
         foreach (Guid genderId in command.GenderIds)
         {
@@ -61,6 +62,16 @@ internal sealed class CreateProductCommandHandler(
     private async Task<Result> ValidateProductDetailsAsync(CreateProductCommand command, CancellationToken cancellationToken)
     {
         Result result = await validator.ValidateCategoryAsync(
+            command.CategoryId,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure<Guid>(result.Error);
+        }
+
+        result = await validator.ValidateSubcategoryAsync(
+            command.SubcategoryId,
             command.CategoryId,
             cancellationToken);
 

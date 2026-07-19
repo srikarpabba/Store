@@ -23,6 +23,36 @@ internal sealed class ProductValidator(IApplicationDbContext context)
                     $"Category with Id '{categoryId}' was not found."));
     }
 
+    /// <summary>
+    /// A product's subcategory is optional, but when set it must exist and
+    /// belong to the product's selected category.
+    /// </summary>
+    public async Task<Result> ValidateSubcategoryAsync(
+        Guid? subcategoryId,
+        Guid categoryId,
+        CancellationToken cancellationToken)
+    {
+        if (subcategoryId is null)
+        {
+            return Result.Success();
+        }
+
+        Guid? parentCategoryId = await context.Subcategories
+            .AsNoTracking()
+            .Where(s => s.Id == subcategoryId.Value)
+            .Select(s => (Guid?)s.CategoryId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (parentCategoryId is null)
+        {
+            return Result.Failure(SubcategoryErrors.NotFound(subcategoryId.Value));
+        }
+
+        return parentCategoryId == categoryId
+            ? Result.Success()
+            : Result.Failure(SubcategoryErrors.NotInCategory);
+    }
+
     public async Task<Result> ValidateBrandAsync(
         Guid brandId,
         CancellationToken cancellationToken)

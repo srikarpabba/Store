@@ -45,6 +45,12 @@ internal static class ProductQueryExtensions
                 filters.Categories.Contains(x.Category.Name));
         }
 
+        if (filters.Subcategories is { Length: > 0 })
+        {
+            query = query.Where(x =>
+                x.Subcategory != null && filters.Subcategories.Contains(x.Subcategory.Name));
+        }
+
         if (filters.Colors is { Length: > 0 })
         {
             query = query.Where(x =>

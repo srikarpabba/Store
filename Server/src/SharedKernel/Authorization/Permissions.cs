@@ -14,6 +14,10 @@ public static class Permissions
     public const string CategoriesUpdate = "categories:update";
     public const string CategoriesDelete = "categories:delete";
 
+    public const string SubcategoriesCreate = "subcategories:create";
+    public const string SubcategoriesUpdate = "subcategories:update";
+    public const string SubcategoriesDelete = "subcategories:delete";
+
     public const string BrandsCreate = "brands:create";
     public const string BrandsUpdate = "brands:update";
     public const string BrandsDelete = "brands:delete";

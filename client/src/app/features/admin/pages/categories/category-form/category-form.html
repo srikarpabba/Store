@@ -42,7 +42,56 @@
                 <mat-error>Select at least one gender this category applies to</mat-error>
                 }
             </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Sizes</mat-label>
+                <mat-select formControlName="sizeIds" multiple>
+                    @for (size of allSizes(); track size.id) {
+                    <mat-option [value]="size.id">{{ size.name }}</mat-option>
+                    }
+                </mat-select>
+                <mat-hint>Sizes this category's products can use. Leave empty to allow all sizes.</mat-hint>
+            </mat-form-field>
         </section>
+
+        @if (isEdit) {
+        <section class="category-form__card">
+            <h2>Subcategories</h2>
+            <p class="category-form__photos-hint">
+                E.g. "Oversized T-Shirts" under "T-Shirts". Products can then be assigned to one.
+            </p>
+
+            @if (subcategories().length > 0) {
+            <div class="category-form__subcategories">
+                @for (subcategory of subcategories(); track subcategory.id) {
+                <span class="category-form__subcategory-chip">
+                    {{ subcategory.name }}
+                    <button type="button" class="category-form__subcategory-remove"
+                        (click)="removeSubcategory(subcategory)"
+                        [attr.aria-label]="'Remove ' + subcategory.name">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </span>
+                }
+            </div>
+            } @else {
+            <p class="category-form__no-subcategories">No subcategories yet.</p>
+            }
+
+            <div class="category-form__subcategory-add">
+                <mat-form-field appearance="outline" class="category-form__subcategory-field">
+                    <mat-label>New subcategory name</mat-label>
+                    <input matInput [formControl]="newSubcategoryName" maxlength="100"
+                        (keydown.enter)="$event.preventDefault(); addSubcategory()" />
+                </mat-form-field>
+                <button mat-stroked-button type="button" (click)="addSubcategory()"
+                    [disabled]="!newSubcategoryName.value.trim()">
+                    <mat-icon>add</mat-icon>
+                    Add
+                </button>
+            </div>
+        </section>
+        }
 
         @if (isEdit && category(); as savedCategory) {
         <section class="category-form__card">

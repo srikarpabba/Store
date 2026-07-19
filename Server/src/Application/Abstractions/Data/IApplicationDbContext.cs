@@ -15,12 +15,15 @@ public interface IApplicationDbContext
     DbSet<Brand> Brands { get; }
     DbSet<Color> Colors { get; }
     DbSet<Size> Sizes { get; }
+    DbSet<Subcategory> Subcategories { get; }
     DbSet<Gender> Genders { get; }
     DbSet<ProductPhoto> ProductPhotos { get; }
     DbSet<ProductColor> ProductColors { get; }
     DbSet<ProductGender> ProductGenders { get; }
     DbSet<ProductVariant> ProductVariants { get; }
     DbSet<CategoryGender> CategoryGenders { get; }
+
+    DbSet<CategorySize> CategorySizes { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

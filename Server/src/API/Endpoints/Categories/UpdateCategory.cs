@@ -8,7 +8,7 @@ namespace API.Endpoints.Categories;
 
 internal sealed class UpdateCategory : IEndpoint
 {
-    public sealed record Request(string Name, string? Description, List<Guid> GenderIds);
+    public sealed record Request(string Name, string? Description, List<Guid> GenderIds, List<Guid>? SizeIds);
 
     public static void Map(IEndpointRouteBuilder app)
     {
@@ -18,7 +18,7 @@ internal sealed class UpdateCategory : IEndpoint
             ICommandHandler<UpdateCategoryCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new UpdateCategoryCommand(id, request.Name, request.Description, request.GenderIds);
+            var command = new UpdateCategoryCommand(id, request.Name, request.Description, request.GenderIds, request.SizeIds ?? []);
 
             SharedKernel.Result result = await handler.Handle(command, cancellationToken);
 

@@ -35,6 +35,18 @@ internal sealed class CreateCategoryCommandHandler(
             }
         }
 
+        var sizeIds = command.SizeIds.Distinct().ToList();
+
+        if (sizeIds.Count > 0)
+        {
+            Result sizeResult = await validator.ValidateSizeIdsAsync(sizeIds, cancellationToken);
+
+            if (sizeResult.IsFailure)
+            {
+                return Result.Failure<Guid>(sizeResult.Error);
+            }
+        }
+
         var category = new Category
         {
             Name = command.Name.Trim(),
@@ -44,6 +56,11 @@ internal sealed class CreateCategoryCommandHandler(
         foreach (Guid genderId in genderIds)
         {
             category.AddGender(genderId);
+        }
+
+        foreach (Guid sizeId in sizeIds)
+        {
+            category.AddSize(sizeId);
         }
 
         context.Categories.Add(category);

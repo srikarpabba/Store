@@ -35,17 +35,14 @@
 
             <div class="product-form__row">
                 <mat-form-field appearance="outline">
-                    <mat-label>Category</mat-label>
-                    <mat-select formControlName="categoryId">
-                        @for (category of availableCategories(); track category.id) {
-                        <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                    <mat-label>Genders</mat-label>
+                    <mat-select formControlName="genderIds" multiple>
+                        @for (gender of filters()?.genders ?? []; track gender.id) {
+                        <mat-option [value]="gender.id">{{ gender.name }}</mat-option>
                         }
                     </mat-select>
-                    @if (form.controls.categoryId.hasError('required')) {
-                    <mat-error>Category is required</mat-error>
-                    }
-                    @if (availableCategories().length === 0) {
-                    <mat-hint>No categories are tagged for the selected genders yet</mat-hint>
+                    @if (form.controls.genderIds.hasError('required')) {
+                    <mat-error>Select at least one gender</mat-error>
                     }
                 </mat-form-field>
 
@@ -62,97 +59,139 @@
                 </mat-form-field>
             </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Genders</mat-label>
-                <mat-select formControlName="genderIds" multiple>
-                    @for (gender of availableGenders(); track gender.id) {
-                    <mat-option [value]="gender.id">{{ gender.name }}</mat-option>
+            <div class="product-form__row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Category</mat-label>
+                    <mat-select formControlName="categoryId">
+                        @for (category of availableCategories(); track category.id) {
+                        <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (form.controls.categoryId.hasError('required')) {
+                    <mat-error>Category is required</mat-error>
                     }
-                </mat-select>
-                @if (form.controls.genderIds.hasError('required')) {
-                <mat-error>Select at least one gender</mat-error>
-                }
-                @if (selectedCategoryName(); as categoryName) {
-                <mat-hint>Showing genders tagged on "{{ categoryName }}"</mat-hint>
-                }
-            </mat-form-field>
+                    @if (form.controls.categoryId.disabled) {
+                    <mat-hint>Pick a gender first</mat-hint>
+                    } @else if (availableCategories().length === 0) {
+                    <mat-hint>No categories are tagged for the selected genders yet</mat-hint>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Subcategory (optional)</mat-label>
+                    <mat-select formControlName="subcategoryId">
+                        <mat-option value="">None</mat-option>
+                        @for (subcategory of availableSubcategories(); track subcategory.id) {
+                        <mat-option [value]="subcategory.id">{{ subcategory.name }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (form.controls.subcategoryId.disabled) {
+                    <mat-hint>Pick a category first</mat-hint>
+                    } @else if (availableSubcategories().length === 0) {
+                    <mat-hint>This category has no subcategories yet</mat-hint>
+                    }
+                </mat-form-field>
+            </div>
         </section>
 
         <section class="product-form__card">
             <div class="product-form__variants-header">
                 <h2>Variants</h2>
-                <button mat-stroked-button type="button" (click)="addVariant()">
+                <button mat-stroked-button type="button" (click)="addColorGroup()">
                     <mat-icon>add</mat-icon>
-                    Add variant
+                    Add color
                 </button>
             </div>
 
-            @if (variants.length === 0) {
-            <p class="product-form__no-variants">No variants yet — add at least one.</p>
+            @if (variantColors.length === 0) {
+            <p class="product-form__no-variants">No variants yet — add a color, then its sizes.</p>
             }
 
-            <div formArrayName="variants">
-                @for (variant of variants.controls; track variant; let i = $index) {
-                <div class="product-form__variant" [formGroupName]="i">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Color</mat-label>
-                        <mat-select formControlName="colorId">
-                            @for (color of filters()?.colors ?? []; track color.id) {
-                            <mat-option [value]="color.id">
-                                <span class="product-form__color-option">
-                                    <span class="product-form__color-swatch" [style.background]="color.hexCode"></span>
-                                    {{ color.name }}
-                                </span>
-                            </mat-option>
+            <div formArrayName="variantColors">
+                @for (colorGroup of variantColors.controls; track colorGroup; let i = $index) {
+                <div class="product-form__variant-color" [formGroupName]="i">
+                    <div class="product-form__variant-color-header">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Color</mat-label>
+                            <mat-select formControlName="colorId">
+                                @for (color of filters()?.colors ?? []; track color.id) {
+                                <mat-option [value]="color.id">
+                                    <span class="product-form__color-option">
+                                        <span class="product-form__color-swatch" [style.background]="color.hexCode"></span>
+                                        {{ color.name }}
+                                    </span>
+                                </mat-option>
+                                }
+                            </mat-select>
+                            @if (colorGroup.controls.colorId.hasError('required')) {
+                            <mat-error>Required</mat-error>
                             }
-                        </mat-select>
-                        @if (variant.controls.colorId.hasError('required')) {
-                        <mat-error>Required</mat-error>
-                        }
-                    </mat-form-field>
+                        </mat-form-field>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Size</mat-label>
-                        <mat-select formControlName="sizeId">
-                            @for (size of filters()?.sizes ?? []; track size.id) {
-                            <mat-option [value]="size.id">{{ size.name }}</mat-option>
-                            }
-                        </mat-select>
-                        @if (variant.controls.sizeId.hasError('required')) {
-                        <mat-error>Required</mat-error>
-                        }
-                    </mat-form-field>
+                        <button mat-stroked-button type="button" (click)="addSizeRow(colorGroup)">
+                            <mat-icon>add</mat-icon>
+                            Add size
+                        </button>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Price (₹)</mat-label>
-                        <input matInput type="number" formControlName="price" min="0.01" step="0.01" />
-                        @if (variant.controls.price.hasError('required') || variant.controls.price.hasError('min')) {
-                        <mat-error>Must be above 0</mat-error>
-                        }
-                    </mat-form-field>
+                        <button mat-icon-button class="product-form__remove-variant" type="button"
+                            (click)="removeColorGroup(i)" matTooltip="Remove color and its sizes"
+                            aria-label="Remove color and its sizes">
+                            <mat-icon>delete_outline</mat-icon>
+                        </button>
+                    </div>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Stock</mat-label>
-                        <input matInput type="number" formControlName="quantityInStock" min="0" step="1" />
-                        @if (variant.controls.quantityInStock.hasError('required') || variant.controls.quantityInStock.hasError('min')) {
-                        <mat-error>0 or more</mat-error>
-                        }
-                    </mat-form-field>
+                    @if (colorGroup.controls.sizes.length === 0) {
+                    <p class="product-form__no-variants">No sizes for this color yet — add at least one.</p>
+                    }
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>SKU</mat-label>
-                        <input matInput formControlName="sku" />
-                        @if (variant.controls.sku.hasError('required')) {
-                        <mat-error>Required</mat-error>
-                        } @else if (variant.controls.sku.hasError('pattern')) {
-                        <mat-error>Letters, numbers, - and _ only</mat-error>
-                        }
-                    </mat-form-field>
+                    <div formArrayName="sizes">
+                        @for (row of colorGroup.controls.sizes.controls; track row; let j = $index) {
+                        <div class="product-form__variant" [formGroupName]="j">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Size</mat-label>
+                                <mat-select formControlName="sizeId">
+                                    @for (size of availableSizes(); track size.id) {
+                                    <mat-option [value]="size.id">{{ size.name }}</mat-option>
+                                    }
+                                </mat-select>
+                                @if (row.controls.sizeId.hasError('required')) {
+                                <mat-error>Required</mat-error>
+                                }
+                            </mat-form-field>
 
-                    <button mat-icon-button class="product-form__remove-variant" type="button"
-                        (click)="removeVariant(i)" aria-label="Remove variant">
-                        <mat-icon>delete_outline</mat-icon>
-                    </button>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Price (₹)</mat-label>
+                                <input matInput type="number" formControlName="price" min="0.01" step="0.01" />
+                                @if (row.controls.price.hasError('required') || row.controls.price.hasError('min')) {
+                                <mat-error>Must be above 0</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Stock</mat-label>
+                                <input matInput type="number" formControlName="quantityInStock" min="0" step="1" />
+                                @if (row.controls.quantityInStock.hasError('required') || row.controls.quantityInStock.hasError('min')) {
+                                <mat-error>0 or more</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>SKU</mat-label>
+                                <input matInput formControlName="sku" />
+                                @if (row.controls.sku.hasError('required')) {
+                                <mat-error>Required</mat-error>
+                                } @else if (row.controls.sku.hasError('pattern')) {
+                                <mat-error>Letters, numbers, - and _ only</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <button mat-icon-button class="product-form__remove-variant" type="button"
+                                (click)="removeSizeRow(colorGroup, j)" aria-label="Remove size">
+                                <mat-icon>delete_outline</mat-icon>
+                            </button>
+                        </div>
+                        }
+                    </div>
                 </div>
                 }
             </div>
@@ -185,9 +224,10 @@
                 @if (color.photos.length === 0) {
                 <p class="product-form__no-photos">No images for this color yet.</p>
                 } @else {
-                <div class="product-form__photos">
+                <div class="product-form__photos" cdkDropList cdkDropListOrientation="mixed"
+                    (cdkDropListDropped)="reorderPhotos(color, $event)">
                     @for (photo of color.photos; track photo.id) {
-                    <figure class="product-form__photo" [class.product-form__photo--main]="photo.isMain">
+                    <figure class="product-form__photo" cdkDrag [class.product-form__photo--main]="photo.isMain">
                         <img [src]="photo.fileName" alt="Product photo" loading="lazy" />
                         @if (photo.isMain) {
                         <span class="product-form__photo-badge">Main</span>

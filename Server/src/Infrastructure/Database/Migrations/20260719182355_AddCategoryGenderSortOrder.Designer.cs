@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260717210421_AddCategoryGenderAndCategoryPhoto")]
-    partial class AddCategoryGenderAndCategoryPhoto
+    [Migration("20260719182355_AddCategoryGenderSortOrder")]
+    partial class AddCategoryGenderSortOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,89 @@ namespace Infrastructure.Database.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Banners.Banner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<string>("ImageFileName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("image_file_name");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("LinkUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("link_url");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("Storefront")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("storefront");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id")
+                        .HasName("pk_banners");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Banner_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Banner_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Banner_IsDeleted");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Banner_IsDeleted_CreatedOn");
+
+                    b.HasIndex("Storefront", "SortOrder")
+                        .HasDatabaseName("ix_banners_storefront_sort_order");
+
+                    b.ToTable("banners", "store");
+                });
 
             modelBuilder.Entity("Domain.Products.Brand", b =>
                 {
@@ -59,9 +142,10 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_featured");
 
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("logo_url");
+                    b.Property<string>("LogoFileName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("logo_file_name");
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uuid")
@@ -142,11 +226,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
-                    b.Property<string>("PhotoFileName")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("photo_file_name");
-
                     b.HasKey("Id")
                         .HasName("pk_categories");
 
@@ -179,6 +258,17 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("gender_id");
 
+                    b.Property<string>("PhotoFileName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("photo_file_name");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("sort_order");
+
                     b.HasKey("CategoryId", "GenderId")
                         .HasName("pk_category_genders");
 
@@ -188,6 +278,25 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("category_genders", "store");
                 });
 
+            modelBuilder.Entity("Domain.Products.CategorySize", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid>("SizeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("size_id");
+
+                    b.HasKey("CategoryId", "SizeId")
+                        .HasName("pk_category_sizes");
+
+                    b.HasIndex("SizeId")
+                        .HasDatabaseName("ix_category_sizes_size_id");
+
+                    b.ToTable("category_sizes", "store");
+                });
+
             modelBuilder.Entity("Domain.Products.Color", b =>
                 {
                     b.Property<Guid>("Id")
@@ -195,11 +304,37 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
                     b.Property<string>("HexCode")
                         .IsRequired()
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)")
                         .HasColumnName("hex_code");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -210,9 +345,21 @@ namespace Infrastructure.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_colors");
 
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Color_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Color_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Color_IsDeleted");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_colors_name");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Color_IsDeleted_CreatedOn");
 
                     b.ToTable("colors", "store");
                 });
@@ -299,6 +446,10 @@ namespace Infrastructure.Database.Migrations
                         .HasDefaultValue(0m)
                         .HasColumnName("rating");
 
+                    b.Property<Guid?>("SubcategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subcategory_id");
+
                     b.HasKey("Id")
                         .HasName("pk_products");
 
@@ -322,6 +473,9 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasIndex("Rating")
                         .HasDatabaseName("IX_Products_Rating");
+
+                    b.HasIndex("SubcategoryId")
+                        .HasDatabaseName("IX_Products_SubcategoryId");
 
                     b.HasIndex("IsDeleted", "CreatedOnUtc")
                         .HasDatabaseName("IX_Product_IsDeleted_CreatedOn");
@@ -447,6 +601,12 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("product_color_id");
 
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("sort_order");
+
                     b.HasKey("Id")
                         .HasName("pk_product_photos");
 
@@ -540,6 +700,32 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -549,11 +735,88 @@ namespace Infrastructure.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_sizes");
 
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Size_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Size_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Size_IsDeleted");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_sizes_name");
 
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Size_IsDeleted_CreatedOn");
+
                     b.ToTable("sizes", "store");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_subcategories");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Subcategory_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Subcategory_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Subcategory_IsDeleted");
+
+                    b.HasIndex("CategoryId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_subcategories_category_id_name");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Subcategory_IsDeleted_CreatedOn");
+
+                    b.ToTable("subcategories", "store");
                 });
 
             modelBuilder.Entity("Domain.Users.Address", b =>
@@ -1111,6 +1374,27 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Gender");
                 });
 
+            modelBuilder.Entity("Domain.Products.CategorySize", b =>
+                {
+                    b.HasOne("Domain.Products.Category", "Category")
+                        .WithMany("CategorySizes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_sizes_categories_category_id");
+
+                    b.HasOne("Domain.Products.Size", "Size")
+                        .WithMany("CategorySizes")
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_sizes_sizes_size_id");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Size");
+                });
+
             modelBuilder.Entity("Domain.Products.Product", b =>
                 {
                     b.HasOne("Domain.Products.Brand", "Brand")
@@ -1127,9 +1411,17 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_products_categories_category_id");
 
+                    b.HasOne("Domain.Products.Subcategory", "Subcategory")
+                        .WithMany("Products")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_products_subcategories_subcategory_id");
+
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Subcategory");
                 });
 
             modelBuilder.Entity("Domain.Products.ProductColor", b =>
@@ -1210,6 +1502,18 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("ProductColor");
 
                     b.Navigation("Size");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.HasOne("Domain.Products.Category", "Category")
+                        .WithMany("Subcategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_subcategories_categories_category_id");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Domain.Users.Address", b =>
@@ -1307,7 +1611,11 @@ namespace Infrastructure.Database.Migrations
                 {
                     b.Navigation("CategoryGenders");
 
+                    b.Navigation("CategorySizes");
+
                     b.Navigation("Products");
+
+                    b.Navigation("Subcategories");
                 });
 
             modelBuilder.Entity("Domain.Products.Color", b =>
@@ -1340,7 +1648,14 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Products.Size", b =>
                 {
+                    b.Navigation("CategorySizes");
+
                     b.Navigation("ProductVariants");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Infrastructure.Authorization.Permission", b =>

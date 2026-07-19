@@ -27,6 +27,14 @@ public class ProductConfiguration : AuditableBaseEntityConfiguration<Product>
         builder.HasIndex(p => p.CategoryId)
             .HasDatabaseName("IX_Products_CategoryId");
 
+        builder.HasIndex(p => p.SubcategoryId)
+            .HasDatabaseName("IX_Products_SubcategoryId");
+
+        builder.HasOne(p => p.Subcategory)
+            .WithMany(s => s.Products)
+            .HasForeignKey(p => p.SubcategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(p => p.Rating)
             .HasDatabaseName("IX_Products_Rating");  //For sorting
     }

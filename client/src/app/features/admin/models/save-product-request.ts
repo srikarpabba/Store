@@ -13,6 +13,7 @@ export interface SaveProductRequest {
     name: string;
     description: string;
     categoryId: string;
+    subcategoryId?: string | null;
     brandId: string;
     genderIds: string[];
     variants: SaveVariantRequest[];

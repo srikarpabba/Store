@@ -16,6 +16,30 @@ namespace Infrastructure.Database.Migrations
                 name: "store");
 
             migrationBuilder.CreateTable(
+                name: "banners",
+                schema: "store",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    storefront = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    link_url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    image_file_name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    sort_order = table.Column<int>(type: "integer", nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    modified_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_banners", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "brands",
                 schema: "store",
                 columns: table => new
@@ -23,7 +47,7 @@ namespace Infrastructure.Database.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
-                    logo_url = table.Column<string>(type: "text", nullable: true),
+                    logo_file_name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     is_featured = table.Column<bool>(type: "boolean", nullable: false),
                     created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -63,8 +87,14 @@ namespace Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     hex_code = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
-                    name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    modified_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -149,7 +179,13 @@ namespace Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
+                    name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    modified_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -190,16 +226,13 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "products",
+                name: "subcategories",
                 schema: "store",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     category_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    brand_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    rating = table.Column<decimal>(type: "numeric(3,2)", nullable: false, defaultValue: 0m),
                     created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     modified_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -209,21 +242,42 @@ namespace Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_products", x => x.id);
+                    table.PrimaryKey("pk_subcategories", x => x.id);
                     table.ForeignKey(
-                        name: "fk_products_brands_brand_id",
-                        column: x => x.brand_id,
-                        principalSchema: "store",
-                        principalTable: "brands",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_products_categories_category_id",
+                        name: "fk_subcategories_categories_category_id",
                         column: x => x.category_id,
                         principalSchema: "store",
                         principalTable: "categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "category_genders",
+                schema: "store",
+                columns: table => new
+                {
+                    category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    gender_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    photo_file_name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_category_genders", x => new { x.category_id, x.gender_id });
+                    table.ForeignKey(
+                        name: "fk_category_genders_categories_category_id",
+                        column: x => x.category_id,
+                        principalSchema: "store",
+                        principalTable: "categories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_category_genders_genders_gender_id",
+                        column: x => x.gender_id,
+                        principalSchema: "store",
+                        principalTable: "genders",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -272,6 +326,33 @@ namespace Infrastructure.Database.Migrations
                         column: x => x.role_id,
                         principalSchema: "store",
                         principalTable: "roles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "category_sizes",
+                schema: "store",
+                columns: table => new
+                {
+                    category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    size_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_category_sizes", x => new { x.category_id, x.size_id });
+                    table.ForeignKey(
+                        name: "fk_category_sizes_categories_category_id",
+                        column: x => x.category_id,
+                        principalSchema: "store",
+                        principalTable: "categories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_category_sizes_sizes_size_id",
+                        column: x => x.size_id,
+                        principalSchema: "store",
+                        principalTable: "sizes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -401,6 +482,51 @@ namespace Infrastructure.Database.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "products",
+                schema: "store",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    subcategory_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    brand_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    rating = table.Column<decimal>(type: "numeric(3,2)", nullable: false, defaultValue: 0m),
+                    created_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    modified_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_on_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_products", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_products_brands_brand_id",
+                        column: x => x.brand_id,
+                        principalSchema: "store",
+                        principalTable: "brands",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_products_categories_category_id",
+                        column: x => x.category_id,
+                        principalSchema: "store",
+                        principalTable: "categories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_products_subcategories_subcategory_id",
+                        column: x => x.subcategory_id,
+                        principalSchema: "store",
+                        principalTable: "subcategories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -557,6 +683,36 @@ namespace Infrastructure.Database.Migrations
                 filter: "is_default = true");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Banner_CreatedById",
+                schema: "store",
+                table: "banners",
+                column: "created_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Banner_CreatedOn",
+                schema: "store",
+                table: "banners",
+                column: "created_on_utc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Banner_IsDeleted",
+                schema: "store",
+                table: "banners",
+                column: "is_deleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Banner_IsDeleted_CreatedOn",
+                schema: "store",
+                table: "banners",
+                columns: new[] { "is_deleted", "created_on_utc" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_banners_storefront_sort_order",
+                schema: "store",
+                table: "banners",
+                columns: new[] { "storefront", "sort_order" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Brand_CreatedById",
                 schema: "store",
                 table: "brands",
@@ -616,6 +772,42 @@ namespace Infrastructure.Database.Migrations
                 name: "IX_Category_IsDeleted_CreatedOn",
                 schema: "store",
                 table: "categories",
+                columns: new[] { "is_deleted", "created_on_utc" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_category_genders_gender_id",
+                schema: "store",
+                table: "category_genders",
+                column: "gender_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_category_sizes_size_id",
+                schema: "store",
+                table: "category_sizes",
+                column: "size_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Color_CreatedById",
+                schema: "store",
+                table: "colors",
+                column: "created_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Color_CreatedOn",
+                schema: "store",
+                table: "colors",
+                column: "created_on_utc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Color_IsDeleted",
+                schema: "store",
+                table: "colors",
+                column: "is_deleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Color_IsDeleted_CreatedOn",
+                schema: "store",
+                table: "colors",
                 columns: new[] { "is_deleted", "created_on_utc" });
 
             migrationBuilder.CreateIndex(
@@ -763,6 +955,12 @@ namespace Infrastructure.Database.Migrations
                 column: "rating");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_SubcategoryId",
+                schema: "store",
+                table: "products",
+                column: "subcategory_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_expires_on_utc",
                 schema: "store",
                 table: "refresh_tokens",
@@ -801,11 +999,66 @@ namespace Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Size_CreatedById",
+                schema: "store",
+                table: "sizes",
+                column: "created_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Size_CreatedOn",
+                schema: "store",
+                table: "sizes",
+                column: "created_on_utc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Size_IsDeleted",
+                schema: "store",
+                table: "sizes",
+                column: "is_deleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Size_IsDeleted_CreatedOn",
+                schema: "store",
+                table: "sizes",
+                columns: new[] { "is_deleted", "created_on_utc" });
+
+            migrationBuilder.CreateIndex(
                 name: "ix_sizes_name",
                 schema: "store",
                 table: "sizes",
                 column: "name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_subcategories_category_id_name",
+                schema: "store",
+                table: "subcategories",
+                columns: new[] { "category_id", "name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategory_CreatedById",
+                schema: "store",
+                table: "subcategories",
+                column: "created_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategory_CreatedOn",
+                schema: "store",
+                table: "subcategories",
+                column: "created_on_utc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategory_IsDeleted",
+                schema: "store",
+                table: "subcategories",
+                column: "is_deleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategory_IsDeleted_CreatedOn",
+                schema: "store",
+                table: "subcategories",
+                columns: new[] { "is_deleted", "created_on_utc" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_claims_user_id",
@@ -844,6 +1097,18 @@ namespace Infrastructure.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "addresses",
+                schema: "store");
+
+            migrationBuilder.DropTable(
+                name: "banners",
+                schema: "store");
+
+            migrationBuilder.DropTable(
+                name: "category_genders",
+                schema: "store");
+
+            migrationBuilder.DropTable(
+                name: "category_sizes",
                 schema: "store");
 
             migrationBuilder.DropTable(
@@ -920,6 +1185,10 @@ namespace Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "brands",
+                schema: "store");
+
+            migrationBuilder.DropTable(
+                name: "subcategories",
                 schema: "store");
 
             migrationBuilder.DropTable(

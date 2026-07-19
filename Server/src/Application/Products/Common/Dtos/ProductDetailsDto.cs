@@ -5,6 +5,7 @@ internal sealed record ProductDetailsDto(
     string Name,
     string Description,
     CategoryDto Category,
+    SubcategoryDto? Subcategory,
     BrandDto Brand,
     decimal Rating,
     IReadOnlyList<ProductColorDto> Colors,

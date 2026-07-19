@@ -74,9 +74,24 @@
     font-size: 0.9rem;
 }
 
+.product-form__variant-color {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.product-form__variant-color-header {
+    display: grid;
+    grid-template-columns: 1.2fr auto auto;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
 .product-form__variant {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr 0.8fr 1.2fr auto;
+    grid-template-columns: 1fr 1fr 0.8fr 1.2fr auto;
     gap: 0.5rem;
     align-items: baseline;
     padding-top: 0.25rem;
@@ -150,6 +165,25 @@
     border-radius: 0.5rem;
     overflow: hidden;
     background: var(--color-surface-alt);
+    cursor: grab;
+}
+
+.product-form__photo:active {
+    cursor: grabbing;
+}
+
+/* CDK drag-and-drop states for photo reordering */
+.cdk-drag-preview.product-form__photo {
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+    width: 8.5rem;
+}
+
+.cdk-drag-placeholder.product-form__photo {
+    opacity: 0.25;
+}
+
+.product-form__photos.cdk-drop-list-dragging .product-form__photo:not(.cdk-drag-placeholder) {
+    transition: transform 200ms ease;
 }
 
 .product-form__photo--main {

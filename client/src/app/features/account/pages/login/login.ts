@@ -48,7 +48,7 @@ export class Login implements AfterViewInit {
   readonly form = this.formBuilder.group({
     email: ['', [Validators.required, emailValidator]],
     password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator]],
-    rememberMe: [false]
+    rememberMe: [true]
   });
 
   ngAfterViewInit(): void {

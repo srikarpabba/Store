@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BannerSlide, BannerSlider } from '../../../../shared/ui/banner-slider/banner-slider';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ProductCard } from '../../components/product-card/product-card';
+import { slugify } from '../../../../shared/utils/slug';
 
 @Component({
   selector: 'app-shop-page',
@@ -25,6 +26,9 @@ export class ShopPage {
   private storefrontService = inject(StorefrontService);
 
   private notificationService = inject(NotificationService);
+
+  /** Exposed for the category-tile links */
+  readonly slugify = slugify;
 
   readonly section = signal('');
 

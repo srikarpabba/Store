@@ -59,6 +59,13 @@ export class AdminProductService {
         );
     }
 
+    reorderImages(productId: string, productColorId: string, photoIds: string[]) {
+        return this.http.put<void>(
+            `${this.apiUrl}${ProductApi.details(productId)}/colors/${productColorId}/images/order`,
+            { photoIds }
+        );
+    }
+
     setMainImage(productId: string, photoId: string) {
         return this.http.put<void>(
             `${this.apiUrl}${ProductApi.details(productId)}/images/${photoId}/main`,

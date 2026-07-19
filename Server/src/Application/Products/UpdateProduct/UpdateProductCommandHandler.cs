@@ -35,7 +35,8 @@ internal sealed class UpdateProductCommandHandler(
             command.Name,
             command.Description,
             command.CategoryId,
-            command.BrandId);
+            command.BrandId,
+            command.SubcategoryId);
 
         SyncGenders(product, command);
 
@@ -144,6 +145,13 @@ internal sealed class UpdateProductCommandHandler(
     private async Task<Result> ValidateProductDetailsAsync(UpdateProductCommand command, CancellationToken cancellationToken)
     {
         Result result = await validator.ValidateCategoryAsync(command.CategoryId, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result;
+        }
+
+        result = await validator.ValidateSubcategoryAsync(command.SubcategoryId, command.CategoryId, cancellationToken);
 
         if (result.IsFailure)
         {

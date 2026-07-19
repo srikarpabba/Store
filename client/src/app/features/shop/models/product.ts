@@ -16,6 +16,10 @@ export interface Product {
     /** Only populated by the shop grid's GraphQL query (includeColors: true) — null for the admin table and search typeahead. */
     category: Lookup | null;
 
+    /** Populated alongside category when the product has one — cards prefer
+        showing this over the category name. */
+    subcategory: Lookup | null;
+
     /** Only populated by the shop grid's GraphQL query (includeColors: true) — null for the admin table and search typeahead. */
     colors: ProductColorDetails[] | null;
 }

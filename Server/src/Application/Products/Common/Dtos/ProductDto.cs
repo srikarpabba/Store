@@ -8,4 +8,5 @@ internal sealed record ProductDto(
     decimal Rating,
     string? Image,
     CategoryDto? Category,
+    SubcategoryDto? Subcategory,
     IReadOnlyList<ProductColorDto>? Colors);

@@ -56,10 +56,14 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
                     product.ProductColors
                         .SelectMany(pc => pc.Photos)
                         .OrderByDescending(p => p.IsMain)
+                        .ThenBy(p => p.SortOrder)
                         .ThenBy(p => p.CreatedOnUtc)
                         .Select(p => p.FileName)
                         .FirstOrDefault(),
                     new CategoryDto(product.CategoryId, product.Category.Name),
+                    product.Subcategory == null
+                        ? null
+                        : new SubcategoryDto(product.Subcategory.Id, product.Subcategory.Name),
                     product.ProductColors
                         .Select(pc => new ProductColorDto(
                             pc.Id,
@@ -67,6 +71,9 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
                             pc.Color.Name,
                             pc.Color.HexCode,
                             pc.Photos
+                                .OrderByDescending(photo => photo.IsMain)
+                                .ThenBy(photo => photo.SortOrder)
+                                .ThenBy(photo => photo.CreatedOnUtc)
                                 .Select(photo => new ProductPhotoDto(photo.Id, photo.FileName, photo.IsMain))
                                 .ToList()))
                         .ToList()))
@@ -81,9 +88,11 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
                     product.ProductColors
                         .SelectMany(pc => pc.Photos)
                         .OrderByDescending(p => p.IsMain)
+                        .ThenBy(p => p.SortOrder)
                         .ThenBy(p => p.CreatedOnUtc)
                         .Select(p => p.FileName)
                         .FirstOrDefault(),
+                    null,
                     null,
                     null))
                 .ToListAsync(cancellationToken);

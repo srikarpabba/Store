@@ -8,6 +8,7 @@ import { ProductDetails } from '../models/product-details';
 import { PagedResponse } from '../models/paged-response';
 import { ProductApi } from '../api/product-api';
 import { ProductFilters } from '../models/product-filters';
+import { ProductFacets } from '../models/product-facets';
 import { ProductSort } from '../models/enums/product-sort';
 
 interface GraphQlResponse<T> {
@@ -46,6 +47,7 @@ export class ProductService {
                 items {
                     id name startingPrice rating image
                     category { id name }
+                    subcategory { id name }
                     colors {
                         productColorId colorId colorName hexCode
                         photos { id fileName isMain }
@@ -85,6 +87,7 @@ export class ProductService {
             search: query.search,
             brands: query.brands,
             categories: query.categories,
+            subcategories: query.subcategories,
             colors: query.colors,
             sizes: query.sizes,
             genders: query.genders,
@@ -125,6 +128,17 @@ export class ProductService {
         );
     }
 
+    /** Counts per filter option for the given selection — paging/sort
+        fields of the query are ignored server-side. */
+    getFacets(query: ProductQuery) {
+        return this.http.get<ProductFacets>(
+            `${this.apiUrl}${ProductApi.facets}`,
+            {
+                params: this.buildParams(query)
+            }
+        );
+    }
+
     private buildParams(query: ProductQuery): HttpParams {
 
         let params = new HttpParams();
@@ -138,6 +152,9 @@ export class ProductService {
 
         query.categories?.forEach(category =>
             params = params.append('categories', category));
+
+        query.subcategories?.forEach(subcategory =>
+            params = params.append('subcategories', subcategory));
 
         query.colors?.forEach(color =>
             params = params.append('colors', color));

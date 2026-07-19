@@ -76,6 +76,39 @@
     gap: 1rem;
 }
 
+.admin-categories__reorder-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0 0 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.admin-categories__drag-handle {
+    color: var(--color-text-muted);
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.admin-categories__drag-handle:active {
+    cursor: grabbing;
+}
+
+/* CDK drag-and-drop states for category reordering */
+.cdk-drag-preview.admin-categories__card {
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+    background: var(--color-surface);
+}
+
+.cdk-drag-placeholder.admin-categories__card {
+    opacity: 0.25;
+}
+
+.admin-categories__grid.cdk-drop-list-dragging .admin-categories__card:not(.cdk-drag-placeholder) {
+    transition: transform 200ms ease;
+}
+
 .admin-categories__card {
     display: flex;
     align-items: center;

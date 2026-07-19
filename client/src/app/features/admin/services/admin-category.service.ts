@@ -47,6 +47,15 @@ export class AdminCategoryService {
         return this.http.delete<void>(`${this.apiUrl}${CategoryApi.details(id)}`);
     }
 
+    /** Sets one gender's storefront category order — every category tagged
+        with the gender, in display order. */
+    reorder(genderId: string, categoryIds: string[]) {
+        return this.http.put<void>(
+            `${this.apiUrl}${CategoryApi.categories}/genders/${genderId}/order`,
+            { categoryIds }
+        );
+    }
+
     uploadGenderPhoto(categoryId: string, genderId: string, file: File) {
         const form = new FormData();
         form.append('file', file);

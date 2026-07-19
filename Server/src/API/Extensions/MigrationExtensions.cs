@@ -2,7 +2,6 @@
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace API.Extensions;
 
@@ -23,14 +22,11 @@ public static class MigrationExtensions
         RoleManager<AppRole> roleManager =
             scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
-        IDateTimeProvider dateTimeProvider =
-            scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
-
         IHostEnvironment environment = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
         if (environment.IsDevelopment())
         {
-            await StoreDbSeeder.SeedAsync(userManager, roleManager, dbContext, dateTimeProvider);
+            await StoreDbSeeder.SeedAsync(userManager, roleManager, dbContext);
         }
     }
 }

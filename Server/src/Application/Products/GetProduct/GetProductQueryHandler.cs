@@ -25,6 +25,9 @@ internal sealed class GetProductQueryHandler(IApplicationDbContext context, Prod
                 new CategoryDto(
                     product.CategoryId,
                     product.Category.Name),
+                product.Subcategory == null
+                    ? null
+                    : new SubcategoryDto(product.Subcategory.Id, product.Subcategory.Name),
                 new BrandDto(
                     product.BrandId,
                     product.Brand.Name),
@@ -39,6 +42,8 @@ internal sealed class GetProductQueryHandler(IApplicationDbContext context, Prod
 
                         color.Photos
                             .OrderByDescending(p => p.IsMain)
+                            .ThenBy(p => p.SortOrder)
+                            .ThenBy(p => p.CreatedOnUtc)
                             .Select(photo => new ProductPhotoDto(
                                 photo.Id,
                                 photo.FileName,

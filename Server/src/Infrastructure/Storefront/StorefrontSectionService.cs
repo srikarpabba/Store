@@ -27,6 +27,8 @@ internal sealed class StorefrontSectionService(
         string? ImageFileName,
         Guid CategoryId,
         string CategoryName,
+        Guid? SubcategoryId,
+        string? SubcategoryName,
         List<NewArrivalColorRow> Colors);
 
     private sealed record NewArrivalColorRow(
@@ -129,11 +131,14 @@ internal sealed class StorefrontSectionService(
                 p.ProductColors
                     .SelectMany(pc => pc.Photos)
                     .OrderByDescending(ph => ph.IsMain)
+                    .ThenBy(ph => ph.SortOrder)
                     .ThenBy(ph => ph.CreatedOnUtc)
                     .Select(ph => ph.FileName)
                     .FirstOrDefault(),
                 p.CategoryId,
                 p.Category.Name,
+                p.SubcategoryId,
+                p.Subcategory == null ? null : p.Subcategory.Name,
                 p.ProductColors
                     .Select(pc => new NewArrivalColorRow(
                         pc.Id,
@@ -141,6 +146,9 @@ internal sealed class StorefrontSectionService(
                         pc.Color.Name,
                         pc.Color.HexCode,
                         pc.Photos
+                            .OrderByDescending(ph => ph.IsMain)
+                            .ThenBy(ph => ph.SortOrder)
+                            .ThenBy(ph => ph.CreatedOnUtc)
                             .Select(ph => new NewArrivalPhotoRow(ph.Id, ph.FileName, ph.IsMain))
                             .ToList()))
                     .ToList()))
@@ -154,6 +162,9 @@ internal sealed class StorefrontSectionService(
                 r.Rating,
                 r.ImageFileName is null ? null : fileStorage.GetUrl(r.ImageFileName).AbsoluteUri,
                 new StorefrontProductCategory(r.CategoryId, r.CategoryName),
+                r.SubcategoryId is null || r.SubcategoryName is null
+                    ? null
+                    : new StorefrontProductSubcategory(r.SubcategoryId.Value, r.SubcategoryName),
                 r.Colors
                     .Select(c => new StorefrontProductColor(
                         c.ProductColorId,
@@ -172,7 +183,11 @@ internal sealed class StorefrontSectionService(
         List<CategoryRow> rows = await context.Categories
             .AsNoTracking()
             .Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == genderName))
-            .OrderBy(c => c.Name)
+            .OrderBy(c => c.CategoryGenders
+                .Where(cg => cg.Gender.Name == genderName)
+                .Select(cg => cg.SortOrder)
+                .FirstOrDefault())
+            .ThenBy(c => c.Name)
             .Select(c => new CategoryRow(
                 c.Id,
                 c.Name,

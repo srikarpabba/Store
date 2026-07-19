@@ -13,6 +13,10 @@ public class CategoryGenderConfiguration : IEntityTypeConfiguration<CategoryGend
         builder.Property(cg => cg.PhotoFileName)
             .HasMaxLength(500);
 
+        builder.Property(cg => cg.SortOrder)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.HasOne(cg => cg.Category)
                .WithMany(c => c.CategoryGenders)
                .HasForeignKey(cg => cg.CategoryId);

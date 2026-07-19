@@ -8,6 +8,8 @@ public sealed class Product : AuditableEntity
     public string Description { get; private set; }
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; } = null!;
+    public Guid? SubcategoryId { get; private set; }
+    public Subcategory? Subcategory { get; }
     public Guid BrandId { get; private set; }
     public Brand Brand { get; private set; } = null!;
     public decimal Rating { get; private set; }
@@ -23,7 +25,8 @@ public sealed class Product : AuditableEntity
         string name,
         string description,
         Guid categoryId,
-        Guid brandId)
+        Guid brandId,
+        Guid? subcategoryId)
     {
         var product = new Product
         {
@@ -31,6 +34,7 @@ public sealed class Product : AuditableEntity
             Description = description,
             CategoryId = categoryId,
             BrandId = brandId,
+            SubcategoryId = subcategoryId,
             Rating = 0m
         };
 
@@ -43,12 +47,14 @@ public sealed class Product : AuditableEntity
         string name,
         string description,
         Guid categoryId,
-        Guid brandId)
+        Guid brandId,
+        Guid? subcategoryId)
     {
         Name = name;
         Description = description;
         CategoryId = categoryId;
         BrandId = brandId;
+        SubcategoryId = subcategoryId;
     }
 
     public void RemoveGender(ProductGender gender)
@@ -108,11 +114,13 @@ public sealed class Product : AuditableEntity
     public ProductPhoto CreatePhoto(
         ProductColor productColor,
         string fileName,
-        bool isMain = false)
+        bool isMain = false,
+        int sortOrder = 0)
     {
         return ProductPhoto.Create(
         productColor.Id,
         fileName,
-        isMain);
+        isMain,
+        sortOrder);
     }
 }

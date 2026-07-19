@@ -9,4 +9,5 @@ public sealed record ProductResponse(
     decimal Rating,
     string? Image,
     ProductCategoryResponse? Category,
+    ProductSubcategoryResponse? Subcategory,
     IReadOnlyList<ProductColorResponse>? Colors);

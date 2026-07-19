@@ -15,6 +15,7 @@ public sealed record UpdateProductCommand(
     string Name,
     string Description,
     Guid CategoryId,
+    Guid? SubcategoryId,
     Guid BrandId,
     IReadOnlyCollection<Guid> GenderIds,
     IReadOnlyCollection<UpdateVariantRequest> Variants)

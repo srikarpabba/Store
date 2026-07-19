@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260718125336_MakeColorSizeAuditable")]
-    partial class MakeColorSizeAuditable
+    [Migration("20260719133354_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -272,6 +272,25 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("category_genders", "store");
                 });
 
+            modelBuilder.Entity("Domain.Products.CategorySize", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid>("SizeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("size_id");
+
+                    b.HasKey("CategoryId", "SizeId")
+                        .HasName("pk_category_sizes");
+
+                    b.HasIndex("SizeId")
+                        .HasDatabaseName("ix_category_sizes_size_id");
+
+                    b.ToTable("category_sizes", "store");
+                });
+
             modelBuilder.Entity("Domain.Products.Color", b =>
                 {
                     b.Property<Guid>("Id")
@@ -421,6 +440,10 @@ namespace Infrastructure.Database.Migrations
                         .HasDefaultValue(0m)
                         .HasColumnName("rating");
 
+                    b.Property<Guid?>("SubcategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subcategory_id");
+
                     b.HasKey("Id")
                         .HasName("pk_products");
 
@@ -444,6 +467,9 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasIndex("Rating")
                         .HasDatabaseName("IX_Products_Rating");
+
+                    b.HasIndex("SubcategoryId")
+                        .HasDatabaseName("IX_Products_SubcategoryId");
 
                     b.HasIndex("IsDeleted", "CreatedOnUtc")
                         .HasDatabaseName("IX_Product_IsDeleted_CreatedOn");
@@ -714,6 +740,71 @@ namespace Infrastructure.Database.Migrations
                         .HasDatabaseName("IX_Size_IsDeleted_CreatedOn");
 
                     b.ToTable("sizes", "store");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_subcategories");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Subcategory_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Subcategory_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Subcategory_IsDeleted");
+
+                    b.HasIndex("CategoryId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_subcategories_category_id_name");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Subcategory_IsDeleted_CreatedOn");
+
+                    b.ToTable("subcategories", "store");
                 });
 
             modelBuilder.Entity("Domain.Users.Address", b =>
@@ -1271,6 +1362,27 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Gender");
                 });
 
+            modelBuilder.Entity("Domain.Products.CategorySize", b =>
+                {
+                    b.HasOne("Domain.Products.Category", "Category")
+                        .WithMany("CategorySizes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_sizes_categories_category_id");
+
+                    b.HasOne("Domain.Products.Size", "Size")
+                        .WithMany("CategorySizes")
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_category_sizes_sizes_size_id");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Size");
+                });
+
             modelBuilder.Entity("Domain.Products.Product", b =>
                 {
                     b.HasOne("Domain.Products.Brand", "Brand")
@@ -1287,9 +1399,17 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_products_categories_category_id");
 
+                    b.HasOne("Domain.Products.Subcategory", "Subcategory")
+                        .WithMany("Products")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_products_subcategories_subcategory_id");
+
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Subcategory");
                 });
 
             modelBuilder.Entity("Domain.Products.ProductColor", b =>
@@ -1370,6 +1490,18 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("ProductColor");
 
                     b.Navigation("Size");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.HasOne("Domain.Products.Category", "Category")
+                        .WithMany("Subcategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_subcategories_categories_category_id");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Domain.Users.Address", b =>
@@ -1467,7 +1599,11 @@ namespace Infrastructure.Database.Migrations
                 {
                     b.Navigation("CategoryGenders");
 
+                    b.Navigation("CategorySizes");
+
                     b.Navigation("Products");
+
+                    b.Navigation("Subcategories");
                 });
 
             modelBuilder.Entity("Domain.Products.Color", b =>
@@ -1500,7 +1636,14 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Products.Size", b =>
                 {
+                    b.Navigation("CategorySizes");
+
                     b.Navigation("ProductVariants");
+                });
+
+            modelBuilder.Entity("Domain.Products.Subcategory", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Infrastructure.Authorization.Permission", b =>

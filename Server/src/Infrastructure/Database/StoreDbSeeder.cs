@@ -3,21 +3,18 @@ using Infrastructure.Authorization;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 using SharedKernel.Authorization;
-using Color = Domain.Products.Color;
-using Size = Domain.Products.Size;
 
 namespace Infrastructure.Database;
 
 public static class StoreDbSeeder
 {
-    public static async Task SeedAsync(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, ApplicationDbContext context, IDateTimeProvider dateTimeProvider)
+    public static async Task SeedAsync(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, ApplicationDbContext context)
     {
         await SeedRolesAndAdminAsync(userManager, roleManager);
         await SeedPermissionsAsync(context);
         await SeedRolePermissionsAsync(roleManager, context);
-        await SeedLookupDataAsync(userManager, context, dateTimeProvider);
+        await SeedGendersAsync(context);
     }
 
     private static async Task SeedRolesAndAdminAsync(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
@@ -116,148 +113,23 @@ public static class StoreDbSeeder
         await context.SaveChangesAsync();
     }
 
-    private static async Task SeedLookupDataAsync(UserManager<AppUser> userManager, ApplicationDbContext context, IDateTimeProvider dateTimeProvider)
-    {
-        AppUser? admin = await userManager.FindByEmailAsync("pabbasrikar@gmail.com");
-        Guid? adminId = admin?.Id;
-
-        DateTime now = dateTimeProvider.UtcNow;
-
-        if (!await context.Colors.AnyAsync())
-        {
-            var colors = new List<Color>
-            {
-                new Color { Name = "Red", HexCode = "#FF0000" },
-                new Color { Name = "Blue", HexCode = "#0000FF" },
-                new Color { Name = "Green", HexCode = "#00FF00" },
-                new Color { Name = "Black", HexCode = "#000000" },
-                new Color { Name = "White", HexCode = "#FFFFFF" },
-                new Color { Name = "Purple", HexCode = "#800080" },
-                new Color { Name = "Pink", HexCode = "#FFC0CB" },
-                new Color { Name = "Brown", HexCode = "#A52A2A" },
-                new Color { Name = "Gray", HexCode = "#808080" },
-                new Color { Name = "Navy Blue", HexCode = "#000080" }
-            };
-            context.Colors.AddRange(colors);
-        }
-
-        if (!await context.Sizes.AnyAsync())
-        {
-            var sizes = new List<Size>
-            {
-                new Size { Name = "S" },
-                new Size { Name = "M" },
-                new Size { Name = "L" },
-                new Size { Name = "XL" },
-                new Size { Name = "XXL" },
-                new Size { Name = "OneSize" },
-                new Size { Name = "6" },
-                new Size { Name = "7" },
-                new Size { Name = "8" },
-                new Size { Name = "9" },
-                new Size { Name = "10" },
-                new Size { Name = "30" },
-                new Size { Name = "32" },
-                new Size { Name = "34" },
-                new Size { Name = "36" },
-            };
-            context.Sizes.AddRange(sizes);
-        }
-
-        if (!await context.Genders.AnyAsync())
-        {
-            var genders = new List<Gender>
-            {
-                new Gender { Name = "Male" },
-                new Gender { Name = "Female" },
-                new Gender { Name = "Unisex" }
-            };
-            context.Genders.AddRange(genders);
-        }
-
-        if (!await context.Brands.AnyAsync())
-        {
-            var brands = new List<Brand>
-            {
-                new Brand { Name = "Levi's" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Brand { Name = "Tommy Hilfiger", CreatedOnUtc = now, CreatedBy = adminId  },
-                new Brand {Name = "Wrangler", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "Nike", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "Zara", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "FabIndia", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "Adidas", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "Puma", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "RedTape", CreatedOnUtc = now, CreatedBy = adminId},
-                new Brand {Name = "Clarks", CreatedOnUtc = now, CreatedBy = adminId}
-            };
-            context.Brands.AddRange(brands);
-        }
-
-        if (!await context.Categories.AnyAsync())
-        {
-            var categories = new List<Category>
-            {
-                new Category { Name = "Boots" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Hat" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Kurta" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Dress" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Shoes" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Jeans" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "Shirt" , CreatedOnUtc = now, CreatedBy = adminId },
-                new Category { Name = "T-Shirt" , CreatedOnUtc = now, CreatedBy = adminId }
-            };
-            context.Categories.AddRange(categories);
-        }
-
-        await context.SaveChangesAsync();
-
-        await SeedCategoryGendersAsync(context);
-    }
-
     /// <summary>
-    /// Every category must be explicitly tagged with the genders it applies
-    /// to — there is no implicit "unisex" default, since each tag also
-    /// carries its own display photo (set later via the admin UI). A
-    /// category with no tags can't be used by any product yet.
+    /// Genders are structural reference data, not user-managed content:
+    /// storefront and category queries match them by name ("Male",
+    /// "Female", "Unisex"), and there is no Gender CRUD. Everything else
+    /// (colors, sizes, brands, categories, ...) is created via the admin UI.
     /// </summary>
-    private static async Task SeedCategoryGendersAsync(ApplicationDbContext context)
+    private static async Task SeedGendersAsync(ApplicationDbContext context)
     {
-        if (await context.CategoryGenders.AnyAsync())
+        if (await context.Genders.AnyAsync())
         {
             return;
         }
 
-        (string CategoryName, string[] GenderNames)[] associations =
-        [
-            ("Boots", ["Male", "Female", "Unisex"]),
-            ("Hat", ["Male", "Female", "Unisex"]),
-            ("Kurta", ["Male", "Female"]),
-            ("Dress", ["Female"]),
-            ("Shoes", ["Male", "Female", "Unisex"]),
-            ("Jeans", ["Male", "Female", "Unisex"]),
-            ("Shirt", ["Male", "Female", "Unisex"]),
-            ("T-Shirt", ["Male", "Female", "Unisex"])
-        ];
-
-        foreach ((string categoryName, string[] genderNames) in associations)
-        {
-            Category? category = await context.Categories.FirstOrDefaultAsync(c => c.Name == categoryName);
-
-            if (category is null)
-            {
-                continue;
-            }
-
-            foreach (string genderName in genderNames)
-            {
-                Gender? gender = await context.Genders.FirstOrDefaultAsync(g => g.Name == genderName);
-
-                if (gender is not null)
-                {
-                    context.CategoryGenders.Add(new CategoryGender { CategoryId = category.Id, GenderId = gender.Id });
-                }
-            }
-        }
+        context.Genders.AddRange(
+            new Gender { Name = "Male" },
+            new Gender { Name = "Female" },
+            new Gender { Name = "Unisex" });
 
         await context.SaveChangesAsync();
     }

@@ -18,6 +18,10 @@ public class ProductPhotoConfiguration : IEntityTypeConfiguration<ProductPhoto>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(x => x.SortOrder)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.HasOne(x => x.ProductColor)
             .WithMany(x => x.Photos)
             .HasForeignKey(x => x.ProductColorId)

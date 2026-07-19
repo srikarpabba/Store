@@ -16,6 +16,10 @@ public static class PermissionDefinitions
         (Permissions.CategoriesUpdate, "Update categories"),
         (Permissions.CategoriesDelete, "Delete categories"),
 
+        (Permissions.SubcategoriesCreate, "Create subcategories"),
+        (Permissions.SubcategoriesUpdate, "Update subcategories"),
+        (Permissions.SubcategoriesDelete, "Delete subcategories"),
+
         (Permissions.BrandsCreate, "Create brands"),
         (Permissions.BrandsUpdate, "Update brands"),
         (Permissions.BrandsDelete, "Delete brands"),

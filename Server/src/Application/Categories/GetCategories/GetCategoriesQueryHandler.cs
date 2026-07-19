@@ -21,7 +21,8 @@ internal sealed class GetCategoriesQueryHandler(
         Guid Id,
         string Name,
         string? Description,
-        List<CategoryGenderRow> Genders);
+        List<CategoryGenderRow> Genders,
+        List<CategorySizeResponse> Sizes);
 
     public async Task<Result<PagedResponse<CategoryResponse>>> Handle(
         GetCategoriesQuery query,
@@ -32,15 +33,30 @@ internal sealed class GetCategoriesQueryHandler(
 
         IQueryable<Category> categories = context.Categories.AsNoTracking();
 
-        categories = query.Gender switch
+        string? genderName = query.Gender switch
         {
-            "Men" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Male")),
-            "Women" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Female")),
-            "Unisex" => categories.Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == "Unisex")),
-            _ => categories
+            "Men" => "Male",
+            "Women" => "Female",
+            "Unisex" => "Unisex",
+            _ => null
         };
 
-        categories = categories.OrderBy(c => c.Name);
+        if (genderName is null)
+        {
+            categories = categories.OrderBy(c => c.Name);
+        }
+        else
+        {
+            // gender-filtered view mirrors that gender's storefront order,
+            // so the admin sees (and can rearrange) what shoppers see
+            categories = categories
+                .Where(c => c.CategoryGenders.Any(cg => cg.Gender.Name == genderName))
+                .OrderBy(c => c.CategoryGenders
+                    .Where(cg => cg.Gender.Name == genderName)
+                    .Select(cg => cg.SortOrder)
+                    .FirstOrDefault())
+                .ThenBy(c => c.Name);
+        }
 
         int total = await categories.CountAsync(cancellationToken);
 
@@ -52,6 +68,9 @@ internal sealed class GetCategoriesQueryHandler(
                 c.Description,
                 c.CategoryGenders
                     .Select(cg => new CategoryGenderRow(cg.GenderId, cg.Gender.Name, cg.PhotoFileName))
+                    .ToList(),
+                c.CategorySizes
+                    .Select(cs => new CategorySizeResponse(cs.SizeId, cs.Size.Name))
                     .ToList()))
             .ToListAsync(cancellationToken);
 
@@ -65,7 +84,8 @@ internal sealed class GetCategoriesQueryHandler(
                         g.GenderId,
                         g.GenderName,
                         g.PhotoFileName is null ? null : fileStorage.GetUrl(g.PhotoFileName).AbsoluteUri))
-                    .ToList()))
+                    .ToList(),
+                r.Sizes))
             .ToList();
 
         return new PagedResponse<CategoryResponse>(items, pageIndex, pageSize, total);

@@ -1,0 +1,151 @@
+<div class="max-w-328 mx-auto px-4 pt-6 pb-16">
+
+    @if (category(); as resolvedCategory) {
+    <div class="flex flex-col gap-8 md:flex-row">
+
+        <aside class="w-full md:w-56 shrink-0">
+
+            @if (availableSubcategories().length > 0) {
+            <section class="mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Categories</h2>
+                <input type="text" placeholder="Search for Categories"
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 mb-2"
+                    [value]="subcategorySearch()"
+                    (input)="subcategorySearch.set(subcategoryInput.value)" #subcategoryInput />
+                @for (subcategory of subcategoryOptions(); track subcategory.name) {
+                <label class="flex items-center justify-between gap-2 py-1.5 text-[15px] cursor-pointer">
+                    <span class="flex items-center gap-2">
+                        <input type="checkbox" class="cursor-pointer"
+                            [checked]="selectedSubcategories().has(subcategory.name)"
+                            (change)="toggleSubcategory(subcategory.name)" />
+                        {{ subcategory.name }}
+                    </span>
+                    @if (subcategory.count !== null) {
+                    <span class="text-sm text-gray-400">{{ subcategory.count }}</span>
+                    }
+                </label>
+                }
+            </section>
+            }
+
+            @if (filters()?.brands?.length) {
+            <section class="mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Brand</h2>
+                <input type="text" placeholder="Search for Brand"
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 mb-2"
+                    [value]="brandSearch()"
+                    (input)="brandSearch.set(brandInput.value)" #brandInput />
+                @for (brand of brandOptions(); track brand.name) {
+                <label class="flex items-center justify-between gap-2 py-1.5 text-[15px] cursor-pointer">
+                    <span class="flex items-center gap-2">
+                        <input type="checkbox" class="cursor-pointer"
+                            [checked]="selectedBrands().has(brand.name)"
+                            (change)="toggleBrand(brand.name)" />
+                        {{ brand.name }}
+                    </span>
+                    @if (brand.count !== null) {
+                    <span class="text-sm text-gray-400">{{ brand.count }}</span>
+                    }
+                </label>
+                }
+            </section>
+            }
+
+            @if (availableSizes().length > 0) {
+            <section class="mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Size</h2>
+                <input type="text" placeholder="Search for Size"
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 mb-3"
+                    [value]="sizeSearch()"
+                    (input)="sizeSearch.set(sizeInput.value)" #sizeInput />
+                <div class="flex flex-wrap gap-2">
+                    @for (size of sizeOptions(); track size.name) {
+                    <button type="button"
+                        class="rounded-lg border-2 px-3 py-1.5 text-[15px] cursor-pointer transition-colors"
+                        [class.border-gray-400]="!selectedSizes().has(size.name)"
+                        [class.border-black]="selectedSizes().has(size.name)"
+                        [class.bg-gray-100]="selectedSizes().has(size.name)"
+                        (click)="toggleSize(size.name)"
+                        [attr.aria-pressed]="selectedSizes().has(size.name)">
+                        {{ size.name }}
+                        @if (size.count !== null) {
+                        <span class="text-xs text-gray-400">({{ size.count }})</span>
+                        }
+                    </button>
+                    }
+                </div>
+            </section>
+            }
+
+            @if (filters()?.colors?.length) {
+            <section class="mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Color</h2>
+                <input type="text" placeholder="Search for Color"
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 mb-3"
+                    [value]="colorSearch()"
+                    (input)="colorSearch.set(colorInput.value)" #colorInput />
+                <div class="flex flex-wrap gap-2">
+                    @for (color of colorOptions(); track color.id) {
+                    <button type="button" class="w-6 h-6 rounded-full border cursor-pointer transition-shadow"
+                        [class.border-gray-300]="!selectedColors().has(color.name)"
+                        [class.ring-2]="selectedColors().has(color.name)"
+                        [class.ring-offset-1]="selectedColors().has(color.name)"
+                        [class.ring-black]="selectedColors().has(color.name)"
+                        [style.background]="color.hexCode"
+                        (click)="toggleColor(color.name)"
+                        [title]="color.name" [attr.aria-label]="color.name"
+                        [attr.aria-pressed]="selectedColors().has(color.name)">
+                    </button>
+                    }
+                </div>
+            </section>
+            }
+
+            <section class="mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Price</h2>
+                <div class="flex items-center gap-2">
+                    <input #minInput type="number" min="0" placeholder="Min"
+                        class="w-20 rounded border border-gray-300 px-2 py-1 text-sm"
+                        (change)="applyPrice(minInput.value, maxInput.value)" />
+                    <span class="text-gray-400">–</span>
+                    <input #maxInput type="number" min="0" placeholder="Max"
+                        class="w-20 rounded border border-gray-300 px-2 py-1 text-sm"
+                        (change)="applyPrice(minInput.value, maxInput.value)" />
+                </div>
+            </section>
+
+        </aside>
+
+        <main class="flex-1">
+
+            @if (pageIndex() > 0 && !isLoadingMore() && products().length === 0) {
+            <div class="flex flex-col items-center gap-2 py-20 text-center text-gray-500">
+                <p class="text-base font-medium">No products found</p>
+                <p class="text-sm">Try removing some filters.</p>
+            </div>
+            } @else {
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-10">
+                @for (product of products(); track product.id) {
+                <app-product-card [product]="product" [section]="section()" />
+                }
+            </div>
+            }
+
+            <div #scrollSentinel class="flex justify-center py-10">
+                @if (isLoadingMore()) {
+                <mat-spinner diameter="28" />
+                } @else if (!hasNext() && products().length > 0) {
+                <p class="text-sm text-gray-500">You've reached the end.</p>
+                }
+            </div>
+
+        </main>
+
+    </div>
+    } @else {
+    <div class="flex justify-center py-24">
+        <mat-spinner diameter="32" />
+    </div>
+    }
+
+</div>

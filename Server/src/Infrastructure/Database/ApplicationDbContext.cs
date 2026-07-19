@@ -33,12 +33,15 @@ public sealed class ApplicationDbContext(
     public DbSet<Brand> Brands { get; set; }
     public DbSet<Color> Colors { get; set; }
     public DbSet<Size> Sizes { get; set; }
+    public DbSet<Subcategory> Subcategories { get; set; }
     public DbSet<Gender> Genders { get; set; }
     public DbSet<ProductPhoto> ProductPhotos { get; set; }
     public DbSet<ProductColor> ProductColors { get; set; }
     public DbSet<ProductGender> ProductGenders { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<CategoryGender> CategoryGenders { get; set; }
+
+    public DbSet<CategorySize> CategorySizes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -18,6 +18,7 @@ internal sealed class UpdateCategoryCommandHandler(
     {
         Category? category = await context.Categories
             .Include(c => c.CategoryGenders)
+            .Include(c => c.CategorySizes)
             .FirstOrDefaultAsync(c => c.Id == command.Id, cancellationToken);
 
         if (category is null)
@@ -43,6 +44,18 @@ internal sealed class UpdateCategoryCommandHandler(
             return genderResult;
         }
 
+        var sizeIds = command.SizeIds.Distinct().ToList();
+
+        if (sizeIds.Count > 0)
+        {
+            Result sizeResult = await validator.ValidateSizeIdsAsync(sizeIds, cancellationToken);
+
+            if (sizeResult.IsFailure)
+            {
+                return sizeResult;
+            }
+        }
+
         category.Update(
             command.Name.Trim(),
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description.Trim());
@@ -60,6 +73,19 @@ internal sealed class UpdateCategoryCommandHandler(
             .Where(id => !category.CategoryGenders.Any(g => g.GenderId == id)))
         {
             category.AddGender(genderId);
+        }
+
+        foreach (CategorySize size in category.CategorySizes
+            .Where(s => !sizeIds.Contains(s.SizeId))
+            .ToList())
+        {
+            category.RemoveSize(size);
+        }
+
+        foreach (Guid sizeId in sizeIds
+            .Where(id => !category.CategorySizes.Any(s => s.SizeId == id)))
+        {
+            category.AddSize(sizeId);
         }
 
         await context.SaveChangesAsync(cancellationToken);

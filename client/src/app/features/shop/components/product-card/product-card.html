@@ -41,8 +41,8 @@
 
     <a class="card__info" [routerLink]="['/', section(), product().id]" [queryParams]="queryParams()">
         <p class="card__name">{{ product().name }}</p>
-        @if (product().category; as category) {
-        <p class="card__category">{{ category.name }}</p>
+        @if (product().subcategory ?? product().category; as categoryLabel) {
+        <p class="card__category">{{ categoryLabel.name }}</p>
         }
         <p class="card__price">{{ product().startingPrice | price }}</p>
         @if (product().rating > 0) {

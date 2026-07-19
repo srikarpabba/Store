@@ -7,6 +7,7 @@ public sealed record ProductDetailsResponse(
     string Name,
     string Description,
     ProductCategoryResponse Category,
+    ProductSubcategoryResponse? Subcategory,
     BrandResponse Brand,
     decimal Rating,
     IReadOnlyList<ProductColorResponse> Colors,

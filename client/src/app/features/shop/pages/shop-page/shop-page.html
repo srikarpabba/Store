@@ -12,7 +12,7 @@
             <div class="grid grid-cols-3 sm:grid-cols-6 gap-x-8 gap-y-6">
                 @for (category of categories(); track category.id) {
                 <a class="flex flex-col items-center gap-2 no-underline text-inherit w-28"
-                    [routerLink]="['/', section()]" [queryParams]="{ category: category.name }">
+                    [routerLink]="['/', section(), slugify(category.name)]">
                     @if (category.photo) {
                     <img class="w-28 h-28 object-cover" [src]="category.photo" [alt]="category.name" />
                     } @else {

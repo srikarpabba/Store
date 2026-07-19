@@ -25,9 +25,24 @@ export class BannerSlider {
 
   readonly activeIndex = signal(0);
 
+  private timer: ReturnType<typeof setInterval> | null = null;
+
   constructor() {
-    const timer = setInterval(() => this.next(), BannerSlider.AUTOPLAY_MS);
-    this.destroyRef.onDestroy(() => clearInterval(timer));
+    this.resume();
+    this.destroyRef.onDestroy(() => this.pause());
+  }
+
+  /** Stops autoplay while the pointer is over the slider, so it can't
+      silently advance to another slide out from under a hovering click. */
+  pause(): void {
+    if (this.timer !== null) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+
+  resume(): void {
+    this.timer ??= setInterval(() => this.next(), BannerSlider.AUTOPLAY_MS);
   }
 
   select(index: number): void {

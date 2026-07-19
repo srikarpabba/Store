@@ -10,7 +10,7 @@ internal sealed class CreateProduct : IEndpoint
 {
     public sealed record VariantRequest(Guid ColorId, Guid SizeId, decimal Price, int QuantityInStock, string SKU);
 
-    public sealed record Request(string Name, string Description, Guid CategoryId, Guid BrandId, List<Guid> GenderIds, List<VariantRequest> Variants);
+    public sealed record Request(string Name, string Description, Guid CategoryId, Guid? SubcategoryId, Guid BrandId, List<Guid> GenderIds, List<VariantRequest> Variants);
 
     public static void Map(IEndpointRouteBuilder app)
     {
@@ -23,6 +23,7 @@ internal sealed class CreateProduct : IEndpoint
                 request.Name,
                 request.Description,
                 request.CategoryId,
+                request.SubcategoryId,
                 request.BrandId,
                 request.GenderIds,
                 request.Variants

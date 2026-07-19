@@ -29,6 +29,7 @@ export interface ProductDetails {
     name: string;
     description: string;
     category: Lookup;
+    subcategory: Lookup | null;
     brand: Lookup;
     rating: number;
     colors: ProductColorDetails[];

@@ -25,7 +25,14 @@ internal sealed class GetProductFiltersQueryHandler(
             .Select(x => new CategoryLookupResponse(
                 x.Id,
                 x.Name,
-                x.CategoryGenders.Select(cg => cg.GenderId).ToList()))
+                x.CategoryGenders.Select(cg => cg.GenderId).ToList(),
+                x.CategorySizes.Select(cs => cs.SizeId).ToList()))
+            .ToListAsync(cancellationToken);
+
+        List<SubcategoryLookupResponse> subcategories = await context.Subcategories
+            .AsNoTracking()
+            .OrderBy(x => x.Name)
+            .Select(x => new SubcategoryLookupResponse(x.Id, x.Name, x.CategoryId))
             .ToListAsync(cancellationToken);
 
         List<ColorLookupResponse> colors = await context.Colors
@@ -62,6 +69,7 @@ internal sealed class GetProductFiltersQueryHandler(
         return new ProductFiltersResponse(
             brands,
             categories,
+            subcategories,
             colors,
             sizes,
             genders,

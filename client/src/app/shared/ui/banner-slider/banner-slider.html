@@ -1,8 +1,9 @@
 @if (banners().length > 0) {
-<div class="banner-slider">
+<div class="banner-slider" (mouseenter)="pause()" (mouseleave)="resume()">
     <div class="banner-slider__track" [style.transform]="'translateX(-' + (activeIndex() * 100) + '%)'">
         @for (banner of banners(); track banner.id) {
-        <a class="banner-slider__slide" [href]="banner.link || null">
+        <a class="banner-slider__slide" [class.banner-slider__slide--linked]="banner.link"
+            [href]="banner.link || null">
             @if (banner.photo) {
             <img class="banner-slider__image" [src]="banner.photo" [alt]="banner.title ?? ''" />
             }

@@ -4,6 +4,11 @@ export interface CategoryGenderInfo {
     photo: string | null;
 }
 
+export interface CategorySizeInfo {
+    sizeId: string;
+    sizeName: string;
+}
+
 export interface Category {
 
     id: string;
@@ -13,4 +18,6 @@ export interface Category {
     description: string | null;
 
     genders: CategoryGenderInfo[];
+
+    sizes: CategorySizeInfo[];
 }

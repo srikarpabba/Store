@@ -7,9 +7,12 @@ public sealed record StorefrontProductItem(
     decimal Rating,
     string? Image,
     StorefrontProductCategory? Category,
+    StorefrontProductSubcategory? Subcategory,
     IReadOnlyList<StorefrontProductColor> Colors);
 
 public sealed record StorefrontProductCategory(Guid Id, string Name);
+
+public sealed record StorefrontProductSubcategory(Guid Id, string Name);
 
 public sealed record StorefrontProductColor(
     Guid ProductColorId,

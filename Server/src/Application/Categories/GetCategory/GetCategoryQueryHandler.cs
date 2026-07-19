@@ -18,7 +18,8 @@ internal sealed class GetCategoryQueryHandler(
         Guid Id,
         string Name,
         string? Description,
-        List<CategoryGenderRow> Genders);
+        List<CategoryGenderRow> Genders,
+        List<CategorySizeResponse> Sizes);
 
     public async Task<Result<CategoryResponse>> Handle(
         GetCategoryQuery query,
@@ -33,6 +34,9 @@ internal sealed class GetCategoryQueryHandler(
                 c.Description,
                 c.CategoryGenders
                     .Select(cg => new CategoryGenderRow(cg.GenderId, cg.Gender.Name, cg.PhotoFileName))
+                    .ToList(),
+                c.CategorySizes
+                    .Select(cs => new CategorySizeResponse(cs.SizeId, cs.Size.Name))
                     .ToList()))
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -50,6 +54,7 @@ internal sealed class GetCategoryQueryHandler(
                     g.GenderId,
                     g.GenderName,
                     g.PhotoFileName is null ? null : fileStorage.GetUrl(g.PhotoFileName).AbsoluteUri))
-                .ToList());
+                .ToList(),
+            category.Sizes);
     }
 }

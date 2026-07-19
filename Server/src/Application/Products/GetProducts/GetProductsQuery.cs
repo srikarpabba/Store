@@ -8,6 +8,7 @@ public sealed record GetProductsQuery(
     string? Search,
     string[]? Brands,
     string[]? Categories,
+    string[]? Subcategories,
     string[]? Colors,
     string[]? Sizes,
     string[]? Genders,

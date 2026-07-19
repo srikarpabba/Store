@@ -6,6 +6,7 @@ using API.Endpoints.Categories;
 using API.Endpoints.Colors;
 using API.Endpoints.Products;
 using API.Endpoints.Sizes;
+using API.Endpoints.Subcategories;
 using API.Endpoints.Storefronts;
 using API.Endpoints.Users;
 using API.RateLimiting;
@@ -22,6 +23,7 @@ public static class EndpointExtensions
         endpoints.MapAuthenticationEndpoints();
         endpoints.MapProductEndpoints();
         endpoints.MapCategoryEndpoints();
+        endpoints.MapSubcategoryEndpoints();
         endpoints.MapBrandEndpoints();
         endpoints.MapColorEndpoints();
         endpoints.MapSizeEndpoints();
@@ -69,7 +71,8 @@ public static class EndpointExtensions
         endpoints.MapPublicGroup()
            .MapEndpoint<GetProducts>()
            .MapEndpoint<GetProduct>()
-           .MapEndpoint<GetProductFilters>();
+           .MapEndpoint<GetProductFilters>()
+           .MapEndpoint<GetProductFacets>();
 
         endpoints.MapAuthorizedGroup()
            .MapEndpoint<CreateProduct>()
@@ -77,7 +80,8 @@ public static class EndpointExtensions
            .MapEndpoint<DeleteProduct>()
            .MapEndpoint<UploadProductImages>()
            .MapEndpoint<DeleteProductImage>()
-           .MapEndpoint<SetMainProductImage>();
+           .MapEndpoint<SetMainProductImage>()
+           .MapEndpoint<ReorderProductImages>();
     }
 
     private static void MapCategoryEndpoints(this IEndpointRouteBuilder app)
@@ -94,7 +98,8 @@ public static class EndpointExtensions
            .MapEndpoint<UpdateCategory>()
            .MapEndpoint<DeleteCategory>()
            .MapEndpoint<UploadCategoryGenderPhoto>()
-           .MapEndpoint<DeleteCategoryGenderPhoto>();
+           .MapEndpoint<DeleteCategoryGenderPhoto>()
+           .MapEndpoint<ReorderCategories>();
     }
 
     private static void MapBrandEndpoints(this IEndpointRouteBuilder app)
@@ -112,6 +117,21 @@ public static class EndpointExtensions
            .MapEndpoint<DeleteBrand>()
            .MapEndpoint<UploadBrandLogo>()
            .MapEndpoint<DeleteBrandLogo>();
+    }
+
+    private static void MapSubcategoryEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/subcategories")
+            .WithTags(Tags.Subcategories);
+
+        endpoints.MapPublicGroup()
+           .MapEndpoint<GetSubcategories>()
+           .MapEndpoint<GetSubcategory>();
+
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<CreateSubcategory>()
+           .MapEndpoint<UpdateSubcategory>()
+           .MapEndpoint<DeleteSubcategory>();
     }
 
     private static void MapColorEndpoints(this IEndpointRouteBuilder app)

@@ -24,6 +24,15 @@ internal sealed class DeleteProductCommandHandler(
             return Result.Failure(ProductErrors.NotFound(command.Id));
         }
 
+        bool inUseByPromotion = await context.Promotions
+            .AsNoTracking()
+            .AnyAsync(p => p.ProductId == command.Id, cancellationToken);
+
+        if (inUseByPromotion)
+        {
+            return Result.Failure(ProductErrors.InUseByPromotion);
+        }
+
         context.Products.Remove(product);
 
         await context.SaveChangesAsync(cancellationToken);

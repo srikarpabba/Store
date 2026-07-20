@@ -31,6 +31,15 @@ internal sealed class DeleteBrandCommandHandler(
             return Result.Failure(BrandErrors.InUse);
         }
 
+        bool inUseByPromotion = await context.Promotions
+            .AsNoTracking()
+            .AnyAsync(p => p.BrandId == command.Id, cancellationToken);
+
+        if (inUseByPromotion)
+        {
+            return Result.Failure(BrandErrors.InUseByPromotion);
+        }
+
         string? logoFileName = brand.LogoFileName;
 
         context.Brands.Remove(brand);

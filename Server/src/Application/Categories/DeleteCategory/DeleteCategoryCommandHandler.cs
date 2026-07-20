@@ -32,6 +32,15 @@ internal sealed class DeleteCategoryCommandHandler(
             return Result.Failure(CategoryErrors.InUse);
         }
 
+        bool inUseBySubcategory = await context.Subcategories
+            .AsNoTracking()
+            .AnyAsync(s => s.CategoryId == command.Id, cancellationToken);
+
+        if (inUseBySubcategory)
+        {
+            return Result.Failure(CategoryErrors.InUseBySubcategory);
+        }
+
         var photoFileNames = category.CategoryGenders
             .Where(g => g.PhotoFileName is not null)
             .Select(g => g.PhotoFileName!)

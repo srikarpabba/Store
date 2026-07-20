@@ -30,6 +30,15 @@ internal sealed class DeleteSizeCommandHandler(IApplicationDbContext context)
             return Result.Failure(SizeErrors.InUse);
         }
 
+        bool inUseByCategory = await context.CategorySizes
+            .AsNoTracking()
+            .AnyAsync(cs => cs.SizeId == command.Id, cancellationToken);
+
+        if (inUseByCategory)
+        {
+            return Result.Failure(SizeErrors.InUseByCategory);
+        }
+
         context.Sizes.Remove(size);
 
         await context.SaveChangesAsync(cancellationToken);

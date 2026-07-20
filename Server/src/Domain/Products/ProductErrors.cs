@@ -19,4 +19,8 @@ public static class ProductErrors
     public static readonly Error CategoryGenderMismatch = Error.Validation(
         "Products.CategoryGenderMismatch",
         "One or more selected genders are not valid for this category.");
+
+    public static readonly Error InUseByPromotion = Error.Conflict(
+        "Products.InUseByPromotion",
+        "This product has one or more promotions and cannot be deleted.");
 }

@@ -15,4 +15,8 @@ public static class SizeErrors
     public static readonly Error InUse = Error.Conflict(
         "Sizes.InUse",
         "This size is assigned to one or more product variants and cannot be deleted.");
+
+    public static readonly Error InUseByCategory = Error.Conflict(
+        "Sizes.InUseByCategory",
+        "This size is tagged on one or more categories and cannot be deleted.");
 }

@@ -15,4 +15,8 @@ public static class BrandErrors
     public static readonly Error InUse = Error.Conflict(
         "Brands.InUse",
         "This brand is assigned to one or more products and cannot be deleted.");
+
+    public static readonly Error InUseByPromotion = Error.Conflict(
+        "Brands.InUseByPromotion",
+        "This brand has one or more promotions and cannot be deleted.");
 }

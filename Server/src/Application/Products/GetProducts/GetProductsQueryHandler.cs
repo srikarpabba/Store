@@ -23,7 +23,7 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
 
         products = products
             .ApplySearch(query.Search)
-            .ApplyFilters(query)
+            .ApplyFilters(query, context)
             .ApplySorting(sort);
 
         int total = await products.CountAsync(cancellationToken);
@@ -64,6 +64,28 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
                     product.Subcategory == null
                         ? null
                         : new SubcategoryDto(product.Subcategory.Id, product.Subcategory.Name),
+                    // Raw inline LINQ rather than a shared extension method
+                    // here — EF Core can't translate a custom IQueryable
+                    // extension call made from this deep inside a nested
+                    // Select projection.
+                    context.Promotions
+                        .Where(promo => promo.IsActive
+                            && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                            && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                            && (promo.ProductId == product.Id || promo.BrandId == product.BrandId))
+                        .OrderByDescending(promo => promo.DiscountPercentage)
+                        .ThenBy(promo => promo.Id)
+                        .Select(promo => (decimal?)promo.DiscountPercentage)
+                        .FirstOrDefault(),
+                    context.Promotions
+                        .Where(promo => promo.IsActive
+                            && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                            && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                            && (promo.ProductId == product.Id || promo.BrandId == product.BrandId))
+                        .OrderByDescending(promo => promo.DiscountPercentage)
+                        .ThenBy(promo => promo.Id)
+                        .Select(promo => promo.EndsAtUtc)
+                        .FirstOrDefault(),
                     product.ProductColors
                         .Select(pc => new ProductColorDto(
                             pc.Id,
@@ -92,6 +114,8 @@ internal sealed class GetProductsQueryHandler(IApplicationDbContext context, Pro
                         .ThenBy(p => p.CreatedOnUtc)
                         .Select(p => p.FileName)
                         .FirstOrDefault(),
+                    null,
+                    null,
                     null,
                     null,
                     null))

@@ -7,5 +7,6 @@ public enum StorefrontSectionType
     Product,
     Category,
     Collection,
-    Editorial
+    Editorial,
+    Brand
 }

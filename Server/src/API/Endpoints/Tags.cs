@@ -11,5 +11,6 @@ public static class Tags
     public const string Colors = "Colors";
     public const string Sizes = "Sizes";
     public const string Banners = "Banners";
+    public const string Promotions = "Promotions";
     public const string Storefronts = "Storefronts";
 }

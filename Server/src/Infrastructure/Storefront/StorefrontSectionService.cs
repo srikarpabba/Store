@@ -19,6 +19,8 @@ internal sealed class StorefrontSectionService(
 
     private sealed record CategoryRow(Guid Id, string Name, string? PhotoFileName);
 
+    private sealed record BrandRow(Guid Id, string Name, string? LogoFileName);
+
     private sealed record NewArrivalRow(
         Guid Id,
         string Name,
@@ -29,6 +31,8 @@ internal sealed class StorefrontSectionService(
         string CategoryName,
         Guid? SubcategoryId,
         string? SubcategoryName,
+        decimal? DiscountPercentage,
+        DateTime? SaleEndsAtUtc,
         List<NewArrivalColorRow> Colors);
 
     private sealed record NewArrivalColorRow(
@@ -49,7 +53,9 @@ internal sealed class StorefrontSectionService(
         {
             Storefronts.Men => await GetGenderScopedSectionsAsync(normalized, "Male", cancellationToken),
             Storefronts.Women => await GetGenderScopedSectionsAsync(normalized, "Female", cancellationToken),
-            Storefronts.Kids => await GetBannersOnlySectionsAsync(normalized, cancellationToken),
+            // New/Sale are dynamic product listings, not gender-scoped
+            // storefronts — only banners apply to them
+            Storefronts.New or Storefronts.Sale => await GetBannersOnlySectionsAsync(normalized, cancellationToken),
             _ => throw new UnreachableException()
         };
     }
@@ -77,6 +83,12 @@ internal sealed class StorefrontSectionService(
         if (newArrivals.Count > 0)
         {
             sections.Add(new StorefrontSectionResponse("new-arrivals", "New Arrivals", StorefrontSectionType.Product, sections.Count, newArrivals));
+        }
+
+        IReadOnlyList<StorefrontBrandItem> featuredBrands = await GetFeaturedBrandsAsync(cancellationToken);
+        if (featuredBrands.Count > 0)
+        {
+            sections.Add(new StorefrontSectionResponse("featured-brands", "Featured Brands", StorefrontSectionType.Brand, sections.Count, featuredBrands));
         }
 
         return sections;
@@ -139,6 +151,28 @@ internal sealed class StorefrontSectionService(
                 p.Category.Name,
                 p.SubcategoryId,
                 p.Subcategory == null ? null : p.Subcategory.Name,
+                // Raw inline LINQ rather than a shared extension method
+                // here — EF Core can't translate a custom IQueryable
+                // extension call made from this deep inside a nested Select
+                // projection.
+                context.Promotions
+                    .Where(promo => promo.IsActive
+                        && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                        && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                        && (promo.ProductId == p.Id || promo.BrandId == p.BrandId))
+                    .OrderByDescending(promo => promo.DiscountPercentage)
+                    .ThenBy(promo => promo.Id)
+                    .Select(promo => (decimal?)promo.DiscountPercentage)
+                    .FirstOrDefault(),
+                context.Promotions
+                    .Where(promo => promo.IsActive
+                        && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                        && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                        && (promo.ProductId == p.Id || promo.BrandId == p.BrandId))
+                    .OrderByDescending(promo => promo.DiscountPercentage)
+                    .ThenBy(promo => promo.Id)
+                    .Select(promo => promo.EndsAtUtc)
+                    .FirstOrDefault(),
                 p.ProductColors
                     .Select(pc => new NewArrivalColorRow(
                         pc.Id,
@@ -165,6 +199,8 @@ internal sealed class StorefrontSectionService(
                 r.SubcategoryId is null || r.SubcategoryName is null
                     ? null
                     : new StorefrontProductSubcategory(r.SubcategoryId.Value, r.SubcategoryName),
+                r.DiscountPercentage,
+                r.SaleEndsAtUtc,
                 r.Colors
                     .Select(c => new StorefrontProductColor(
                         c.ProductColorId,
@@ -175,6 +211,25 @@ internal sealed class StorefrontSectionService(
                             .Select(ph => new StorefrontProductPhoto(ph.Id, fileStorage.GetUrl(ph.FileName).AbsoluteUri, ph.IsMain))
                             .ToList()))
                     .ToList()))
+            .ToList();
+    }
+
+    private async Task<IReadOnlyList<StorefrontBrandItem>> GetFeaturedBrandsAsync(CancellationToken cancellationToken)
+    {
+        // Brands aren't gender-scoped like categories are, so the same
+        // featured lineup shows on both /men and /women.
+        List<BrandRow> rows = await context.Brands
+            .AsNoTracking()
+            .Where(b => b.IsFeatured)
+            .OrderBy(b => b.Name)
+            .Select(b => new BrandRow(b.Id, b.Name, b.LogoFileName))
+            .ToListAsync(cancellationToken);
+
+        return rows
+            .Select(r => new StorefrontBrandItem(
+                r.Id,
+                r.Name,
+                r.LogoFileName is null ? null : fileStorage.GetUrl(r.LogoFileName).AbsoluteUri))
             .ToList();
     }
 

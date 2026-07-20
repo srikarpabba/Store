@@ -8,6 +8,8 @@ public sealed record StorefrontProductItem(
     string? Image,
     StorefrontProductCategory? Category,
     StorefrontProductSubcategory? Subcategory,
+    decimal? DiscountPercentage,
+    DateTime? SaleEndsAtUtc,
     IReadOnlyList<StorefrontProductColor> Colors);
 
 public sealed record StorefrontProductCategory(Guid Id, string Name);
@@ -22,3 +24,5 @@ public sealed record StorefrontProductColor(
     IReadOnlyList<StorefrontProductPhoto> Photos);
 
 public sealed record StorefrontProductPhoto(Guid Id, string FileName, bool IsMain);
+
+public sealed record StorefrontBrandItem(Guid Id, string Name, string? Logo);

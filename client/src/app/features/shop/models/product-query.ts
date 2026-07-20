@@ -13,6 +13,9 @@ export interface ProductQuery {
     minPrice?: number;
     maxPrice?: number;
 
+    /** Only products with a currently active promotion (their own or their brand's) */
+    onSale?: boolean;
+
     sort?: ProductSort;
 
     pageIndex?: number;

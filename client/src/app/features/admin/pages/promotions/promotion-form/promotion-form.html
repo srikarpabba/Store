@@ -1,0 +1,169 @@
+<div class="promotion-form">
+    <header class="promotion-form__header">
+        <a mat-icon-button routerLink="/admin/promotions/sales" aria-label="Back to sales">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>{{ isEdit ? 'Edit sale' : 'New sale' }}</h1>
+            <p>{{ isEdit ? 'Update the discount, schedule or scope.' : 'Add a percentage-off sale for a product or a brand.' }}</p>
+        </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <section class="promotion-form__card">
+            <h2>Details</h2>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" placeholder="e.g. Diwali Sale" />
+                @if (form.controls.name.hasError('required')) {
+                <mat-error>Name is required</mat-error>
+                } @else if (form.controls.name.hasError('maxlength')) {
+                <mat-error>Name must be 200 characters or fewer</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Discount</mat-label>
+                <input matInput type="number" formControlName="discountPercentage" min="0.01" max="100" step="1" />
+                <span matTextSuffix>%</span>
+                @if (form.controls.discountPercentage.hasError('required') || form.controls.discountPercentage.hasError('min')) {
+                <mat-error>Must be above 0</mat-error>
+                } @else if (form.controls.discountPercentage.hasError('max')) {
+                <mat-error>Can't exceed 100</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-checkbox formControlName="isActive">Active</mat-checkbox>
+        </section>
+
+        <section class="promotion-form__card">
+            <h2>Schedule</h2>
+            <p class="promotion-form__hint">Leave either blank for no start/end limit.</p>
+
+            <div class="promotion-form__row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Starts</mat-label>
+                    <input matInput type="datetime-local" formControlName="startsAt" [min]="minDateTime" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Ends</mat-label>
+                    <input matInput type="datetime-local" formControlName="endsAt" [min]="minDateTime" />
+                </mat-form-field>
+            </div>
+        </section>
+
+        <section class="promotion-form__card">
+            <h2>Applies to</h2>
+
+            <div class="promotion-form__scope-toggle">
+                <button type="button" class="promotion-form__scope-option"
+                    [class.promotion-form__scope-option--active]="scope() === 'product'"
+                    (click)="selectScope('product')">
+                    <mat-icon>inventory_2</mat-icon>
+                    One product
+                </button>
+                <button type="button" class="promotion-form__scope-option"
+                    [class.promotion-form__scope-option--active]="scope() === 'brand'"
+                    (click)="selectScope('brand')">
+                    <mat-icon>sell</mat-icon>
+                    A whole brand
+                </button>
+            </div>
+
+            @if (scope() === 'product') {
+            <div class="promotion-form__product-picker">
+                @if (selectedProduct(); as product) {
+                <div class="promotion-form__selected-product">
+                    @if (product.image) {
+                    <img [src]="product.image" [alt]="product.name" />
+                    } @else {
+                    <span class="promotion-form__selected-product-placeholder">
+                        <mat-icon>image_not_supported</mat-icon>
+                    </span>
+                    }
+                    <span class="promotion-form__selected-product-info">
+                        <span class="promotion-form__selected-product-name">{{ product.name }}</span>
+                        <span class="promotion-form__selected-product-price">{{ product.startingPrice | price }}</span>
+                    </span>
+                    <button mat-icon-button type="button" (click)="clearProduct()" aria-label="Change product">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+                } @else {
+                <mat-form-field appearance="outline">
+                    <mat-label>Search for a product</mat-label>
+                    <input matInput [formControl]="productQuery" (focus)="isProductPanelOpen.set(true)"
+                        (blur)="closeProductPanel()" autocomplete="off" />
+                </mat-form-field>
+
+                @if (isProductPanelOpen()) {
+                <div class="promotion-form__product-panel">
+                    @if (isSearching()) {
+                    <p class="promotion-form__product-status">Searching…</p>
+                    } @else if (productResults().length === 0) {
+                    <p class="promotion-form__product-status">
+                        @if (productQuery.value.trim().length > 0) {
+                        No products found.
+                        } @else {
+                        Type at least 2 characters.
+                        }
+                    </p>
+                    } @else {
+                    <ul class="promotion-form__product-results">
+                        @for (product of productResults(); track product.id) {
+                        <li>
+                            <button type="button" class="promotion-form__product-result"
+                                (click)="selectProduct(product)">
+                                @if (product.image) {
+                                <img [src]="product.image" [alt]="product.name" />
+                                } @else {
+                                <span class="promotion-form__product-result-placeholder">
+                                    <mat-icon>image_not_supported</mat-icon>
+                                </span>
+                                }
+                                <span class="promotion-form__product-result-info">
+                                    <span>{{ product.name }}</span>
+                                    <span class="promotion-form__product-result-price">{{ product.startingPrice | price }}</span>
+                                </span>
+                            </button>
+                        </li>
+                        }
+                    </ul>
+                    }
+                </div>
+                }
+                }
+
+                @if (!selectedProduct() && form.controls.productId.value === '') {
+                <p class="promotion-form__hint">No product selected yet.</p>
+                }
+            </div>
+            } @else {
+            <mat-form-field appearance="outline">
+                <mat-label>Brand</mat-label>
+                <mat-select formControlName="brandId">
+                    @for (brand of filters()?.brands ?? []; track brand.id) {
+                    <mat-option [value]="brand.id">{{ brand.name }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            }
+        </section>
+
+        <div class="promotion-form__actions">
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading.isLoading()">
+                @if (loading.isLoading()) {
+                <span class="promotion-form__saving">
+                    <mat-spinner diameter="18" />
+                    Saving…
+                </span>
+                } @else {
+                {{ isEdit ? 'Save changes' : 'Create promotion' }}
+                }
+            </button>
+            <a mat-stroked-button routerLink="/admin/promotions/sales">Cancel</a>
+        </div>
+    </form>
+</div>

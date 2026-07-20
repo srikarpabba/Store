@@ -1,0 +1,149 @@
+.promotion-batch-form {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.promotion-batch-form__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.promotion-batch-form__header h1 {
+    margin: 0;
+}
+
+.promotion-batch-form__header p {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.promotion-batch-form__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+}
+
+.promotion-batch-form__card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+}
+
+.promotion-batch-form__card mat-form-field {
+    width: 100%;
+}
+
+.promotion-batch-form__hint {
+    margin: 0 0 0.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.promotion-batch-form__defaults-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* ---------- Rows ---------- */
+.promotion-batch-form__row {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface-alt);
+}
+
+.promotion-batch-form__row-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.promotion-batch-form__row-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.promotion-batch-form__scope-toggle {
+    display: flex;
+    gap: 0.375rem;
+    flex: 1;
+}
+
+.promotion-batch-form__scope-option {
+    padding: 0.375rem 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.promotion-batch-form__scope-option:hover {
+    border-color: var(--color-border-strong);
+}
+
+.promotion-batch-form__scope-option--active {
+    border-color: var(--color-primary);
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-weight: 600;
+}
+
+.promotion-batch-form__row-remove {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.promotion-batch-form__row-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 0.75rem;
+}
+
+.promotion-batch-form__add-row {
+    width: 100%;
+}
+
+.promotion-batch-form__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.promotion-batch-form__saving {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .promotion-batch-form__defaults-row,
+    .promotion-batch-form__row-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+}

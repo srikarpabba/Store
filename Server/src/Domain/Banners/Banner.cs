@@ -4,7 +4,7 @@ namespace Domain.Banners;
 
 public sealed class Banner : AuditableEntity
 {
-    /// <summary>Which storefront page shows this banner (e.g. "men", "women", "kids").</summary>
+    /// <summary>Which storefront page shows this banner (e.g. "men", "women", "new", "sale").</summary>
     public string Storefront { get; set; } = string.Empty;
     public string? Title { get; set; }
     public string? LinkUrl { get; set; }

@@ -1,4 +1,6 @@
-﻿using Application.Products.GetProducts;
+﻿using Application.Abstractions.Data;
+using Application.Products.GetProducts;
+using Application.Promotions;
 using Domain.Products;
 
 namespace Application.Products.Common;
@@ -31,7 +33,8 @@ internal static class ProductQueryExtensions
 
     public static IQueryable<Product> ApplyFilters(
         this IQueryable<Product> query,
-        GetProductsQuery filters)
+        GetProductsQuery filters,
+        IApplicationDbContext context)
     {
         if (filters.Brands is { Length: > 0 })
         {
@@ -82,6 +85,12 @@ internal static class ProductQueryExtensions
         {
             query = query.Where(x =>
                 x.Variants.Min(v => v.Price) <= filters.MaxPrice.Value);
+        }
+
+        if (filters.OnSale == true)
+        {
+            query = query.Where(x =>
+                context.Promotions.Active().Any(promo => promo.ProductId == x.Id || promo.BrandId == x.BrandId));
         }
 
         return query;

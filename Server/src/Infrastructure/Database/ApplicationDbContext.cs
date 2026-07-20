@@ -3,6 +3,7 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Domain.Banners;
 using Domain.Products;
+using Domain.Promotions;
 using Domain.Users;
 using Infrastructure.Authorization;
 using Infrastructure.DomainEvents;
@@ -25,6 +26,7 @@ public sealed class ApplicationDbContext(
 {
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Banner> Banners { get; set; }
+    public DbSet<Promotion> Promotions { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<Address> Addresses { get; set; }

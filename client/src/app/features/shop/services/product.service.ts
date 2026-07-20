@@ -48,6 +48,7 @@ export class ProductService {
                     id name startingPrice rating image
                     category { id name }
                     subcategory { id name }
+                    discountPercentage saleEndsAtUtc
                     colors {
                         productColorId colorId colorName hexCode
                         photos { id fileName isMain }
@@ -93,6 +94,7 @@ export class ProductService {
             genders: query.genders,
             minPrice: query.minPrice,
             maxPrice: query.maxPrice,
+            onSale: query.onSale,
             sort: query.sort ? ProductService.SORT_GRAPHQL_NAMES[query.sort] : undefined,
             pageIndex: query.pageIndex ?? ProductService.DEFAULT_PAGE_INDEX,
             pageSize: query.pageSize ?? ProductService.DEFAULT_PAGE_SIZE,
@@ -171,6 +173,10 @@ export class ProductService {
 
         if (query.maxPrice != null) {
             params = params.set('maxPrice', query.maxPrice);
+        }
+
+        if (query.onSale != null) {
+            params = params.set('onSale', query.onSale);
         }
 
         if (query.sort != null) {

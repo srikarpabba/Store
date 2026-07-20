@@ -29,7 +29,8 @@ internal sealed class GetProductFacetsQueryHandler(
             Sort: null,
             PageIndex: null,
             PageSize: null,
-            IncludeColors: null);
+            IncludeColors: null,
+            OnSale: null);
 
         List<FacetCount> subcategories = await CountAsync(
             Filtered(filters with { Subcategories = null })
@@ -61,7 +62,7 @@ internal sealed class GetProductFacetsQueryHandler(
         return context.Products
             .AsNoTracking()
             .ApplySearch(filters.Search)
-            .ApplyFilters(filters);
+            .ApplyFilters(filters, context);
     }
 
     /// <summary>

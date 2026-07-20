@@ -45,7 +45,8 @@ export class AdminDashboard {
     {
       icon: 'sell',
       title: 'Promotions',
-      description: 'Discount codes, sales and campaigns'
+      description: 'Discount codes, campaigns and sales',
+      link: '/admin/promotions'
     },
     {
       icon: 'insights',

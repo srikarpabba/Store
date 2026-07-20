@@ -1,0 +1,61 @@
+<div class="product-picker">
+    @if (selected(); as product) {
+    <div class="product-picker__selected">
+        @if (product.image) {
+        <img [src]="product.image" [alt]="product.name" />
+        } @else {
+        <span class="product-picker__selected-placeholder">
+            <mat-icon>image_not_supported</mat-icon>
+        </span>
+        }
+        <span class="product-picker__selected-info">
+            <span class="product-picker__selected-name">{{ product.name }}</span>
+            <span class="product-picker__selected-price">{{ product.startingPrice | price }}</span>
+        </span>
+        <button mat-icon-button type="button" (click)="clear()" aria-label="Change product">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    } @else {
+    <mat-form-field appearance="outline">
+        <mat-label>Search for a product</mat-label>
+        <input matInput [formControl]="query" (focus)="openPanel()" (blur)="closePanel()" autocomplete="off" />
+    </mat-form-field>
+
+    @if (isPanelOpen()) {
+    <div class="product-picker__panel">
+        @if (isSearching()) {
+        <p class="product-picker__status">Searching…</p>
+        } @else if (results().length === 0) {
+        <p class="product-picker__status">
+            @if (query.value.trim().length > 0) {
+            No products found.
+            } @else {
+            Type at least 2 characters.
+            }
+        </p>
+        } @else {
+        <ul class="product-picker__results">
+            @for (product of results(); track product.id) {
+            <li>
+                <button type="button" class="product-picker__result" (click)="select(product)">
+                    @if (product.image) {
+                    <img [src]="product.image" [alt]="product.name" />
+                    } @else {
+                    <span class="product-picker__result-placeholder">
+                        <mat-icon>image_not_supported</mat-icon>
+                    </span>
+                    }
+                    <span class="product-picker__result-info">
+                        <span>{{ product.name }}</span>
+                        <span class="product-picker__result-price">{{ product.startingPrice | price }}</span>
+                    </span>
+                </button>
+            </li>
+            }
+        </ul>
+        }
+    </div>
+    }
+    }
+</div>

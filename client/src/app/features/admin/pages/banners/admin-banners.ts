@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { filter, switchMap } from 'rxjs';
 import { AdminBannerService } from '../../services/admin-banner.service';
 import { Banner } from '../../../shop/models/banner';
+import { ShopSection } from '../../../shop/models/enums/shop-section';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ConfirmDialogService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.service';
 
@@ -27,9 +28,10 @@ export class AdminBanners {
 
   readonly tabs: StorefrontTab[] = [
     { label: 'All', value: null },
-    { label: 'Men', value: 'men' },
-    { label: 'Women', value: 'women' },
-    { label: 'Kids', value: 'kids' }
+    { label: 'Men', value: ShopSection.Men },
+    { label: 'Women', value: ShopSection.Women },
+    { label: 'New', value: ShopSection.New },
+    { label: 'Sale', value: ShopSection.Sale }
   ];
 
   readonly activeTab = signal<StorefrontTab>(this.tabs[0]);

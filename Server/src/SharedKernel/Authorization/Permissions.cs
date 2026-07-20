@@ -34,4 +34,9 @@ public static class Permissions
     public const string BannersCreate = "banners:create";
     public const string BannersUpdate = "banners:update";
     public const string BannersDelete = "banners:delete";
+
+    public const string PromotionsRead = "promotions:read";
+    public const string PromotionsCreate = "promotions:create";
+    public const string PromotionsUpdate = "promotions:update";
+    public const string PromotionsDelete = "promotions:delete";
 }

@@ -816,6 +816,94 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("subcategories", "store");
                 });
 
+            modelBuilder.Entity("Domain.Promotions.Promotion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("BrandId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("brand_id");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on_utc");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("discount_percentage");
+
+                    b.Property<DateTime?>("EndsAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ends_at_utc");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on_utc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
+                    b.Property<DateTime?>("StartsAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("starts_at_utc");
+
+                    b.HasKey("Id")
+                        .HasName("pk_promotions");
+
+                    b.HasIndex("BrandId")
+                        .HasDatabaseName("ix_promotions_brand_id");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_Promotion_CreatedById");
+
+                    b.HasIndex("CreatedOnUtc")
+                        .HasDatabaseName("IX_Promotion_CreatedOn");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Promotion_IsDeleted");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("ix_promotions_product_id");
+
+                    b.HasIndex("IsDeleted", "CreatedOnUtc")
+                        .HasDatabaseName("IX_Promotion_IsDeleted_CreatedOn");
+
+                    b.ToTable("promotions", "store");
+                });
+
             modelBuilder.Entity("Domain.Users.Address", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1511,6 +1599,25 @@ namespace Infrastructure.Database.Migrations
                         .HasConstraintName("fk_subcategories_categories_category_id");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Domain.Promotions.Promotion", b =>
+                {
+                    b.HasOne("Domain.Products.Brand", "Brand")
+                        .WithMany()
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_promotions_brands_brand_id");
+
+                    b.HasOne("Domain.Products.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_promotions_products_product_id");
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Domain.Users.Address", b =>

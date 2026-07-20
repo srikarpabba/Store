@@ -14,6 +14,10 @@ import { AdminSizes } from './pages/sizes/admin-sizes';
 import { SizeForm } from './pages/sizes/size-form/size-form';
 import { AdminBanners } from './pages/banners/admin-banners';
 import { BannerForm } from './pages/banners/banner-form/banner-form';
+import { PromotionsHub } from './pages/promotions/promotions-hub';
+import { AdminPromotions } from './pages/promotions/admin-promotions';
+import { PromotionForm } from './pages/promotions/promotion-form/promotion-form';
+import { PromotionBatchForm } from './pages/promotions/promotion-batch-form/promotion-batch-form';
 import { pendingChangesGuard } from '../../core/guards/pending-changes.guard';
 
 export const ADMIN_ROUTES: Routes = [
@@ -141,6 +145,39 @@ export const ADMIN_ROUTES: Routes = [
         component: BannerForm,
         canDeactivate: [pendingChangesGuard],
         title: 'Edit Banner | Admin | Store'
+      }
+    ]
+  },
+  {
+    path: 'promotions',
+    children: [
+      {
+        path: '',
+        component: PromotionsHub,
+        title: 'Promotions | Admin | Store'
+      },
+      {
+        path: 'sales',
+        component: AdminPromotions,
+        title: 'Sales | Admin | Store'
+      },
+      {
+        path: 'sales/new',
+        component: PromotionForm,
+        canDeactivate: [pendingChangesGuard],
+        title: 'New Sale | Admin | Store'
+      },
+      {
+        path: 'sales/new-bulk',
+        component: PromotionBatchForm,
+        canDeactivate: [pendingChangesGuard],
+        title: 'New Sale (Bulk) | Admin | Store'
+      },
+      {
+        path: 'sales/:id/edit',
+        component: PromotionForm,
+        canDeactivate: [pendingChangesGuard],
+        title: 'Edit Sale | Admin | Store'
       }
     ]
   }

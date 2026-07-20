@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { AdminBannerService } from '../../../services/admin-banner.service';
 import { SaveBannerRequest } from '../../../models/save-banner-request';
 import { Banner } from '../../../../shop/models/banner';
+import { ShopSection } from '../../../../shop/models/enums/shop-section';
 import { HasPendingChanges } from '../../../../../core/guards/pending-changes.guard';
 import { LoadingService } from '../../../../../core/services/loading.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
@@ -43,7 +44,9 @@ export class BannerForm implements HasPendingChanges {
 
   readonly loading = inject(LoadingService);
 
-  readonly storefronts = ['men', 'women', 'kids'];
+  /** Every page a banner can actually appear on — kept in lockstep with the
+      routable shop sections rather than a separately-maintained list. */
+  readonly storefronts = Object.values(ShopSection);
 
   /** null when creating; the banner id when editing */
   readonly bannerId = this.route.snapshot.paramMap.get('id');

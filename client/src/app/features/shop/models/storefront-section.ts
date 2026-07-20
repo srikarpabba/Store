@@ -4,7 +4,8 @@ export enum StorefrontSectionType {
   Product = 2,
   Category = 3,
   Collection = 4,
-  Editorial = 5
+  Editorial = 5,
+  Brand = 6
 }
 
 export interface StorefrontBannerItem {
@@ -19,6 +20,12 @@ export interface StorefrontCategoryItem {
   id: string;
   name: string;
   photo: string | null;
+}
+
+export interface StorefrontBrandItem {
+  id: string;
+  name: string;
+  logo: string | null;
 }
 
 export interface StorefrontSection {

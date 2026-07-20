@@ -5,7 +5,7 @@ import { ShopService } from '../../services/shop.service';
 import { StorefrontService } from '../../services/storefront.service';
 import { ShopSection } from '../../models/enums/shop-section';
 import { Product } from '../../models/product';
-import { StorefrontCategoryItem, StorefrontSectionType } from '../../models/storefront-section';
+import { StorefrontBrandItem, StorefrontCategoryItem, StorefrontSectionType } from '../../models/storefront-section';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BannerSlide, BannerSlider } from '../../../../shared/ui/banner-slider/banner-slider';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -39,6 +39,8 @@ export class ShopPage {
   readonly categories = signal<StorefrontCategoryItem[]>([]);
 
   readonly newArrivals = signal<Product[]>([]);
+
+  readonly featuredBrands = signal<StorefrontBrandItem[]>([]);
 
   /** 0 = nothing loaded yet for the current section/search/category */
   readonly pageIndex = signal(0);
@@ -233,15 +235,8 @@ export class ShopPage {
 
     this.loadedStorefrontSection = section;
 
-    if (section !== ShopSection.Men && section !== ShopSection.Women) {
-      this.bannerSlides.set([]);
-      this.categories.set([]);
-      this.newArrivals.set([]);
-      // No sections to wait for — the sentinel starts in view, load right away.
-      this.storefrontReady.set(true);
-      return;
-    }
-
+    // Every ShopSection is a real backend storefront now (New/Sale get
+    // banners only — no gender-scoped categories/new-arrivals/brands).
     // Defer product loading until these land (see storefrontReady).
     this.storefrontReady.set(false);
 
@@ -249,11 +244,13 @@ export class ShopPage {
 
       const bannerSection = response.sections.find(s => s.type === StorefrontSectionType.Banner);
       const categorySection = response.sections.find(s => s.type === StorefrontSectionType.Category);
-      const productSection = response.sections.find(s => s.type === StorefrontSectionType.Product);
+      const newArrivalsSection = response.sections.find(s => s.key === 'new-arrivals');
+      const featuredBrandsSection = response.sections.find(s => s.type === StorefrontSectionType.Brand);
 
       this.bannerSlides.set((bannerSection?.items as BannerSlide[] | undefined) ?? []);
       this.categories.set((categorySection?.items as StorefrontCategoryItem[] | undefined) ?? []);
-      this.newArrivals.set((productSection?.items as Product[] | undefined) ?? []);
+      this.newArrivals.set((newArrivalsSection?.items as Product[] | undefined) ?? []);
+      this.featuredBrands.set((featuredBrandsSection?.items as StorefrontBrandItem[] | undefined) ?? []);
 
       this.storefrontReady.set(true);
     });

@@ -4,9 +4,12 @@ public static class Storefronts
 {
     public const string Men = "men";
     public const string Women = "women";
-    public const string Kids = "kids";
+    public const string New = "new";
+    public const string Sale = "sale";
 
-    private static readonly string[] All = [Men, Women, Kids];
+    // Mirrors the client's routable shop sections (ShopSection enum) —
+    // every storefront a banner can target actually has a page to show it.
+    private static readonly string[] All = [Men, Women, New, Sale];
 
     public static bool IsValid(string? storefront) => Normalize(storefront) is not null;
 

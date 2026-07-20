@@ -10,6 +10,8 @@ public sealed record ProductDetailsResponse(
     ProductSubcategoryResponse? Subcategory,
     BrandResponse Brand,
     decimal Rating,
+    decimal? DiscountPercentage,
+    DateTime? SaleEndsAtUtc,
     IReadOnlyList<ProductColorResponse> Colors,
     IReadOnlyList<GenderResponse> Genders,
     IReadOnlyList<ProductVariantResponse> Variants);

@@ -5,6 +5,7 @@ using API.Endpoints.Brands;
 using API.Endpoints.Categories;
 using API.Endpoints.Colors;
 using API.Endpoints.Products;
+using API.Endpoints.Promotions;
 using API.Endpoints.Sizes;
 using API.Endpoints.Subcategories;
 using API.Endpoints.Storefronts;
@@ -28,6 +29,7 @@ public static class EndpointExtensions
         endpoints.MapColorEndpoints();
         endpoints.MapSizeEndpoints();
         endpoints.MapBannerEndpoints();
+        endpoints.MapPromotionEndpoints();
         endpoints.MapCartEndpoints();
         endpoints.MapUserEndpoints();
         endpoints.MapWishlistEndpoints();
@@ -178,6 +180,22 @@ public static class EndpointExtensions
            .MapEndpoint<UpdateBanner>()
            .MapEndpoint<DeleteBanner>()
            .MapEndpoint<UploadBannerImage>();
+    }
+
+    private static void MapPromotionEndpoints(this IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder endpoints = app.MapGroup("/promotions")
+            .WithTags(Tags.Promotions);
+
+        // Admin-only end to end — storefront prices already reflect any
+        // active discount, computed server-side into the product responses
+        endpoints.MapAuthorizedGroup()
+           .MapEndpoint<GetPromotions>()
+           .MapEndpoint<GetPromotion>()
+           .MapEndpoint<CreatePromotion>()
+           .MapEndpoint<CreatePromotionBatch>()
+           .MapEndpoint<UpdatePromotion>()
+           .MapEndpoint<DeletePromotion>();
     }
 
     private static void MapCartEndpoints(this IEndpointRouteBuilder app)

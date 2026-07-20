@@ -11,6 +11,10 @@
         <span class="card__placeholder"></span>
         }
 
+        @if (product().discountPercentage; as discount) {
+        <span class="card__sale-badge">-{{ discount }}%</span>
+        }
+
         @if (isHovering() && photos().length > 1) {
         <div class="card__dots">
             @for (photo of photos(); track photo.id; let i = $index) {
@@ -44,7 +48,14 @@
         @if (product().subcategory ?? product().category; as categoryLabel) {
         <p class="card__category">{{ categoryLabel.name }}</p>
         }
-        <p class="card__price">{{ product().startingPrice | price }}</p>
+        <p class="card__price">
+            @if (salePrice(); as sale) {
+            <span class="card__price-sale">{{ sale | price }}</span>
+            <span class="card__price-original">{{ product().startingPrice | price }}</span>
+            } @else {
+            {{ product().startingPrice | price }}
+            }
+        </p>
         @if (product().rating > 0) {
         <p class="card__rating">★ {{ product().rating }}</p>
         }

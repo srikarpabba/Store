@@ -20,6 +20,11 @@ export interface Product {
         showing this over the category name. */
     subcategory: Lookup | null;
 
+    /** Percentage off, from whichever active promotion applies (its own or
+        its brand's) — null when the product isn't currently on sale. */
+    discountPercentage: number | null;
+    saleEndsAtUtc: string | null;
+
     /** Only populated by the shop grid's GraphQL query (includeColors: true) — null for the admin table and search typeahead. */
     colors: ProductColorDetails[] | null;
 }

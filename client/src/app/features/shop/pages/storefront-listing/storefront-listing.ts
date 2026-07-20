@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ShopSection } from '../../models/enums/shop-section';
 import { CategoryLookup } from '../../models/category-lookup';
+import { Lookup } from '../../models/lookup';
 import { Product } from '../../models/product';
 import { ProductFacets, FacetCount } from '../../models/product-facets';
 import { ProductFilters } from '../../models/product-filters';
@@ -12,18 +13,23 @@ import { ProductCard } from '../../components/product-card/product-card';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { slugify } from '../../../../shared/utils/slug';
 
+type ListingTarget =
+  | { kind: 'category'; category: CategoryLookup }
+  | { kind: 'brand'; brand: Lookup };
+
 /**
- * Category landing page (`/men/t-shirt`) — all of a category's products for
- * the section's gender, with sidebar filters (subcategory, size, color,
- * price) and the same infinite-scroll grid as the shop page.
+ * Category/brand landing page (`/men/t-shirt`, `/men/nike`) — all products
+ * for the section's gender matching whichever the slug resolves to, with
+ * sidebar filters (subcategory, size, color, price — plus brand, on a
+ * category page) and the same infinite-scroll grid as the shop page.
  */
 @Component({
-  selector: 'app-category-listing',
+  selector: 'app-storefront-listing',
   imports: [MatProgressSpinnerModule, ProductCard],
-  templateUrl: './category-listing.html',
-  styleUrl: './category-listing.css',
+  templateUrl: './storefront-listing.html',
+  styleUrl: './storefront-listing.css',
 })
-export class CategoryListing {
+export class StorefrontListing {
 
   private static readonly PAGE_SIZE = 24;
 
@@ -35,16 +41,17 @@ export class CategoryListing {
 
   readonly section = signal('');
 
-  private readonly categorySlug = signal('');
+  private readonly slug = signal('');
 
   readonly filters = signal<ProductFilters | null>(null);
 
-  /** The category this page is for, resolved from the filters payload by
-      slugified name — must be tagged with the section's gender (an empty
-      genderIds means the category applies to every gender). */
-  readonly category = computed<CategoryLookup | null>(() => {
+  /** What this page is for, resolved from the filters payload by slugified
+      name — a category (must be tagged with the section's gender; an empty
+      genderIds means it applies to every gender) or, failing that, a brand
+      (brands aren't gender-scoped, so any match applies). */
+  readonly target = computed<ListingTarget | null>(() => {
     const filters = this.filters();
-    const slug = this.categorySlug();
+    const slug = this.slug();
 
     if (!filters || !slug) {
       return null;
@@ -52,43 +59,64 @@ export class CategoryListing {
 
     const genderId = filters.genders.find(g => g.name === this.genderName)?.id;
 
-    return filters.categories.find(c =>
+    const category = filters.categories.find(c =>
       slugify(c.name) === slug &&
-      (c.genderIds.length === 0 || (!!genderId && c.genderIds.includes(genderId)))) ?? null;
+      (c.genderIds.length === 0 || (!!genderId && c.genderIds.includes(genderId))));
+
+    if (category) {
+      return { kind: 'category', category };
+    }
+
+    const brand = filters.brands.find(b => slugify(b.name) === slug);
+
+    return brand ? { kind: 'brand', brand } : null;
   });
 
-  /** Sidebar options: only this category's subcategories */
-  readonly availableSubcategories = computed(() => {
-    const categoryId = this.category()?.id;
+  readonly targetName = computed(() => {
+    const target = this.target();
 
-    if (!categoryId) {
+    if (!target) {
+      return null;
+    }
+
+    return target.kind === 'category' ? target.category.name : target.brand.name;
+  });
+
+  /** Sidebar "Categories" options: a category page scopes these to its own
+      subcategories; a brand page has no single parent category, so every
+      subcategory is offered (further narrowed by facet counts below). */
+  readonly availableSubcategories = computed(() => {
+    const target = this.target();
+
+    if (!target) {
       return [];
     }
 
-    return (this.filters()?.subcategories ?? []).filter(s => s.categoryId === categoryId);
+    if (target.kind === 'brand') {
+      return this.filters()?.subcategories ?? [];
+    }
+
+    return (this.filters()?.subcategories ?? []).filter(s => s.categoryId === target.category.id);
   });
 
-  /** Sidebar options: only sizes this category is tagged with — a category
-      with no tagged sizes allows all of them */
+  /** Sidebar options: only sizes the current category is tagged with — a
+      category with no tagged sizes (or a brand page, with no category at
+      all) allows all of them */
   readonly availableSizes = computed(() => {
     const sizes = this.filters()?.sizes ?? [];
-    const categoryId = this.category()?.id;
+    const target = this.target();
 
-    if (!categoryId) {
+    if (!target || target.kind === 'brand' || target.category.sizeIds.length === 0) {
       return sizes;
     }
 
-    const categoryLookup = this.filters()?.categories.find(c => c.id === categoryId);
-
-    if (!categoryLookup || categoryLookup.sizeIds.length === 0) {
-      return sizes;
-    }
-
-    return sizes.filter(size => categoryLookup.sizeIds.includes(size.id));
+    return sizes.filter(size => target.category.sizeIds.includes(size.id));
   });
 
   readonly selectedSubcategories = signal<ReadonlySet<string>>(new Set());
 
+  /** Brand filter is only shown on category pages — a brand page is
+      already scoped to one brand */
   readonly selectedBrands = signal<ReadonlySet<string>>(new Set());
 
   readonly selectedSizes = signal<ReadonlySet<string>>(new Set());
@@ -111,19 +139,19 @@ export class CategoryListing {
 
   readonly colorSearch = signal('');
 
-  readonly subcategoryOptions = computed(() => CategoryListing.withCounts(
+  readonly subcategoryOptions = computed(() => StorefrontListing.withCounts(
     this.availableSubcategories().map(s => s.name),
     this.facets()?.subcategories,
     this.selectedSubcategories(),
     this.subcategorySearch()));
 
-  readonly brandOptions = computed(() => CategoryListing.withCounts(
+  readonly brandOptions = computed(() => StorefrontListing.withCounts(
     (this.filters()?.brands ?? []).map(b => b.name),
     this.facets()?.brands,
     this.selectedBrands(),
     this.brandSearch()));
 
-  readonly sizeOptions = computed(() => CategoryListing.withCounts(
+  readonly sizeOptions = computed(() => StorefrontListing.withCounts(
     this.availableSizes().map(s => s.name),
     this.facets()?.sizes,
     this.selectedSizes(),
@@ -135,7 +163,7 @@ export class CategoryListing {
     const search = this.colorSearch();
 
     return (this.filters()?.colors ?? [])
-      .filter(color => CategoryListing.matchesSearch(color.name, search))
+      .filter(color => StorefrontListing.matchesSearch(color.name, search))
       .map(color => ({
         ...color,
         count: this.facets() ? counts.get(color.name) ?? 0 : null
@@ -149,7 +177,7 @@ export class CategoryListing {
 
   readonly products = signal<Product[]>([]);
 
-  /** 0 = nothing loaded yet for the current category/filter combination */
+  /** 0 = nothing loaded yet for the current target/filter combination */
   readonly pageIndex = signal(0);
 
   readonly hasNext = signal(false);
@@ -160,7 +188,7 @@ export class CategoryListing {
 
   private readonly scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
 
-  /** Re-attaches the observer on every category/filter reset (see shop-page) */
+  /** Re-attaches the observer on every target/filter reset (see shop-page) */
   private readonly resetTrigger = signal(0);
 
   /** Stale-response guard, bumped with every reset */
@@ -173,7 +201,7 @@ export class CategoryListing {
 
     this.route.paramMap.subscribe(params => {
       const section = params.get('section') ?? '';
-      const slug = params.get('categorySlug') ?? '';
+      const slug = params.get('slug') ?? '';
 
       this.section.set(section);
 
@@ -182,40 +210,41 @@ export class CategoryListing {
           : section === ShopSection.Women ? 'Female'
             : '';
 
-      // Category pages only exist for the gendered storefronts
+      // Category/brand pages only exist for the gendered storefronts
       if (!this.genderName) {
         this.router.navigateByUrl('/not-found', { skipLocationChange: true });
         return;
       }
 
       this.resetState();
-      this.categorySlug.set(slug);
+      this.slug.set(slug);
     });
 
-    // Once the filters have loaded, an unmatched slug means the category
-    // doesn't exist (for this gender) — treat it like any bad URL.
+    // Once the filters have loaded, an unmatched slug means neither a
+    // category nor a brand exists for it (for this gender) — treat it like
+    // any bad URL.
     effect(() => {
       const filters = this.filters();
-      const slug = this.categorySlug();
+      const slug = this.slug();
 
       if (!filters || !slug) {
         return;
       }
 
-      const category = this.category();
+      const name = this.targetName();
 
-      if (!category) {
+      if (!name) {
         this.router.navigateByUrl('/not-found', { skipLocationChange: true });
         return;
       }
 
-      this.title.setTitle(`${category.name} | Store`);
+      this.title.setTitle(`${name} | Store`);
     });
 
-    // Reload facet counts whenever the category or any filter selection
+    // Reload facet counts whenever the target or any filter selection
     // changes, so every option's count reflects the products it would show.
     effect(() => {
-      const category = this.category();
+      const target = this.target();
       const subcategories = [...this.selectedSubcategories()];
       const brands = [...this.selectedBrands()];
       const sizes = [...this.selectedSizes()];
@@ -223,7 +252,7 @@ export class CategoryListing {
       const minPrice = this.minPrice() ?? undefined;
       const maxPrice = this.maxPrice() ?? undefined;
 
-      if (!category) {
+      if (!target) {
         return;
       }
 
@@ -231,9 +260,8 @@ export class CategoryListing {
 
       this.productService.getFacets({
         genders: [this.genderName],
-        categories: [category.name],
+        ...this.targetQueryFilter(target, brands),
         subcategories,
-        brands,
         sizes,
         colors,
         minPrice,
@@ -245,14 +273,14 @@ export class CategoryListing {
       });
     });
 
-    // Same observer pattern as shop-page: attach only once the category has
+    // Same observer pattern as shop-page: attach only once the target has
     // resolved, so the first page loads when the sentinel is genuinely in
     // view, and re-check after each page for short result sets.
     effect(onCleanup => {
       const sentinel = this.scrollSentinel();
       this.resetTrigger();
 
-      if (!sentinel || !this.category()) {
+      if (!sentinel || !this.target()) {
         return;
       }
 
@@ -272,22 +300,22 @@ export class CategoryListing {
   }
 
   toggleSubcategory(name: string): void {
-    this.selectedSubcategories.update(current => CategoryListing.toggled(current, name));
+    this.selectedSubcategories.update(current => StorefrontListing.toggled(current, name));
     this.resetAndReload();
   }
 
   toggleBrand(name: string): void {
-    this.selectedBrands.update(current => CategoryListing.toggled(current, name));
+    this.selectedBrands.update(current => StorefrontListing.toggled(current, name));
     this.resetAndReload();
   }
 
   toggleSize(name: string): void {
-    this.selectedSizes.update(current => CategoryListing.toggled(current, name));
+    this.selectedSizes.update(current => StorefrontListing.toggled(current, name));
     this.resetAndReload();
   }
 
   toggleColor(name: string): void {
-    this.selectedColors.update(current => CategoryListing.toggled(current, name));
+    this.selectedColors.update(current => StorefrontListing.toggled(current, name));
     this.resetAndReload();
   }
 
@@ -326,11 +354,20 @@ export class CategoryListing {
     this.isLoadingMore.set(false);
   }
 
+  /** category page: filters by category name, plus the Brand facet's
+      selection; brand page: filters by brand name alone — there's no
+      Brand facet to select from since the page is already brand-scoped. */
+  private targetQueryFilter(target: ListingTarget, selectedBrands: string[]): { categories?: string[]; brands?: string[] } {
+    return target.kind === 'category'
+      ? { categories: [target.category.name], brands: selectedBrands }
+      : { brands: [target.brand.name] };
+  }
+
   private loadPage(pageIndex: number): void {
 
-    const category = this.category();
+    const target = this.target();
 
-    if (!category) {
+    if (!target) {
       return;
     }
 
@@ -340,15 +377,14 @@ export class CategoryListing {
 
     this.productService.getProductsGraphQl({
       genders: [this.genderName],
-      categories: [category.name],
-      brands: [...this.selectedBrands()],
+      ...this.targetQueryFilter(target, [...this.selectedBrands()]),
       subcategories: [...this.selectedSubcategories()],
       sizes: [...this.selectedSizes()],
       colors: [...this.selectedColors()],
       minPrice: this.minPrice() ?? undefined,
       maxPrice: this.maxPrice() ?? undefined,
       pageIndex,
-      pageSize: CategoryListing.PAGE_SIZE
+      pageSize: StorefrontListing.PAGE_SIZE
     }).subscribe({
       next: result => {
 
@@ -404,7 +440,7 @@ export class CategoryListing {
     selected: ReadonlySet<string>,
     search: string
   ): { name: string; count: number | null }[] {
-    const visible = names.filter(name => CategoryListing.matchesSearch(name, search));
+    const visible = names.filter(name => StorefrontListing.matchesSearch(name, search));
 
     if (!facetCounts) {
       return visible.map(name => ({ name, count: null }));

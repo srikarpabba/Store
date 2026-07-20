@@ -7,7 +7,7 @@
     @if (categories().length > 0) {
     <section class="mb-12">
         <div class="w-fit mx-auto">
-            <h2 class="text-[1.375rem] font-normal mb-6">Search by category</h2>
+            <h2 class="text-[1.375rem] font-normal mb-6">Shop by category</h2>
 
             <div class="grid grid-cols-3 sm:grid-cols-6 gap-x-8 gap-y-6">
                 @for (category of categories(); track category.id) {
@@ -41,6 +41,30 @@
             @for (product of newArrivals(); track product.id) {
             <app-product-card [product]="product" [section]="section()" />
             }
+        </div>
+    </section>
+    }
+
+    @if (featuredBrands().length > 0) {
+    <section class="mb-12">
+        <div class="w-fit mx-auto">
+            <h2 class="text-[1.375rem] font-normal mb-6">Featured Brands</h2>
+
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-x-8 gap-y-6">
+                @for (brand of featuredBrands(); track brand.id) {
+                <a class="flex flex-col items-center gap-2 no-underline text-inherit w-28"
+                    [routerLink]="['/', section(), slugify(brand.name)]">
+                    @if (brand.logo) {
+                    <span class="flex items-center justify-center w-28 h-28 bg-gray-100">
+                        <img class="max-w-20 max-h-20 object-contain" [src]="brand.logo" [alt]="brand.name" />
+                    </span>
+                    } @else {
+                    <span class="block w-28 h-28 bg-gray-100"></span>
+                    }
+                    <span class="text-[0.8125rem] leading-tight text-center">{{ brand.name }}</span>
+                </a>
+                }
+            </div>
         </div>
     </section>
     }

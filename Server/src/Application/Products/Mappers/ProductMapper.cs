@@ -24,6 +24,8 @@ internal sealed class ProductMapper(IFileStorage fileStorage)
             dto.Subcategory is null
                 ? null
                 : new ProductSubcategoryResponse(dto.Subcategory.Id, dto.Subcategory.Name),
+            dto.DiscountPercentage,
+            dto.SaleEndsAtUtc,
             dto.Colors?
                 .Select(color => new ProductColorResponse(
                     color.Id,
@@ -56,6 +58,8 @@ internal sealed class ProductMapper(IFileStorage fileStorage)
                 dto.Brand.Id,
                 dto.Brand.Name),
                 dto.Rating,
+                dto.DiscountPercentage,
+                dto.SaleEndsAtUtc,
 
             dto.Colors
                 .Select(color => new ProductColorResponse(

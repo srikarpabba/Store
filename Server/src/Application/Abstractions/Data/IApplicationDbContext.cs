@@ -1,5 +1,6 @@
 ﻿using Domain.Banners;
 using Domain.Products;
+using Domain.Promotions;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ public interface IApplicationDbContext
 {
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<Banner> Banners { get; }
+    DbSet<Promotion> Promotions { get; }
     DbSet<Address> Addresses { get; }
     DbSet<Product> Products { get; }
     DbSet<Category> Categories { get; }

@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +11,7 @@ import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
 import { Drawer } from '../../../../shared/ui/drawer/drawer';
+import { applyDiscount } from '../../../../shared/utils/discount';
 
 interface SizeOption {
   sizeId: string;
@@ -22,6 +24,7 @@ interface SizeOption {
   selector: 'app-product-details',
   imports: [
     ReactiveFormsModule,
+    DatePipe,
     MatButtonModule,
     MatIconModule,
     PricePipe,
@@ -101,6 +104,15 @@ export class ProductDetails {
       .map(v => v.price) ?? [];
 
     return candidates.length > 0 ? Math.min(...candidates) : null;
+  });
+
+  /** displayPrice with the product's active discount applied, or null when
+      it isn't currently on sale */
+  readonly displaySalePrice = computed<number | null>(() => {
+    const price = this.displayPrice();
+    const discount = this.product()?.discountPercentage;
+
+    return price !== null && discount ? applyDiscount(price, discount) : null;
   });
 
   readonly canAddToCart = computed(() =>

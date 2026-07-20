@@ -9,4 +9,6 @@ internal sealed record ProductDto(
     string? Image,
     CategoryDto? Category,
     SubcategoryDto? Subcategory,
+    decimal? DiscountPercentage,
+    DateTime? SaleEndsAtUtc,
     IReadOnlyList<ProductColorDto>? Colors);

@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Product } from '../../models/product';
 import { ProductColorDetails } from '../../models/product-details';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { applyDiscount } from '../../../../shared/utils/discount';
 
 /** Grid card for the shop listing — color swap, hover-to-cycle photos, wishlist toggle. */
 @Component({
@@ -49,6 +50,12 @@ export class ProductCard {
   });
 
   readonly photos = computed(() => this.selectedColor()?.photos ?? []);
+
+  /** Discounted price, or null when the product isn't currently on sale */
+  readonly salePrice = computed(() => {
+    const discount = this.product().discountPercentage;
+    return discount ? applyDiscount(this.product().startingPrice, discount) : null;
+  });
 
   readonly displayedPhoto = computed(() => {
     const photos = this.photos();

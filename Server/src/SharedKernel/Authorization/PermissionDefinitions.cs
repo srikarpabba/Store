@@ -35,6 +35,11 @@ public static class PermissionDefinitions
         (Permissions.BannersRead, "Read banners"),
         (Permissions.BannersCreate, "Create banners"),
         (Permissions.BannersUpdate, "Update banners"),
-        (Permissions.BannersDelete, "Delete banners")
+        (Permissions.BannersDelete, "Delete banners"),
+
+        (Permissions.PromotionsRead, "Read promotions"),
+        (Permissions.PromotionsCreate, "Create promotions"),
+        (Permissions.PromotionsUpdate, "Update promotions"),
+        (Permissions.PromotionsDelete, "Delete promotions")
     ];
 }

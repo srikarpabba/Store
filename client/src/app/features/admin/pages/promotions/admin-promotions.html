@@ -1,0 +1,76 @@
+<div class="admin-promotions">
+    <header class="admin-promotions__header">
+        <a mat-icon-button routerLink="/admin/promotions" aria-label="Back to promotions">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="admin-promotions__header-text">
+            <h1>Sales</h1>
+            <p>{{ promotions().length }} sale{{ promotions().length === 1 ? '' : 's' }}</p>
+        </div>
+        <div class="admin-promotions__header-actions">
+            <a mat-stroked-button routerLink="new-bulk">
+                <mat-icon>playlist_add</mat-icon>
+                Bulk add
+            </a>
+            <a mat-flat-button routerLink="new">
+                <mat-icon>add</mat-icon>
+                Add sale
+            </a>
+        </div>
+    </header>
+
+    @if (!isLoading() && promotions().length === 0) {
+    <div class="admin-promotions__empty">
+        <mat-icon>percent</mat-icon>
+        <p>No sales yet. Add your first one to get started.</p>
+    </div>
+    } @else {
+    <div class="admin-promotions__grid">
+        @for (promotion of promotions(); track promotion.id) {
+        <div class="admin-promotions__card">
+            <div class="admin-promotions__discount">{{ promotion.discountPercentage }}%</div>
+
+            <div class="admin-promotions__body">
+                <p class="admin-promotions__name">
+                    {{ promotion.name }}
+                    @if (!promotion.isActive) {
+                    <span class="admin-promotions__flag admin-promotions__flag--inactive">Inactive</span>
+                    } @else if (isExpired(promotion)) {
+                    <span class="admin-promotions__flag admin-promotions__flag--expired">Expired</span>
+                    }
+                </p>
+                <p class="admin-promotions__meta">
+                    @if (promotion.productId) {
+                    <span class="admin-promotions__scope-chip">Product</span>
+                    {{ promotion.productName }}
+                    } @else {
+                    <span class="admin-promotions__scope-chip">Brand</span>
+                    {{ promotion.brandName }}
+                    }
+                </p>
+                <p class="admin-promotions__schedule">
+                    @if (promotion.startsAtUtc) {
+                    From {{ promotion.startsAtUtc | date:'mediumDate' }}
+                    }
+                    @if (promotion.endsAtUtc) {
+                    Until {{ promotion.endsAtUtc | date:'mediumDate' }}
+                    } @else {
+                    No end date
+                    }
+                </p>
+            </div>
+
+            <div class="admin-promotions__actions">
+                <a mat-icon-button [routerLink]="[promotion.id, 'edit']" aria-label="Edit promotion">
+                    <mat-icon>edit</mat-icon>
+                </a>
+                <button mat-icon-button class="admin-promotions__delete" type="button"
+                    (click)="deletePromotion(promotion)" aria-label="Delete promotion">
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

@@ -10,4 +10,6 @@ public sealed record ProductResponse(
     string? Image,
     ProductCategoryResponse? Category,
     ProductSubcategoryResponse? Subcategory,
+    decimal? DiscountPercentage,
+    DateTime? SaleEndsAtUtc,
     IReadOnlyList<ProductColorResponse>? Colors);

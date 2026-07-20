@@ -189,12 +189,46 @@
     margin-top: 1.5rem;
 }
 
+.pd__price-group {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .pd__price {
     /* the price is the only heavy element on the page */
     font-size: 1.875rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--brand);
+}
+
+.pd__price--sale {
+    color: var(--color-primary);
+}
+
+.pd__price-original {
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+.pd__discount-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.pd__sale-ends {
+    margin: 0.375rem 0 0;
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .pd__rating {

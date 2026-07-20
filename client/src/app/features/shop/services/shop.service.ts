@@ -31,7 +31,7 @@ export class ShopService {
                 break;
 
             case ShopSection.Sale:
-                // TODO
+                query.onSale = true;
                 break;
         }
 

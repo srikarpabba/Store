@@ -32,6 +32,27 @@ internal sealed class GetProductQueryHandler(IApplicationDbContext context, Prod
                     product.BrandId,
                     product.Brand.Name),
                 product.Rating,
+                // Raw inline LINQ rather than a shared extension method here —
+                // EF Core can't translate a custom IQueryable extension call
+                // made from this deep inside a nested Select projection.
+                context.Promotions
+                    .Where(promo => promo.IsActive
+                        && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                        && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                        && (promo.ProductId == product.Id || promo.BrandId == product.BrandId))
+                    .OrderByDescending(promo => promo.DiscountPercentage)
+                    .ThenBy(promo => promo.Id)
+                    .Select(promo => (decimal?)promo.DiscountPercentage)
+                    .FirstOrDefault(),
+                context.Promotions
+                    .Where(promo => promo.IsActive
+                        && (promo.StartsAtUtc == null || promo.StartsAtUtc <= DateTime.UtcNow)
+                        && (promo.EndsAtUtc == null || promo.EndsAtUtc >= DateTime.UtcNow)
+                        && (promo.ProductId == product.Id || promo.BrandId == product.BrandId))
+                    .OrderByDescending(promo => promo.DiscountPercentage)
+                    .ThenBy(promo => promo.Id)
+                    .Select(promo => promo.EndsAtUtc)
+                    .FirstOrDefault(),
 
                 product.ProductColors
                     .Select(color => new ProductColorDto(

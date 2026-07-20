@@ -8,6 +8,8 @@ internal sealed record ProductDetailsDto(
     SubcategoryDto? Subcategory,
     BrandDto Brand,
     decimal Rating,
+    decimal? DiscountPercentage,
+    DateTime? SaleEndsAtUtc,
     IReadOnlyList<ProductColorDto> Colors,
     IReadOnlyList<GenderDto> Genders,
     IReadOnlyList<ProductVariantDto> Variants);

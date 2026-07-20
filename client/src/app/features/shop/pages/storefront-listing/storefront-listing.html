@@ -1,6 +1,6 @@
 <div class="max-w-328 mx-auto px-4 pt-6 pb-16">
 
-    @if (category(); as resolvedCategory) {
+    @if (target(); as resolvedTarget) {
     <div class="flex flex-col gap-8 md:flex-row">
 
         <aside class="w-full md:w-56 shrink-0">
@@ -28,7 +28,7 @@
             </section>
             }
 
-            @if (filters()?.brands?.length) {
+            @if (resolvedTarget.kind === 'category' && filters()?.brands?.length) {
             <section class="mb-8">
                 <h2 class="text-sm font-bold uppercase tracking-wide mb-3">Brand</h2>
                 <input type="text" placeholder="Search for Brand"

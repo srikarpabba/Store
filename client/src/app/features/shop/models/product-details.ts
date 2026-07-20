@@ -32,6 +32,10 @@ export interface ProductDetails {
     subcategory: Lookup | null;
     brand: Lookup;
     rating: number;
+    /** Percentage off, from whichever active promotion applies (its own or
+        its brand's) — null when the product isn't currently on sale. */
+    discountPercentage: number | null;
+    saleEndsAtUtc: string | null;
     colors: ProductColorDetails[];
     genders: Lookup[];
     variants: ProductVariantDetails[];

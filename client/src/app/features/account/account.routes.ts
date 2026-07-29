@@ -3,6 +3,7 @@ import { AuthPage } from './pages/auth-page/auth-page';
 import { ChangePassword } from './pages/change-password/change-password';
 import { ConfirmEmail } from './pages/confirm-email/confirm-email';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Wishlist } from './pages/wishlist/wishlist';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
@@ -20,6 +21,12 @@ export const ACCOUNT_ROUTES: Routes = [
     canActivate: [roleGuard('Customer')],
     canDeactivate: [pendingChangesGuard],
     title: 'My Account | Store'
+  },
+  {
+    path: 'wishlist',
+    component: Wishlist,
+    canActivate: [roleGuard('Customer')],
+    title: 'My Wishlist | Store'
   },
   {
     path: 'forgot-password',

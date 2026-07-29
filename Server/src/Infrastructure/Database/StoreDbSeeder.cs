@@ -86,7 +86,7 @@ public static class StoreDbSeeder
 
     private static async Task SeedRolePermissionsAsync(RoleManager<AppRole> roleManager, ApplicationDbContext context)
     {
-        AppRole? adminRole = await roleManager.FindByNameAsync(Roles.Admin);
+        AppRole? adminRole = await roleManager.FindByNameAsync(Infrastructure.Authorization.Roles.Admin);
 
         if (adminRole is null)
         {

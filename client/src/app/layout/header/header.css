@@ -427,6 +427,11 @@ a.account-menu__item {
     background: var(--color-border);
 }
 
+.header__wish-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
 /* ---------- Angular Material overrides ---------- */
 ::ng-deep .mat-mdc-icon-button {
     --mdc-icon-button-state-layer-size: 40px;
@@ -435,6 +440,13 @@ a.account-menu__item {
 ::ng-deep .mat-badge-content {
     font-size: 10px;
     font-weight: 600;
-    right: -4px;
-    top: -2px;
+}
+
+/* Pulls the badge further onto the icon's corner. Material's own rule is
+   `.mat-badge-medium.mat-badge-overlap .mat-badge-content { margin: var(--mat-badge-container-overlap-offset, -12px); }`
+   — that 2-class selector beats a plain `.mat-badge-content` override on
+   specificity alone, so the fix goes through the CSS variable Material
+   already reads instead of fighting it directly. */
+:host {
+    --mat-badge-container-overlap-offset: -15px;
 }

@@ -100,6 +100,12 @@
     box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-ink);
 }
 
+.card__wish-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
 .card__wish {
     display: inline-flex;
     align-items: center;

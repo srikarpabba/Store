@@ -12,6 +12,7 @@ public interface IApplicationDbContext
     DbSet<Banner> Banners { get; }
     DbSet<Promotion> Promotions { get; }
     DbSet<Address> Addresses { get; }
+    DbSet<WishlistItem> WishlistItems { get; }
     DbSet<Product> Products { get; }
     DbSet<Category> Categories { get; }
     DbSet<Brand> Brands { get; }

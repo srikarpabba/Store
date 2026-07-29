@@ -49,8 +49,8 @@
     }
 
     <mat-checkbox class="auth-form__terms" formControlName="acceptTerms">
-        I agree to the <a href="#" (click)="$event.preventDefault()">Terms &amp; Conditions</a>
-        and <a href="#" (click)="$event.preventDefault()">Privacy Policy</a>
+        I agree to the <a routerLink="/terms-and-conditions" target="_blank">Terms &amp; Conditions</a>
+        and <a routerLink="/privacy-policy" target="_blank">Privacy Policy</a>
     </mat-checkbox>
 
     <button mat-flat-button class="auth-form__submit" type="submit"

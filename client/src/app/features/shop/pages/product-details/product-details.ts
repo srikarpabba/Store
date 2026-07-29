@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -8,9 +8,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { combineLatest, map, switchMap } from 'rxjs';
 import { ProductColorDetails, ProductDetails as ProductDetailsModel, ProductVariantDetails } from '../../models/product-details';
 import { ProductService } from '../../services/product.service';
+import { WishlistService } from '../../services/wishlist.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
 import { Drawer } from '../../../../shared/ui/drawer/drawer';
+import { HeartBurst } from '../../../../shared/ui/heart-burst/heart-burst';
 import { applyDiscount } from '../../../../shared/utils/discount';
 
 interface SizeOption {
@@ -28,7 +31,8 @@ interface SizeOption {
     MatButtonModule,
     MatIconModule,
     PricePipe,
-    Drawer
+    Drawer,
+    HeartBurst
   ],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css',
@@ -39,6 +43,8 @@ export class ProductDetails {
 
   private readonly route = inject(ActivatedRoute);
   private readonly productService = inject(ProductService);
+  private readonly wishlistService = inject(WishlistService);
+  private readonly authService = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
   private readonly title = inject(Title);
 
@@ -118,7 +124,39 @@ export class ProductDetails {
   readonly canAddToCart = computed(() =>
     (this.selectedVariant()?.quantityInStock ?? 0) > 0);
 
+  readonly isWishlisted = computed(() => {
+    const product = this.product();
+    return product !== null && this.wishlistService.isWishlisted(product.id);
+  });
+
+  /** Wishlisting is Customer-only server-side — shown for guests too
+      (clicking it prompts sign-in), hidden only for a signed-in
+      Admin/Manager who'd otherwise hit a dead-end 403. */
+  readonly showWishlist = computed(() =>
+    !this.authService.isAuthenticated() || this.authService.isCustomer());
+
+  /** Pulses true just after the heart is filled (not on removal, and not
+      for a product that was already wishlisted on load) — drives the
+      confetti burst. */
+  readonly justWishlisted = signal(false);
+
+  private hasWishlistStateSettled = false;
+
   constructor() {
+    // Fires the burst only on a true false->true transition — the first
+    // time this runs just establishes the starting state without
+    // celebrating anything.
+    effect(() => {
+      const isWishlisted = this.isWishlisted();
+
+      if (this.hasWishlistStateSettled && isWishlisted) {
+        this.justWishlisted.set(true);
+        setTimeout(() => this.justWishlisted.set(false), 600);
+      }
+
+      this.hasWishlistStateSettled = true;
+    });
+
     // combineLatest (not just paramMap) so a color picked on the shop grid
     // for a product the shopper is already viewing (same :id, only the
     // ?color= query param differs) is still picked up — paramMap alone only
@@ -131,6 +169,9 @@ export class ProductDetails {
         this.productService.getProduct(params.get('id') ?? '').pipe(
           map(product => ({ product, colorParam: queryParams.get('color') }))))
     ).subscribe(({ product, colorParam }) => {
+      // A new product is loading (this component instance is reused across
+      // :id navigations) — its starting wishlist state shouldn't celebrate.
+      this.hasWishlistStateSettled = false;
       this.product.set(product);
       this.title.setTitle(`${product.name} | Store`);
 
@@ -187,7 +228,11 @@ export class ProductDetails {
   }
 
   addToWishlist(): void {
-    this.notificationService.info('Wishlist is coming soon.');
+    const product = this.product();
+
+    if (product) {
+      this.wishlistService.toggle(product.id);
+    }
   }
 
   checkDelivery(): void {

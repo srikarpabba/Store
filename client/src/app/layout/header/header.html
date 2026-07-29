@@ -88,10 +88,6 @@
                         <span>Track Orders</span>
                     </button>
                     <button class="account-menu__item" type="button" (click)="closeAccountMenu()">
-                        <mat-icon>favorite_border</mat-icon>
-                        <span>Wishlist</span>
-                    </button>
-                    <button class="account-menu__item" type="button" (click)="closeAccountMenu()">
                         <mat-icon>support_agent</mat-icon>
                         <span>Contact Us</span>
                     </button>
@@ -99,13 +95,17 @@
                 }
             </div>
 
-            <button mat-icon-button class="actions__desktop-only" aria-label="Wishlist"
-                [matBadge]="wishlistCount() || null" matBadgeColor="warn" matBadgeSize="small">
-                <mat-icon>favorite_border</mat-icon>
-            </button>
+            @if (!auth.isAuthenticated() || auth.isCustomer()) {
+            <span class="header__wish-wrap">
+                <a mat-icon-button class="actions__desktop-only" routerLink="/account/wishlist" aria-label="Wishlist"
+                    [matBadge]="wishlistCount() || null" matBadgeColor="warn">
+                    <mat-icon>favorite_border</mat-icon>
+                </a>
+                <app-heart-burst [active]="justAddedToWishlist()" />
+            </span>
+            }
 
-            <button mat-icon-button aria-label="Cart" [matBadge]="cartCount() || null" matBadgeColor="accent"
-                matBadgeSize="small">
+            <button mat-icon-button aria-label="Cart" [matBadge]="cartCount() || null" matBadgeColor="accent">
                 <mat-icon>shopping_bag</mat-icon>
             </button>
         </div>

@@ -30,6 +30,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<WishlistItem> WishlistItems { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Brand> Brands { get; set; }

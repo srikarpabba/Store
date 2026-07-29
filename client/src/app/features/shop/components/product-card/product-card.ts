@@ -1,15 +1,18 @@
-import { Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Product } from '../../models/product';
 import { ProductColorDetails } from '../../models/product-details';
+import { WishlistService } from '../../services/wishlist.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
 import { applyDiscount } from '../../../../shared/utils/discount';
+import { HeartBurst } from '../../../../shared/ui/heart-burst/heart-burst';
 
 /** Grid card for the shop listing — color swap, hover-to-cycle photos, wishlist toggle. */
 @Component({
   selector: 'app-product-card',
-  imports: [RouterLink, MatIconModule, PricePipe],
+  imports: [RouterLink, MatIconModule, PricePipe, HeartBurst],
   templateUrl: './product-card.html',
   styleUrl: './product-card.css',
 })
@@ -18,6 +21,8 @@ export class ProductCard {
   private static readonly HOVER_INTERVAL_MS = 1200;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly wishlistService = inject(WishlistService);
+  private readonly authService = inject(AuthService);
 
   readonly product = input.required<Product>();
 
@@ -31,7 +36,20 @@ export class ProductCard {
 
   readonly isHovering = signal(false);
 
-  readonly wishlisted = signal(false);
+  readonly wishlisted = computed(() => this.wishlistService.isWishlisted(this.product().id));
+
+  /** Pulses true just after the heart is filled (not on removal, and not
+      for an item that was already wishlisted on load) — drives the
+      confetti burst. */
+  readonly justWishlisted = signal(false);
+
+  private hasWishlistStateSettled = false;
+
+  /** Wishlisting is Customer-only server-side — shown for guests too
+      (clicking it prompts sign-in), hidden only for a signed-in
+      Admin/Manager who'd otherwise hit a dead-end 403. */
+  readonly showWishlist = computed(() =>
+    !this.authService.isAuthenticated() || this.authService.isCustomer());
 
   private hoverIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -69,6 +87,21 @@ export class ProductCard {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.clearHoverInterval());
+
+    // Fires the burst only on a true false->true transition — the first
+    // time this runs just establishes the starting state (which may
+    // already be wishlisted, e.g. on the wishlist page itself) without
+    // celebrating anything.
+    effect(() => {
+      const isWishlisted = this.wishlisted();
+
+      if (this.hasWishlistStateSettled && isWishlisted) {
+        this.justWishlisted.set(true);
+        setTimeout(() => this.justWishlisted.set(false), 600);
+      }
+
+      this.hasWishlistStateSettled = true;
+    });
   }
 
   selectColor(colorId: string): void {
@@ -77,7 +110,7 @@ export class ProductCard {
   }
 
   toggleWishlist(): void {
-    this.wishlisted.update(value => !value);
+    this.wishlistService.toggle(this.product().id);
   }
 
   onMouseEnter(): void {

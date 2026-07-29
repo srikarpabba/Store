@@ -102,10 +102,16 @@
                 }
             </p>
 
-            <button class="pd__wishlist" type="button" (click)="addToWishlist()">
-                <mat-icon>favorite_border</mat-icon>
-                ADD TO WISHLIST
-            </button>
+            @if (showWishlist()) {
+            <span class="pd__wishlist-wrap">
+                <button class="pd__wishlist" type="button" [class.pd__wishlist--active]="isWishlisted()"
+                    (click)="addToWishlist()">
+                    <mat-icon>{{ isWishlisted() ? 'favorite' : 'favorite_border' }}</mat-icon>
+                    {{ isWishlisted() ? 'WISHLISTED' : 'ADD TO WISHLIST' }}
+                </button>
+                <app-heart-burst [active]="justWishlisted()" />
+            </span>
+            }
 
             <div class="pd__delivery">
                 <p class="pd__delivery-title">Delivery Details</p>

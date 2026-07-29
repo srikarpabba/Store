@@ -13,4 +13,5 @@ public static class Tags
     public const string Banners = "Banners";
     public const string Promotions = "Promotions";
     public const string Storefronts = "Storefronts";
+    public const string Wishlist = "Wishlist";
 }

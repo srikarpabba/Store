@@ -10,7 +10,9 @@ using API.Endpoints.Sizes;
 using API.Endpoints.Subcategories;
 using API.Endpoints.Storefronts;
 using API.Endpoints.Users;
+using API.Endpoints.Wishlist;
 using API.RateLimiting;
+using SharedKernel.Authorization;
 
 namespace API.Extensions;
 
@@ -221,7 +223,18 @@ public static class EndpointExtensions
 
     private static void MapWishlistEndpoints(this IEndpointRouteBuilder app)
     {
-        //TODO
+        RouteGroupBuilder endpoints = app.MapGroup("/wishlist")
+            .WithTags(Tags.Wishlist);
+
+        // Self-service, own-data endpoints — no granular permission needed
+        // (mirrors /users/me/addresses) — but shopping features are
+        // Customer-only, so Admin/Manager accounts are excluded even
+        // though they're authenticated.
+        endpoints.MapAuthorizedGroup()
+           .RequireAuthorization(policy => policy.RequireRole(Roles.Customer))
+           .MapEndpoint<GetMyWishlist>()
+           .MapEndpoint<AddToWishlist>()
+           .MapEndpoint<RemoveFromWishlist>();
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)

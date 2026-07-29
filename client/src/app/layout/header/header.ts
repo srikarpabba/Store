@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, ElementRef, signal, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -7,11 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { NAV_ITEMS } from '../../shared/constants/navigation';
 import { AuthService } from '../../core/auth/auth.service';
 import { LoadingService } from '../../core/services/loading.service';
-import { PricePipe } from '../../shared/pipes/price.pipe';
 import { Search } from '../../features/shop/components/search/search';
+import { WishlistService } from '../../features/shop/services/wishlist.service';
+import { NAV_ITEMS } from '../../shared/constants/navigation';
+import { PricePipe } from '../../shared/pipes/price.pipe';
+import { HeartBurst } from '../../shared/ui/heart-burst/heart-burst';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +29,7 @@ import { Search } from '../../features/shop/components/search/search';
     MatProgressBarModule,
     PricePipe,
     Search,
+    HeartBurst,
   ],
   templateUrl: './header.html',
   styleUrl: './header.css',
@@ -36,6 +39,8 @@ export class Header {
 
   /** Auth state driving the account menu */
   readonly auth = inject(AuthService);
+
+  private readonly wishlistService = inject(WishlistService);
 
   /** API activity driving the progress bar under the header */
   readonly loading = inject(LoadingService);
@@ -55,11 +60,32 @@ export class Header {
   /** True once the user has scrolled past the top — used for the shadow/border */
   readonly isScrolled = signal(false);
 
-  /** Replace with real state from a cart/wishlist service (signal, store, etc.) */
+  /** Replace with real state once cart exists */
   readonly cartCount = signal(2);
-  readonly wishlistCount = signal(3);
 
-  constructor(private readonly elementRef: ElementRef<HTMLElement>) { }
+  readonly wishlistCount = computed(() => this.wishlistService.items().length);
+
+  /** Pulses true just after the count rises (an add, not a remove) — drives
+      the header heart's confetti burst. Doesn't fire on initial load, even
+      if the wishlist already has items. */
+  readonly justAddedToWishlist = signal(false);
+
+  private previousWishlistCount = 0;
+  private hasWishlistCountSettled = false;
+
+  constructor(private readonly elementRef: ElementRef<HTMLElement>) {
+    effect(() => {
+      const count = this.wishlistCount();
+
+      if (this.hasWishlistCountSettled && count > this.previousWishlistCount) {
+        this.justAddedToWishlist.set(true);
+        setTimeout(() => this.justAddedToWishlist.set(false), 600);
+      }
+
+      this.previousWishlistCount = count;
+      this.hasWishlistCountSettled = true;
+    });
+  }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {

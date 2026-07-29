@@ -1,0 +1,64 @@
+.legal {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 4rem;
+}
+
+.legal__title {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+}
+
+.legal__updated {
+    margin: 0.5rem 0 2rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.legal__intro {
+    margin: 0 0 2rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.legal__section {
+    margin-top: 2rem;
+}
+
+.legal__section h2 {
+    margin: 0 0 0.625rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+}
+
+.legal__section p {
+    margin: 0 0 0.75rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.legal__section p:last-child {
+    margin-bottom: 0;
+}
+
+.legal__section ul {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.legal__section a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.legal__section a:hover {
+    text-decoration: underline;
+}

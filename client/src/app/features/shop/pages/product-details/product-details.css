@@ -288,6 +288,11 @@
     font-size: 0.8rem;
 }
 
+.pd__wishlist-wrap {
+    position: relative;
+    display: block;
+}
+
 .pd__wishlist {
     display: flex;
     align-items: center;
@@ -311,6 +316,15 @@
 .pd__wishlist:hover {
     background: var(--color-surface-alt);
     border-color: var(--color-primary);
+}
+
+.pd__wishlist--active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pd__wishlist--active mat-icon {
+    color: var(--color-primary);
 }
 
 .pd__wishlist mat-icon {

@@ -37,10 +37,15 @@
             }
         </div>
 
-        <button type="button" class="card__wish" [class.card__wish--active]="wishlisted()"
-            (click)="toggleWishlist()" aria-label="Toggle wishlist">
-            <mat-icon>{{ wishlisted() ? 'favorite' : 'favorite_border' }}</mat-icon>
-        </button>
+        @if (showWishlist()) {
+        <span class="card__wish-wrap">
+            <button type="button" class="card__wish" [class.card__wish--active]="wishlisted()"
+                (click)="toggleWishlist()" aria-label="Toggle wishlist">
+                <mat-icon>{{ wishlisted() ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+            <app-heart-burst [active]="justWishlisted()" />
+        </span>
+        }
     </div>
 
     <a class="card__info" [routerLink]="['/', section(), product().id]" [queryParams]="queryParams()">

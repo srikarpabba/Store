@@ -1,0 +1,8 @@
+@if (active()) {
+<span class="heart-burst" aria-hidden="true">
+    @for (dot of dots; track dot) {
+    <span class="heart-burst__dot" [class.heart-burst__dot--alt]="dot % 2 === 1"
+        [style.--heart-burst-angle]="angleFor(dot)"></span>
+    }
+</span>
+}

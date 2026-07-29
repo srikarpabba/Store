@@ -1,0 +1,25 @@
+<div class="wishlist">
+    <header class="wishlist__header">
+        <a mat-icon-button routerLink="/account/dashboard" aria-label="Back to account">
+            <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1>My Wishlist</h1>
+            <p>{{ products().length }} item{{ products().length === 1 ? '' : 's' }}</p>
+        </div>
+    </header>
+
+    @if (isLoaded() && products().length === 0) {
+    <div class="wishlist__empty">
+        <mat-icon>favorite_border</mat-icon>
+        <p>Nothing here yet. Tap the heart on a product to save it for later.</p>
+        <a mat-flat-button routerLink="/new">Browse products</a>
+    </div>
+    } @else {
+    <div class="wishlist__grid">
+        @for (product of products(); track product.id) {
+        <app-product-card [product]="product" [section]="section" />
+        }
+    </div>
+    }
+</div>
